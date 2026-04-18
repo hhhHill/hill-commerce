@@ -1,6 +1,6 @@
-# Ecommerce Learning System
+# hill-commerce
 
-Maven multi-module skeleton for the hill-commerce learning system.
+Maven 多模块单体项目骨架，服务于 `hill-commerce`。
 
 ## Modules
 

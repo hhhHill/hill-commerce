@@ -1,4 +1,6 @@
 package com.hillcommerce.cart.domain;
 
-public record Cart(Long userId, int itemCount) {
+import java.util.List;
+
+public record Cart(Long userId, List<CartItem> items) {
 }

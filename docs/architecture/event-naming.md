@@ -1,5 +1,5 @@
-# Event Naming
+# 事件命名规范
 
-- use uppercase event codes such as `USER_REGISTERED`
-- keep event names domain-oriented, not technical
-- event payloads belong to the publishing module boundary
+- 事件编码统一使用大写风格，例如 `USER_REGISTERED`
+- 事件名称应体现业务语义，而不是技术实现细节
+- 事件载荷归属于发布该事件的模块边界

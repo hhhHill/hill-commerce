@@ -1,21 +1,13 @@
 package com.hillcommerce.backend;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(
-        scanBasePackages = "com.hillcommerce",
-        exclude = {
-                DataSourceAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class,
-                RedisAutoConfiguration.class,
-                RedisRepositoriesAutoConfiguration.class
-        }
-)
+@SpringBootApplication(scanBasePackages = "com.hillcommerce")
+@EntityScan(basePackages = "com.hillcommerce")
+@EnableJpaRepositories(basePackages = "com.hillcommerce")
 public class BackendApiApplication {
 
     public static void main(String[] args) {

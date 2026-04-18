@@ -1,5 +1,5 @@
-# Database Migration
+# 数据库迁移规范
 
-- manage schema changes through Flyway
-- add one migration file per incremental schema change
-- do not edit applied migration files in place
+- 所有结构变更统一通过 Flyway 管理
+- 每次增量结构变更都新增独立迁移脚本
+- 已执行过的迁移脚本不得直接原地修改

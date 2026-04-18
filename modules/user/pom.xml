@@ -9,4 +9,12 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>user</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hillcommerce</groupId>
+            <artifactId>common-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

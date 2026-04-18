@@ -9,4 +9,21 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>common-security</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hillcommerce</groupId>
+            <artifactId>common-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

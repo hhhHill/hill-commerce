@@ -9,4 +9,16 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>common-web</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hillcommerce</groupId>
+            <artifactId>common-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
 </project>

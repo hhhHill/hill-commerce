@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: backend-api
+  datasource:
+    url: jdbc:mysql://localhost:3306/hill_commerce
+    username: root
+    password: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  flyway:
+    enabled: false
+
+server:
+  port: 8080

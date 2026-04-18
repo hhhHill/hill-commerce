@@ -8,20 +8,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>apps/backend-api</module>
-        <module>platforms/common-core</module>
-        <module>platforms/common-web</module>
-        <module>platforms/common-security</module>
-        <module>platforms/common-mysql</module>
-        <module>platforms/common-redis</module>
-        <module>platforms/common-event</module>
-        <module>platforms/common-test</module>
-        <module>modules/user</module>
-        <module>modules/auth</module>
-        <module>modules/product</module>
-        <module>modules/cart</module>
-        <module>modules/order</module>
-        <module>modules/analytics</module>
-        <module>modules/recommendation</module>
+        <module>apps</module>
+        <module>platforms</module>
+        <module>modules</module>
     </modules>
 </project>

@@ -4,9 +4,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.hillcommerce</groupId>
-        <artifactId>platforms</artifactId>
+        <artifactId>ecommerce-learning-system</artifactId>
         <version>0.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>common-security</artifactId>
+    <artifactId>modules</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>user</module>
+        <module>auth</module>
+        <module>product</module>
+        <module>cart</module>
+        <module>order</module>
+        <module>analytics</module>
+        <module>recommendation</module>
+    </modules>
 </project>

@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hillcommerce</groupId>
+    <artifactId>ecommerce-learning-system</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>apps/backend-api</module>
+        <module>platforms/common-core</module>
+        <module>platforms/common-web</module>
+        <module>platforms/common-security</module>
+        <module>platforms/common-mysql</module>
+        <module>platforms/common-redis</module>
+        <module>platforms/common-event</module>
+        <module>platforms/common-test</module>
+        <module>modules/user</module>
+        <module>modules/auth</module>
+        <module>modules/product</module>
+        <module>modules/cart</module>
+        <module>modules/order</module>
+        <module>modules/analytics</module>
+        <module>modules/recommendation</module>
+    </modules>
+</project>

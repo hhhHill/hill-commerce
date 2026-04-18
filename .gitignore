@@ -5,3 +5,4 @@ node_modules/
 dist/
 build/
 .DS_Store
+# Task 1 scaffold keeps the repository ignore rules under versioned control.

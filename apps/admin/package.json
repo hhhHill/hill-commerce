@@ -1,0 +1,8 @@
+{
+  "name": "@hillcommerce/admin",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "echo admin app placeholder"
+  }
+}

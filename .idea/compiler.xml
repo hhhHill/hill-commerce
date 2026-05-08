@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="mall4cloud-common-database" />
+        <module name="mall4cloud-leaf" />
+        <module name="mall4cloud-api-platform" />
+        <module name="mall4cloud-api-user" />
+        <module name="mall4cloud-api-product" />
+        <module name="mall4cloud-common-order" />
+        <module name="mall4cloud-gateway" />
+        <module name="mall4cloud-platform" />
+        <module name="mall4cloud-api-order" />
+        <module name="mall4cloud-api-rbac" />
+        <module name="mall4cloud-common-core" />
+        <module name="mall4cloud-user" />
+        <module name="mall4cloud-rbac" />
+        <module name="mall4cloud-product" />
+        <module name="mall4cloud-common-cache" />
+        <module name="mall4cloud-api-search" />
+        <module name="mall4cloud-multishop" />
+        <module name="mall4cloud-api-leaf" />
+        <module name="mall4cloud-api-biz" />
+        <module name="mall4cloud-payment" />
+        <module name="mall4cloud-search" />
+        <module name="mall4cloud-api-multishop" />
+        <module name="mall4cloud-biz" />
+        <module name="mall4cloud-order" />
+        <module name="mall4cloud-auth" />
+        <module name="mall4cloud-api-auth" />
+        <module name="mall4cloud-common-rocketmq" />
+        <module name="mall4cloud-common-security" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="mall4cloud" options="-parameters" />
+      <module name="mall4cloud-api" options="-parameters" />
+      <module name="mall4cloud-api-auth" options="-parameters" />
+      <module name="mall4cloud-api-biz" options="-parameters" />
+      <module name="mall4cloud-api-leaf" options="-parameters" />
+      <module name="mall4cloud-api-multishop" options="-parameters" />
+      <module name="mall4cloud-api-order" options="-parameters" />
+      <module name="mall4cloud-api-platform" options="-parameters" />
+      <module name="mall4cloud-api-product" options="-parameters" />
+      <module name="mall4cloud-api-rbac" options="-parameters" />
+      <module name="mall4cloud-api-search" options="-parameters" />
+      <module name="mall4cloud-api-user" options="-parameters" />
+      <module name="mall4cloud-auth" options="-parameters" />
+      <module name="mall4cloud-biz" options="-parameters" />
+      <module name="mall4cloud-common" options="-parameters" />
+      <module name="mall4cloud-common-cache" options="-parameters" />
+      <module name="mall4cloud-common-core" options="-parameters" />
+      <module name="mall4cloud-common-database" options="-parameters" />
+      <module name="mall4cloud-common-order" options="-parameters" />
+      <module name="mall4cloud-common-rocketmq" options="-parameters" />
+      <module name="mall4cloud-common-security" options="-parameters" />
+      <module name="mall4cloud-gateway" options="-parameters" />
+      <module name="mall4cloud-leaf" options="-parameters" />
+      <module name="mall4cloud-multishop" options="-parameters" />
+      <module name="mall4cloud-order" options="-parameters" />
+      <module name="mall4cloud-payment" options="-parameters" />
+      <module name="mall4cloud-platform" options="-parameters" />
+      <module name="mall4cloud-product" options="-parameters" />
+      <module name="mall4cloud-rbac" options="-parameters" />
+      <module name="mall4cloud-search" options="-parameters" />
+      <module name="mall4cloud-user" options="-parameters" />
+    </option>
+  </component>
+</project>

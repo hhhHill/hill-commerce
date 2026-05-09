@@ -3,15 +3,16 @@ import { NextResponse } from "next/server";
 import { getBackendBaseUrl } from "@/lib/config";
 
 type ProxyOptions = {
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "PUT" | "DELETE";
   pathname: string;
+  search?: string;
   cookieHeader?: string | null;
   body?: unknown;
   clearSessionCookie?: boolean;
 };
 
-export async function proxyAuthRequest(options: ProxyOptions): Promise<NextResponse> {
-  const backendResponse = await fetch(`${getBackendBaseUrl()}${options.pathname}`, {
+export async function proxyBackendRequest(options: ProxyOptions): Promise<NextResponse> {
+  const backendResponse = await fetch(`${getBackendBaseUrl()}${options.pathname}${options.search ?? ""}`, {
     method: options.method,
     headers: buildHeaders(options.cookieHeader, options.body),
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
@@ -42,6 +43,10 @@ export async function proxyAuthRequest(options: ProxyOptions): Promise<NextRespo
   }
 
   return response;
+}
+
+export async function proxyAuthRequest(options: ProxyOptions): Promise<NextResponse> {
+  return proxyBackendRequest(options);
 }
 
 function buildHeaders(cookieHeader?: string | null, body?: unknown): HeadersInit {

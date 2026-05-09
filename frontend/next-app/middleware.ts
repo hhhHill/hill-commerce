@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const AUTH_PAGES = new Set(["/login", "/register"]);
-const PROTECTED_PAGES = new Set(["/account", "/admin"]);
 
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const hasSessionCookie = Boolean(request.cookies.get("JSESSIONID")?.value);
 
-  if (PROTECTED_PAGES.has(pathname) && !hasSessionCookie) {
+  if (isProtectedPath(pathname) && !hasSessionCookie) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", `${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
@@ -21,6 +20,10 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+function isProtectedPath(pathname: string): boolean {
+  return pathname === "/account" || pathname === "/admin" || pathname.startsWith("/admin/");
+}
+
 export const config = {
-  matcher: ["/login", "/register", "/account", "/admin"]
+  matcher: ["/login", "/register", "/account", "/admin/:path*"]
 };

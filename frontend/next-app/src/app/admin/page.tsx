@@ -1,36 +1,37 @@
 import Link from "next/link";
 
+import { AdminShell } from "@/features/admin/catalog/admin-shell";
 import { requireRole } from "@/lib/auth/server";
 
 export default async function AdminPage() {
   const user = await requireRole(["ADMIN", "SALES"], "/admin");
 
   return (
-    <main className="min-h-screen px-6 py-12">
-      <section className="mx-auto flex max-w-4xl flex-col gap-6 rounded-[32px] border border-black/10 bg-[var(--surface)] p-10 shadow-[0_20px_60px_rgba(74,42,18,0.08)]">
-        <span className="w-fit rounded-full bg-[var(--accent-strong)] px-4 py-1 text-sm font-semibold text-white">
-          Admin Boundary
-        </span>
-        <div className="space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight">后台受保护页</h1>
-          <p className="text-base leading-7 text-black/70">
-            这个页面只允许 `ADMIN` 或 `SALES` 角色进入，用于任务三的后台权限边界验收。
+    <AdminShell
+      description="这里汇总 task 4 的后台商品管理入口。Sales 和 Admin 可以从这里进入分类与商品管理。"
+      title="后台总览"
+      user={user}
+    >
+      <section className="grid gap-6 lg:grid-cols-2">
+        <Link
+          className="rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_16px_40px_rgba(29,20,13,0.06)] transition hover:-translate-y-0.5"
+          href="/admin/categories"
+        >
+          <p className="text-sm uppercase tracking-[0.18em] text-black/45">Category</p>
+          <h2 className="mt-3 text-2xl font-semibold">分类管理</h2>
+          <p className="mt-3 text-sm leading-6 text-black/65">维护一级分类、排序和启停状态，为商品管理提供稳定的分类基础。</p>
+        </Link>
+        <Link
+          className="rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_16px_40px_rgba(29,20,13,0.06)] transition hover:-translate-y-0.5"
+          href="/admin/products"
+        >
+          <p className="text-sm uppercase tracking-[0.18em] text-black/45">Product</p>
+          <h2 className="mt-3 text-2xl font-semibold">商品管理</h2>
+          <p className="mt-3 text-sm leading-6 text-black/65">
+            通过一个聚合编辑页维护 SPU、展示属性、销售属性、图片 URL、描述和 SKU。
           </p>
-        </div>
-        <dl className="grid gap-4 rounded-[24px] bg-white/80 p-6 md:grid-cols-2">
-          <div>
-            <dt className="text-sm text-black/55">当前用户</dt>
-            <dd className="mt-1 font-semibold">{user.nickname}</dd>
-          </div>
-          <div>
-            <dt className="text-sm text-black/55">角色</dt>
-            <dd className="mt-1 font-semibold">{user.roles.join(", ")}</dd>
-          </div>
-        </dl>
-        <Link className="w-fit rounded-full border border-black/10 px-5 py-2 font-medium" href="/">
-          返回首页
         </Link>
       </section>
-    </main>
+    </AdminShell>
   );
 }

@@ -978,6 +978,54 @@ hill-commerce
 - `PUT /api/admin/skus/{skuId}`
 - `PUT /api/admin/skus/{skuId}/status`
 
+任务 4 的后台商品管理实现约束：
+- 只支持一级分类；分类字段至少包含 `name`、`sortOrder`、`status`。
+- 分类状态仅允许 `ENABLED` 与 `DISABLED`。
+- 商品管理采用 SPU 聚合保存模型；商品编辑页一次提交基础信息、图片、展示属性、销售属性与 SKU。
+- 图片能力先采用 URL 录入，不实现上传系统。
+- 商品描述先保存为富文本源字符串或 HTML 源字符串，不引入编辑器依赖。
+- 销售属性最多允许 2 组；每组内属性值不可重复。
+- SKU 必须从销售属性组合派生，组合键必须唯一。
+- SKU 编码允许手工填写；若为空则由后端自动生成。
+- 商品删除采用逻辑删除，不做物理删除。
+
+分类管理规则：
+- 分类名称必填且唯一。
+- 分类排序必须为非负整数。
+- 分类列表默认按 `sortOrder` 升序、`id` 升序展示。
+- 禁用分类后不可用于新建商品，但历史商品详情仍可查看。
+
+商品与 SKU 管理规则：
+- 商品基础信息至少包括 `categoryId`、`name`、`spuCode`、`subtitle`、`coverImageUrl`、`description`、`status`。
+- 商品状态至少支持 `DRAFT`、`ON_SHELF`、`OFF_SHELF`。
+- `spuCode` 必填且唯一。
+- 展示属性采用键值对列表维护。
+- 详情图采用 URL 列表维护，并保留排序字段。
+- SKU 至少包含 `skuCode`、`price`、`stock`、`lowStockThreshold`、`status`。
+- `price`、`stock`、`lowStockThreshold` 必须是非负值。
+- 上架商品前至少必须拥有 1 个 SKU。
+- 逻辑删除商品后，后台默认列表不展示该商品。
+
+SKU 自动编码规则：
+- 若请求中的 SKU 未提供 `skuCode`，后端按 `SPU_CODE-001`、`SPU_CODE-002` 之类的顺序编码自动补全。
+- 若请求中的 SKU 提供了 `skuCode`，后端只做唯一性校验，不改写用户输入。
+- 编辑商品时，已有 SKU 保留原有编码；仅对新增且未填写编码的 SKU 自动补码。
+
+后台页面结构约束：
+- 必须提供 `/admin/categories` 分类管理页。
+- 必须提供 `/admin/products` 商品列表页。
+- 必须提供 `/admin/products/new` 商品新建页。
+- 必须提供 `/admin/products/[id]` 商品编辑页。
+- 商品编辑页按“基础信息 / 图片与描述 / 展示属性与销售属性 / SKU 列表”四个分区组织，但技术上仍为一次提交。
+
+任务 4 的验收映射：
+- Sales 可创建、编辑、停用、删除一级分类。
+- Sales 可创建商品并维护展示属性、销售属性、SKU、图片 URL 与描述。
+- 每个商品最多配置 2 个销售属性，并能生成唯一 SKU 组合。
+- 商品可执行上架、下架、逻辑删除。
+- SKU 的价格、库存、低库存阈值可独立维护。
+- Customer 不可访问后台商品管理接口与页面。
+
 ### 8.7 后台订单与发货
 - `GET /api/admin/orders`
 - `GET /api/admin/orders/{id}`

@@ -249,6 +249,32 @@
 - [ ] 实现 SKU 自动编码生成和允许手工改码
 - [ ] 实现每个 SKU 的低库存阈值配置
 
+**实现约束**
+- 仅支持一级分类，分类字段为名称、排序、状态。
+- 图片先采用 URL 录入；描述先采用文本/富文本源字符串存储。
+- 商品新建与编辑页按四个分区展示，但一次提交聚合保存。
+- 销售属性最多 2 组；SKU 由销售属性组合生成。
+- 逻辑删除后商品不出现在后台默认列表。
+- 后台商品管理只允许 `SALES` 与 `ADMIN` 访问。
+
+**执行步骤**
+- [ ] 补充任务四 spec 对分类、SPU、SKU、图片 URL、描述与状态流转的约束
+- [ ] 新增后端分类管理测试：覆盖分类新增、编辑、停用、删除与唯一性校验
+- [ ] 新增后端商品聚合测试：覆盖新建商品、编辑商品、SKU 自动补码、状态切换、逻辑删除、后台权限边界
+- [ ] 新建 `modules/product` 后端模型、DTO、Mapper、Service、Controller，承接分类 CRUD 与商品聚合保存
+- [ ] 实现分类接口 `GET/POST/PUT/DELETE /api/admin/categories`
+- [ ] 实现商品接口 `GET /api/admin/products`、`GET /api/admin/products/{id}`、`POST /api/admin/products`、`PUT /api/admin/products/{id}`、`PUT /api/admin/products/{id}/status`、`DELETE /api/admin/products/{id}`
+- [ ] 在商品聚合保存中处理展示属性、销售属性、销售属性值、详情图、SKU 的替换式写入
+- [ ] 实现 SKU 自动编码生成规则，并保证手工编码唯一性
+- [ ] 新增前端后台分类页 `/admin/categories`
+- [ ] 新增前端后台商品列表页 `/admin/products`
+- [ ] 新增前端后台商品新建页 `/admin/products/new`
+- [ ] 新增前端后台商品编辑页 `/admin/products/[id]`
+- [ ] 新增前端商品后台表单模块：基础信息、图片与描述、展示属性、销售属性、SKU 列表四个分区
+- [ ] 在前端实现销售属性变化后重建 SKU 草稿表格
+- [ ] 接入前端后台接口请求、错误提示、上下架动作与删除确认
+- [ ] 运行后端测试、前端 typecheck、前端 build，确认任务四验收路径成立
+
 **交付物**
 - 商品后台管理闭环
 - 商品数据模型与页面管理能力

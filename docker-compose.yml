@@ -26,6 +26,13 @@ services:
       - redis-data:/data
     command: ["redis-server", "--appendonly", "yes"]
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: hill-commerce-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   backend:
     profiles: ["app"]
     build:

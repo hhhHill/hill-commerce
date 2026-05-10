@@ -1,3 +1,13 @@
+> Deprecated canonical source
+>
+> This document has been migrated to:
+> - `specs/hill-commerce-mvp/spec.md`
+> - `specs/hill-commerce-mvp/plan.md`
+> - `specs/hill-commerce-mvp/tasks.md`
+>
+> Do not update this file as a source of truth.
+> It is preserved only for historical context.
+
 # hill-commerce MVP Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getBackendBaseUrl } from "@/lib/config";
+import { getProxyResponseBody } from "@/lib/auth/proxy-response";
 
 type ProxyOptions = {
   method: "GET" | "POST" | "PUT" | "DELETE";
@@ -21,7 +22,7 @@ export async function proxyBackendRequest(options: ProxyOptions): Promise<NextRe
   });
 
   const bodyText = await backendResponse.text();
-  const response = new NextResponse(bodyText, {
+  const response = new NextResponse(getProxyResponseBody(backendResponse.status, bodyText), {
     status: backendResponse.status,
     headers: {
       "content-type": backendResponse.headers.get("content-type") ?? "application/json"

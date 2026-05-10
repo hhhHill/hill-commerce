@@ -6,40 +6,46 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="mall4cloud-common-database" />
-        <module name="mall4cloud-leaf" />
-        <module name="mall4cloud-api-platform" />
-        <module name="mall4cloud-api-user" />
-        <module name="mall4cloud-api-product" />
-        <module name="mall4cloud-common-order" />
-        <module name="mall4cloud-gateway" />
-        <module name="mall4cloud-platform" />
-        <module name="mall4cloud-api-order" />
-        <module name="mall4cloud-api-rbac" />
-        <module name="mall4cloud-common-core" />
-        <module name="mall4cloud-user" />
-        <module name="mall4cloud-rbac" />
-        <module name="mall4cloud-product" />
-        <module name="mall4cloud-common-cache" />
-        <module name="mall4cloud-api-search" />
-        <module name="mall4cloud-multishop" />
-        <module name="mall4cloud-api-leaf" />
-        <module name="mall4cloud-api-biz" />
-        <module name="mall4cloud-payment" />
-        <module name="mall4cloud-search" />
-        <module name="mall4cloud-api-multishop" />
-        <module name="mall4cloud-biz" />
-        <module name="mall4cloud-order" />
-        <module name="mall4cloud-auth" />
-        <module name="mall4cloud-api-auth" />
-        <module name="mall4cloud-common-rocketmq" />
-        <module name="mall4cloud-common-security" />
+        <module name="hill-commerce-backend" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="mall4cloud-api" target="17" />
+      <module name="mall4cloud-api-auth" target="17" />
+      <module name="mall4cloud-api-biz" target="17" />
+      <module name="mall4cloud-api-leaf" target="17" />
+      <module name="mall4cloud-api-multishop" target="17" />
+      <module name="mall4cloud-api-order" target="17" />
+      <module name="mall4cloud-api-platform" target="17" />
+      <module name="mall4cloud-api-product" target="17" />
+      <module name="mall4cloud-api-rbac" target="17" />
+      <module name="mall4cloud-api-search" target="17" />
+      <module name="mall4cloud-api-user" target="17" />
+      <module name="mall4cloud-auth" target="17" />
+      <module name="mall4cloud-biz" target="17" />
+      <module name="mall4cloud-common" target="17" />
+      <module name="mall4cloud-common-cache" target="17" />
+      <module name="mall4cloud-common-core" target="17" />
+      <module name="mall4cloud-common-database" target="17" />
+      <module name="mall4cloud-common-order" target="17" />
+      <module name="mall4cloud-common-rocketmq" target="17" />
+      <module name="mall4cloud-common-security" target="17" />
+      <module name="mall4cloud-gateway" target="17" />
+      <module name="mall4cloud-leaf" target="17" />
+      <module name="mall4cloud-multishop" target="17" />
+      <module name="mall4cloud-order" target="17" />
+      <module name="mall4cloud-payment" target="17" />
+      <module name="mall4cloud-platform" target="17" />
+      <module name="mall4cloud-product" target="17" />
+      <module name="mall4cloud-rbac" target="17" />
+      <module name="mall4cloud-search" target="17" />
+      <module name="mall4cloud-user" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="mall4cloud" options="-parameters" />
+      <module name="hill-commerce-backend" options="-parameters" />
+      <module name="mall4cloud" options="" />
       <module name="mall4cloud-api" options="-parameters" />
       <module name="mall4cloud-api-auth" options="-parameters" />
       <module name="mall4cloud-api-biz" options="-parameters" />

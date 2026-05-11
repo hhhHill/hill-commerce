@@ -41,6 +41,8 @@
 
 这个 baseline 承载当前商城 MVP 的项目目标、范围、角色、全局非目标、核心模块总览和跨模块约束。
 
+当前第一阶段只要求存在这一组 baseline 文档，不要求预先创建未来按需 feature 目录。
+
 ## Naming Rules
 
 - 只有当某个模块、子系统或功能复杂到需要独立规范生命周期时，才创建新的 `specs/<feature-name>/`
@@ -49,6 +51,7 @@
 - `spec.md`
 - `plan.md`
 - `tasks.md`
+- 目标目录树在第一阶段只展示必备目录，不展示未来按需 feature 目录
 
 ## Update Rules
 
@@ -57,6 +60,15 @@
 - `tasks.md` 定义当前可执行任务视图
 - `README.md` 只定义规范层入口、命名规则和阅读顺序
 - `migration-map.md` 只记录迁移映射、来源和 `needs-decision`
+
+## Lifecycle Visibility
+
+- `active` spec 可以定义当前产品行为
+- `deprecated` spec 仅保留迁移参考，不应继续新增行为规则
+- `superseded` spec 必须明确指向 replacement spec
+- `archived` spec 仅保留历史价值，不再定义当前行为
+- lifecycle 状态应在 spec 文件头部或对应 README 中可见
+- 若 lifecycle 记录与具体 active spec 冲突，以 active spec 为准
 
 ## Split Triggers
 

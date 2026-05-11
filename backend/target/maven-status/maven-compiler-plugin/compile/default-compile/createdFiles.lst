@@ -16,6 +16,7 @@ com\hillcommerce\modules\user\web\AuthController.class
 com\hillcommerce\framework\cache\NoopCacheService.class
 com\hillcommerce\modules\product\mapper\ProductSalesAttributeMapper.class
 com\hillcommerce\modules\user\mapper\RoleMapper.class
+com\hillcommerce\modules\user\security\SessionUserPrincipal.class
 com\hillcommerce\modules\product\web\ProductAdminController.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductResponse.class
 com\hillcommerce\modules\user\web\AuthDtos.class
@@ -51,6 +52,7 @@ com\hillcommerce\modules\product\mapper\ProductMapper.class
 com\hillcommerce\framework\security\SecurityConfig.class
 com\hillcommerce\framework\web\HealthController.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductImageRequest.class
+com\hillcommerce\modules\user\security\AuthenticatedUserPrincipal.class
 com\hillcommerce\modules\user\web\AuthDtos$RegisterRequest.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSalesAttributeValueResponse.class
 com\hillcommerce\modules\product\web\ProductCategoryAdminController.class

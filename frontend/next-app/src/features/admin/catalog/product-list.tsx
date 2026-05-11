@@ -7,6 +7,8 @@ import { useState, useTransition } from "react";
 import { deleteProduct, updateProductStatus } from "@/lib/admin/client";
 import type { Category, ProductStatus, ProductSummary } from "@/lib/admin/types";
 
+import { FieldLabel } from "./field-label";
+
 type ProductListProps = {
   products: ProductSummary[];
   categories: Category[];
@@ -61,34 +63,43 @@ export function ProductList({ products, categories, filters }: ProductListProps)
       <section className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <form className="grid gap-3 md:grid-cols-4">
-            <input
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-              defaultValue={filters.name ?? ""}
-              name="name"
-              placeholder="按商品名称搜索"
-            />
-            <select
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-              defaultValue={filters.categoryId ?? ""}
-              name="categoryId"
-            >
-              <option value="">全部分类</option>
-              {categories.map((category) => (
-                <option key={category.id} value={String(category.id)}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <select
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-              defaultValue={filters.status ?? ""}
-              name="status"
-            >
-              <option value="">全部状态</option>
-              <option value="DRAFT">草稿</option>
-              <option value="ON_SHELF">已上架</option>
-              <option value="OFF_SHELF">已下架</option>
-            </select>
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              <FieldLabel field="keyword" page="productList">关键词</FieldLabel>
+              <input
+                className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                defaultValue={filters.name ?? ""}
+                name="name"
+                placeholder="按商品名称或 SPU 编码搜索"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              <FieldLabel field="categoryId" page="productList">分类</FieldLabel>
+              <select
+                className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                defaultValue={filters.categoryId ?? ""}
+                name="categoryId"
+              >
+                <option value="">全部分类</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={String(category.id)}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium">
+              <FieldLabel field="status" page="productList">状态</FieldLabel>
+              <select
+                className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                defaultValue={filters.status ?? ""}
+                name="status"
+              >
+                <option value="">全部状态</option>
+                <option value="DRAFT">草稿</option>
+                <option value="ON_SHELF">已上架</option>
+                <option value="OFF_SHELF">已下架</option>
+              </select>
+            </label>
             <button className="rounded-2xl bg-[var(--accent)] px-5 py-3 font-semibold text-white" type="submit">
               过滤
             </button>

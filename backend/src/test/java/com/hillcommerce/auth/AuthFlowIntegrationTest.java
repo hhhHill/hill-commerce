@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,8 +64,17 @@ class AuthFlowIntegrationTest {
             join users u on u.id = ur.user_id
             where u.email like 'customer%@example.com'
                or u.email like 'sales%@example.com'
+               or u.email like 'bcrypt-admin%@example.com'
+               or u.email like 'legacy-admin%@example.com'
             """);
-        jdbcTemplate.update("delete from users where email like 'customer%@example.com' or email like 'sales%@example.com'");
+        jdbcTemplate.update(
+            """
+            delete from users
+            where email like 'customer%@example.com'
+               or email like 'sales%@example.com'
+               or email like 'bcrypt-admin%@example.com'
+               or email like 'legacy-admin%@example.com'
+            """);
     }
 
     @Test
@@ -103,17 +113,37 @@ class AuthFlowIntegrationTest {
     }
 
     @Test
-    void loginWithSeededAdminCreatesSessionAndReturnsCurrentUser() throws Exception {
+    void loginRejectsAdminWhenPasswordHashUsesLegacySha256() throws Exception {
+        seedLegacyAdminUser("legacy-admin@example.com", "Admin@123456");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "email": "legacy-admin@example.com",
+                      "password": "Admin@123456"
+                    }
+                    """))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.message").value("unauthorized"));
+    }
+
+    @Test
+    void loginWithBcryptAdminCreatesSessionAndReturnsCurrentUser() throws Exception {
+        seedAdminUser("bcrypt-admin@example.com", "Admin@123456");
+
+        assertLastLoginAt("bcrypt-admin@example.com", null);
+
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                      "email": "admin@hill-commerce.local",
+                      "email": "bcrypt-admin@example.com",
                       "password": "Admin@123456"
                     }
                     """))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email").value("admin@hill-commerce.local"))
+            .andExpect(jsonPath("$.email").value("bcrypt-admin@example.com"))
             .andExpect(jsonPath("$.roles[0]").value("ADMIN"))
             .andReturn();
 
@@ -122,12 +152,30 @@ class AuthFlowIntegrationTest {
 
         mockMvc.perform(get("/api/auth/me").session(session))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email").value("admin@hill-commerce.local"))
+            .andExpect(jsonPath("$.email").value("bcrypt-admin@example.com"))
             .andExpect(jsonPath("$.roles[0]").value("ADMIN"));
 
         mockMvc.perform(get("/api/admin/auth/ping").session(session))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("admin-access-granted"));
+
+        assertThat(queryLastLoginAt("bcrypt-admin@example.com")).isNotNull();
+    }
+
+    @Test
+    void sessionPrincipalDoesNotRetainPasswordHashAfterSuccessfulLogin() throws Exception {
+        seedAdminUser("bcrypt-admin2@example.com", "Admin@123456");
+
+        MockHttpSession session = login("bcrypt-admin2@example.com", "Admin@123456");
+
+        SecurityContext securityContext =
+            (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+
+        assertThat(securityContext).isNotNull();
+        assertThat(securityContext.getAuthentication()).isNotNull();
+        assertThat(securityContext.getAuthentication().getPrincipal()).isInstanceOfSatisfying(
+            com.hillcommerce.modules.user.security.SessionUserPrincipal.class,
+            principal -> assertThat(principal.getPassword()).isNull());
     }
 
     @Test
@@ -140,6 +188,8 @@ class AuthFlowIntegrationTest {
 
     @Test
     void loginFailsWithWrongPassword() throws Exception {
+        java.time.LocalDateTime beforeLogin = queryLastLoginAt("admin@hill-commerce.local");
+
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -150,6 +200,8 @@ class AuthFlowIntegrationTest {
                     """))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.message").value("unauthorized"));
+
+        assertLastLoginAt("admin@hill-commerce.local", beforeLogin);
     }
 
     @Test
@@ -219,5 +271,50 @@ class AuthFlowIntegrationTest {
             where u.email = ?
             """,
             email);
+    }
+
+    private void seedAdminUser(String email, String rawPassword) {
+        jdbcTemplate.update(
+            "insert into users (email, password_hash, nickname, status) values (?, ?, ?, 'ACTIVE')",
+            email,
+            passwordService.encode(rawPassword),
+            "admin-user");
+        jdbcTemplate.update(
+            """
+            insert into user_roles (user_id, role_id)
+            select u.id, r.id
+            from users u
+            join roles r on r.code = 'ADMIN'
+            where u.email = ?
+            """,
+            email);
+    }
+
+    private void seedLegacyAdminUser(String email, String rawPassword) {
+        jdbcTemplate.update(
+            "insert into users (email, password_hash, nickname, status) values (?, SHA2(?, 256), ?, 'ACTIVE')",
+            email,
+            rawPassword,
+            "legacy-admin-user");
+        jdbcTemplate.update(
+            """
+            insert into user_roles (user_id, role_id)
+            select u.id, r.id
+            from users u
+            join roles r on r.code = 'ADMIN'
+            where u.email = ?
+            """,
+            email);
+    }
+
+    private java.time.LocalDateTime queryLastLoginAt(String email) {
+        return jdbcTemplate.queryForObject(
+            "select last_login_at from users where email = ?",
+            java.time.LocalDateTime.class,
+            email);
+    }
+
+    private void assertLastLoginAt(String email, java.time.LocalDateTime expected) {
+        assertThat(queryLastLoginAt(email)).isEqualTo(expected);
     }
 }

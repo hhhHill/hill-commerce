@@ -320,6 +320,44 @@ class ProductAdminIntegrationTest {
         assertThat(activeCount).isZero();
     }
 
+    @Test
+    void salesCanCreateProductWhenSkuUsesEnabledStatus() throws Exception {
+        MockHttpSession salesSession = loginAsSales("task4-sku-status-sales@example.com", "Sales@123456");
+        Long categoryId = createCategory(salesSession, "Task4-Phones");
+
+        mockMvc.perform(post("/api/admin/products")
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "categoryId": %d,
+                      "name": "Task4 联名手机",
+                      "spuCode": "TASK4-PHONE",
+                      "subtitle": "联名测试机型",
+                      "coverImageUrl": "https://img.example.com/task4-phone-cover.jpg",
+                      "description": "<p>Task4 phone</p>",
+                      "status": "ON_SHELF",
+                      "detailImages": [],
+                      "attributes": [],
+                      "salesAttributes": [],
+                      "skus": [
+                        {
+                          "skuCode": "",
+                          "salesAttrValueKey": "default",
+                          "salesAttrValueText": "默认 SKU",
+                          "price": 1688.00,
+                          "stock": 20,
+                          "lowStockThreshold": 5,
+                          "status": "ENABLED"
+                        }
+                      ]
+                    }
+                    """.formatted(categoryId)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.status").value("ON_SHELF"))
+            .andExpect(jsonPath("$.skus[0].status").value("ENABLED"));
+    }
+
     private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
         seedSalesUser(email, rawPassword);
         return login(email, rawPassword);

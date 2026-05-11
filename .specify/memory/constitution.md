@@ -1,3 +1,21 @@
+<!--
+Sync Impact Report
+- Version change: 1.0.0 -> 1.1.0
+- Modified principles:
+  - V. Scaled Workflow -> V. Scaled Spec Governance
+- Added sections:
+  - V. Spec Lifecycle
+- Removed sections:
+  - Workflow Rules
+- Templates requiring updates:
+  - ✅ .specify/templates/plan-template.md
+  - ✅ .specify/templates/spec-template.md
+  - ✅ .specify/templates/tasks-template.md
+  - ✅ AGENTS.md
+  - ✅ specs/README.md
+- Follow-up TODOs:
+  - None
+-->
 # hill-commerce Constitution
 
 ## Core Principles
@@ -15,6 +33,8 @@
 6. `specs/migration-map.md`
 
 `docs/superpowers/` 下的 prompts、workflows、commands、checklists 属于执行辅助文档，不定义产品事实。
+
+改变产品行为、架构边界、数据契约或高风险业务逻辑的工作，必须能够追溯到 canonical specification system。
 
 ### II. No Dual Truth
 不得在 `specs/*` 之外维护另一套长期有效的产品或架构真相。
@@ -50,8 +70,8 @@
 5. 由人工决定是更新 spec、修正代码，还是保留为已知差异
 6. 在决策完成前，不把冲突内容写死进 canonical spec
 
-### V. Scaled Workflow
-规范工作流采用分级策略，而不是把所有改动都升级为独立 spec。
+### V. Scaled Spec Governance
+规范治理采用分级策略，而不是把所有改动都升级为独立 spec。
 
 必须先有 spec 的变更：
 
@@ -80,6 +100,23 @@
 - 引入新的产品规则
 - 覆盖或绕过 canonical spec
 
+### VI. Spec Lifecycle
+spec 生命周期必须显式可见，并在文件头部或对应 README 中标记状态。
+
+允许的生命周期状态：
+
+- `active`: 可定义当前产品行为、业务规则、架构边界与验收意图
+- `deprecated`: 仍可保留迁移参考价值，但不得继续新增行为规则
+- `superseded`: 已被新的 canonical spec 取代，且必须明确指向 replacement spec
+- `archived`: 仅保留历史价值，不再定义当前行为
+
+生命周期治理规则：
+
+- 若某个 spec 与 active spec 冲突，以 active spec 为准
+- `migration-map` 可以记录状态变更、替代关系和迁移来源，但不能替代 active spec 本身
+- 历史 superpowers spec / plan 迁移后默认不再视为 active spec
+- 生命周期状态必须有可读的替代关系说明，避免形成隐性双真相
+
 ## Project Constraints
 
 - 当前项目是前后端分离的商城 MVP，架构采用模块化单体
@@ -88,17 +125,11 @@
 - 金额、库存、权限、状态流转、外部回调相关变更默认视为高风险
 - 新规范优先落到 `specs/hill-commerce-mvp/`，只有满足拆分条件时才新建独立 feature 目录
 
-## Workflow Rules
-
-- AI agent 开工前必须先读取本文件与目标 feature 的 `spec.md`
-- 若任务跨多个 feature，必须标明 primary feature spec 与 secondary references
-- 新任务默认引用 `specs/*`，而不是 `docs/superpowers/specs/*` 或 `docs/superpowers/plans/*`
-- `README.md` 继续作为开发入口，不整体迁入 spec；仅允许抽取会影响架构或实现决策的约束
-- 完成任何声称“已完成”的规范迁移或行为性修改前，必须执行与该声明对应的验证
-
 ## Governance
 
 本文件高于仓库内其他流程说明、prompt 文档与历史 superpowers 规范文档。
+
+`AGENTS.md` 可以承载 agent / workflow 执行细则，但不得覆盖本文件中的治理原则与优先级。
 
 修订本文件时必须同时检查：
 
@@ -106,4 +137,10 @@
 - `specs/hill-commerce-mvp/*` 是否需要同步更新
 - `AGENTS.md` 是否仍指向正确的 canonical plan
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-11 | **Last Amended**: 2026-05-11
+治理修订要求：
+
+- 原则新增或治理范围实质扩展，按 MINOR 版本升级
+- 原则含义被重定义或出现不兼容变更，按 MAJOR 版本升级
+- 仅澄清措辞、不改变实际约束时，按 PATCH 版本升级
+
+**Version**: 1.1.0 | **Ratified**: 2026-05-11 | **Last Amended**: 2026-05-11

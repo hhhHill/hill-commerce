@@ -30,9 +30,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hillcommerce.modules.user.model.AuthUser;
-import com.hillcommerce.modules.user.security.AppUserPrincipal;
+import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 import com.hillcommerce.modules.user.service.UserAccountService;
 
+/**
+ * 认证 REST 控制器，暴露 /api/auth/* 端点。
+ *
+ * 登录流程手动管理 SecurityContext 而非依赖 Spring Security 的 AbstractAuthenticationProcessingFilter，
+ * 以便在同一个控制器方法中完成认证、日志记录和响应构建。
+ *
+ * 已知问题：login 中未调用 request.changeSessionId()，session fixation 防护不完整（见 review-notes）。
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -53,12 +61,18 @@ public class AuthController {
         this.securityContextRepository = securityContextRepository;
     }
 
+    /** 注册成功后返回 201 + 用户信息，前端自行跳转至登录页完成首次登录 */
     @PostMapping("/register")
     public ResponseEntity<AuthUserResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthUser authUser = userAccountService.register(request.email(), request.password(), request.nickname());
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(authUser));
     }
 
+    /**
+     * 登录：认证 → 手动构建 SecurityContext → 持久化到 HttpSession → 返回用户信息。
+     * 认证失败时记录 warn 日志（不记录明文密码），然后原样向上抛出 AuthenticationException，
+     * 由 SecurityConfig 的 jsonAuthenticationEntryPoint 返回 401 JSON。
+     */
     @PostMapping("/login")
     public AuthUserResponse login(
         @Valid @RequestBody LoginRequest request,
@@ -79,13 +93,15 @@ public class AuthController {
             throw exception;
         }
 
+        // 手动创建并持久化 SecurityContext——绕过 UsernamePasswordAuthenticationFilter 的默认流程
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
         securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
 
-        AppUserPrincipal principal = (AppUserPrincipal) authentication.getPrincipal();
+        AuthenticatedUserPrincipal principal = (AuthenticatedUserPrincipal) authentication.getPrincipal();
+        userAccountService.recordSuccessfulLogin(principal.id());
         log.info(
             "Login succeeded: email={}, userId={}, roles={}, remoteAddr={}",
             principal.email(),
@@ -96,14 +112,22 @@ public class AuthController {
         return toResponse(principal);
     }
 
+    /**
+     * 返回当前会话的已认证用户信息。
+     * authentication 参数由 Spring Security 从 SecurityContextHolder 自动注入。
+     */
     @GetMapping("/me")
     public AuthUserResponse me(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof AppUserPrincipal principal)) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
             throw new AuthenticationCredentialsNotFoundException("No authenticated user");
         }
         return toResponse(principal);
     }
 
+    /**
+     * 注销：销毁 HttpSession + 清理 SecurityContextHolder。
+     * 前端 logout 代理同步清除 JSESSIONID Cookie（set-cookie expires=0）。
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -118,10 +142,14 @@ public class AuthController {
         return new AuthUserResponse(authUser.email(), authUser.nickname(), authUser.roles());
     }
 
-    private AuthUserResponse toResponse(AppUserPrincipal principal) {
+    private AuthUserResponse toResponse(AuthenticatedUserPrincipal principal) {
         return new AuthUserResponse(principal.email(), principal.nickname(), principal.roles());
     }
 
+    /**
+     * 解析客户端真实 IP：优先取 X-Forwarded-For 最左侧地址（Nginx 代理场景），
+     * 回退到 request.getRemoteAddr()。
+     */
     private String resolveRemoteAddr(HttpServletRequest request) {
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
@@ -130,6 +158,9 @@ public class AuthController {
         return request.getRemoteAddr();
     }
 
+    /**
+     * 将 AuthenticationException 归类为安全的日志标签，避免异常类名或消息泄露内部细节。
+     */
     private String sanitizeReason(AuthenticationException exception) {
         if (exception instanceof BadCredentialsException) {
             return "bad-credentials";

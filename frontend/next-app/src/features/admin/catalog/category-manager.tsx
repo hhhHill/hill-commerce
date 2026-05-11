@@ -6,6 +6,8 @@ import { FormEvent, useState, useTransition } from "react";
 import { createCategory, deleteCategory, updateCategory } from "@/lib/admin/client";
 import type { Category, CategoryStatus } from "@/lib/admin/types";
 
+import { FieldLabel } from "./field-label";
+
 type CategoryManagerProps = {
   categories: Category[];
 };
@@ -108,7 +110,7 @@ export function CategoryManager({ categories }: CategoryManagerProps) {
         </div>
         <form className="mt-5 flex flex-col gap-4" onSubmit={handleCreate}>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            分类名称
+            <FieldLabel field="name" page="category">分类名称</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={createForm.name}
@@ -117,7 +119,7 @@ export function CategoryManager({ categories }: CategoryManagerProps) {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            排序
+            <FieldLabel field="sortOrder" page="category">排序</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               min="0"
@@ -128,7 +130,7 @@ export function CategoryManager({ categories }: CategoryManagerProps) {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            状态
+            <FieldLabel field="status" page="category">状态</FieldLabel>
             <select
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={createForm.status}

@@ -57,6 +57,8 @@ public class ProductAdminService {
     public static final String PRODUCT_STATUS_DRAFT = "DRAFT";
     public static final String PRODUCT_STATUS_ON_SHELF = "ON_SHELF";
     public static final String PRODUCT_STATUS_OFF_SHELF = "OFF_SHELF";
+    public static final String SKU_STATUS_ENABLED = "ENABLED";
+    public static final String SKU_STATUS_DISABLED = "DISABLED";
 
     private final ProductCategoryMapper productCategoryMapper;
     private final ProductMapper productMapper;
@@ -408,7 +410,7 @@ public class ProductAdminService {
             entity.setPrice(sku.price());
             entity.setStock(sku.stock());
             entity.setLowStockThreshold(sku.lowStockThreshold());
-            entity.setStatus(normalizeProductStatus(sku.status()));
+            entity.setStatus(normalizeSkuStatus(sku.status()));
             entity.setDeleted(false);
             entity.setDeletedAt(null);
             productSkuMapper.insert(entity);
@@ -550,6 +552,14 @@ public class ProductAdminService {
         String normalizedStatus = status == null ? "" : status.trim();
         if (!Set.of(PRODUCT_STATUS_DRAFT, PRODUCT_STATUS_ON_SHELF, PRODUCT_STATUS_OFF_SHELF).contains(normalizedStatus)) {
             throw new IllegalArgumentException("Unsupported product status");
+        }
+        return normalizedStatus;
+    }
+
+    private String normalizeSkuStatus(String status) {
+        String normalizedStatus = status == null ? "" : status.trim();
+        if (!Set.of(SKU_STATUS_ENABLED, SKU_STATUS_DISABLED).contains(normalizedStatus)) {
+            throw new IllegalArgumentException("Unsupported sku status");
         }
         return normalizedStatus;
     }

@@ -36,6 +36,8 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\model\AuthU
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\AppAuthenticationProvider.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\AppUserDetailsService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\AppUserPrincipal.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\AuthenticatedUserPrincipal.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\SessionUserPrincipal.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\service\PasswordService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\service\UserAccountService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\web\AuthController.java

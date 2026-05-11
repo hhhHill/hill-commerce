@@ -16,6 +16,10 @@ import type {
   SkuStatus
 } from "@/lib/admin/types";
 
+import { FieldLabel } from "./field-label";
+import { FieldHelpRowHeadings } from "./field-help-row-headings";
+import { SkuGridLayout, SKU_GRID_CLASS } from "./sku-grid-layout";
+
 type ProductEditorProps = {
   categories: Category[];
   product?: ProductDetail;
@@ -85,7 +89,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm font-medium">
-            分类
+            <FieldLabel field="categoryId" page="productEditor">分类</FieldLabel>
             <select
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               required
@@ -105,7 +109,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             </select>
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            商品状态
+            <FieldLabel field="status" page="productEditor">商品状态</FieldLabel>
             <select
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={form.status}
@@ -119,7 +123,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             </select>
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            商品名称
+            <FieldLabel field="name" page="productEditor">商品名称</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               required
@@ -128,7 +132,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            SPU 编码
+            <FieldLabel field="spuCode" page="productEditor">SPU 编码</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               required
@@ -144,7 +148,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium md:col-span-2">
-            副标题
+            <FieldLabel field="subtitle" page="productEditor">副标题</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={form.subtitle}
@@ -161,7 +165,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
         </div>
         <div className="mt-5 grid gap-4">
           <label className="flex flex-col gap-2 text-sm font-medium">
-            封面图 URL
+            <FieldLabel field="coverImageUrl" page="productEditor">封面图 URL</FieldLabel>
             <input
               className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={form.coverImageUrl}
@@ -169,7 +173,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
-            描述源字符串
+            <FieldLabel field="description" page="productEditor">描述源字符串</FieldLabel>
             <textarea
               className="min-h-[180px] rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               value={form.description}
@@ -196,11 +200,19 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
               </button>
             </div>
             <div className="space-y-3">
+              <FieldHelpRowHeadings
+                items={[
+                  { field: "detailImageUrl", label: "详情图 URL" },
+                  { field: "detailImageSortOrder", label: "详情图排序" }
+                ]}
+                page="productEditor"
+              />
               {form.detailImages.map((image, index) => (
                 <div key={`detail-image-${index}`} className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
                   <input
                     className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    placeholder="https://example.com/detail.jpg"
+                    aria-label="详情图 URL"
+                    placeholder="详情图 URL，例如 https://example.com/detail.jpg"
                     value={image.imageUrl}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -213,6 +225,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
                   />
                   <input
                     className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="详情图排序"
                     min="0"
                     type="number"
                     value={image.sortOrder}
@@ -267,11 +280,20 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
               </button>
             </div>
             <div className="space-y-3">
+              <FieldHelpRowHeadings
+                items={[
+                  { field: "attributeName", label: "展示属性名" },
+                  { field: "attributeValue", label: "展示属性值" },
+                  { field: "attributeSortOrder", label: "展示属性排序" }
+                ]}
+                page="productEditor"
+              />
               {form.attributes.map((attribute, index) => (
                 <div key={`attribute-${index}`} className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_120px_auto]">
                   <input
                     className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    placeholder="属性名"
+                    aria-label="展示属性名"
+                    placeholder="展示属性名"
                     value={attribute.name}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -284,7 +306,8 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
                   />
                   <input
                     className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    placeholder="属性值"
+                    aria-label="展示属性值"
+                    placeholder="展示属性值"
                     value={attribute.value}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -297,6 +320,7 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
                   />
                   <input
                     className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="展示属性排序"
                     min="0"
                     type="number"
                     value={attribute.sortOrder}
@@ -339,11 +363,19 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
               </button>
             </div>
             <div className="space-y-3">
+              <FieldHelpRowHeadings
+                items={[
+                  { field: "salesAttributeName", label: "销售属性名" },
+                  { field: "salesAttributeValues", label: "销售属性值" }
+                ]}
+                page="productEditor"
+              />
               {form.salesAttributes.map((salesAttribute, index) => (
                 <div key={`sales-attribute-${index}`} className="grid gap-3 rounded-[24px] border border-black/10 bg-[#fffaf5] p-4 md:grid-cols-[220px_minmax(0,1fr)_auto]">
                   <input
                     className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    placeholder="例如 颜色"
+                    aria-label="销售属性名"
+                    placeholder="销售属性名，例如 颜色"
                     value={salesAttribute.name}
                     onChange={(event) => {
                       const nextSalesAttributes = form.salesAttributes.map((item, itemIndex) =>
@@ -354,7 +386,8 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
                   />
                   <input
                     className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    placeholder="例如 黑, 白, 灰"
+                    aria-label="销售属性值"
+                    placeholder="销售属性值，例如 黑, 白, 灰"
                     value={salesAttribute.valuesText}
                     onChange={(event) => {
                       const nextSalesAttributes = form.salesAttributes.map((item, itemIndex) =>
@@ -384,94 +417,123 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
           <h2 className="text-2xl font-semibold">SKU 列表</h2>
           <p className="text-sm text-black/65">销售属性变化会自动重建 SKU 草稿表；编码可手工改写，留空则后端补码。</p>
         </div>
-        <div className="mt-5 space-y-3">
-          {form.skus.map((sku, index) => (
-            <article key={sku.salesAttrValueKey || `sku-${index}`} className="rounded-[24px] border border-black/10 bg-[#fffaf5] p-4">
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
-                <div className="xl:col-span-2">
-                  <p className="text-xs uppercase tracking-[0.18em] text-black/45">组合</p>
-                  <p className="mt-2 text-sm font-semibold">{sku.salesAttrValueText || "默认 SKU"}</p>
+        <div className="mt-5">
+          <SkuGridLayout
+            header={
+              <>
+                <div>
+                  <FieldLabel field="salesAttributeValues" page="productEditor">组合</FieldLabel>
                 </div>
-                <input
-                  className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                  placeholder="SKU 编码，可留空"
-                  value={sku.skuCode}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      skus: current.skus.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, skuCode: event.target.value } : item
-                      )
-                    }))
-                  }
-                />
-                <input
-                  className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                  min="0"
-                  placeholder="价格"
-                  step="0.01"
-                  type="number"
-                  value={sku.price}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      skus: current.skus.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, price: event.target.value } : item
-                      )
-                    }))
-                  }
-                />
-                <input
-                  className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                  min="0"
-                  placeholder="库存"
-                  type="number"
-                  value={sku.stock}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      skus: current.skus.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, stock: Number(event.target.value) } : item
-                      )
-                    }))
-                  }
-                />
-                <input
-                  className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                  min="0"
-                  placeholder="低库存阈值"
-                  type="number"
-                  value={sku.lowStockThreshold}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      skus: current.skus.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, lowStockThreshold: Number(event.target.value) } : item
-                      )
-                    }))
-                  }
-                />
-                <select
-                  className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                  value={sku.status}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      skus: current.skus.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, status: event.target.value as SkuStatus } : item
-                      )
-                    }))
-                  }
-                >
-                  {SKU_STATUS_OPTIONS.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </article>
-          ))}
+                <div>
+                  <FieldLabel field="skuCode" page="productEditor">SKU 编码</FieldLabel>
+                </div>
+                <div>
+                  <FieldLabel field="skuPrice" page="productEditor">SKU 价格</FieldLabel>
+                </div>
+                <div>
+                  <FieldLabel field="skuStock" page="productEditor">SKU 库存</FieldLabel>
+                </div>
+                <div>
+                  <FieldLabel field="skuLowStockThreshold" page="productEditor">低库存阈值</FieldLabel>
+                </div>
+                <div>
+                  <FieldLabel field="skuStatus" page="productEditor">SKU 状态</FieldLabel>
+                </div>
+              </>
+            }
+            rows={form.skus.map((sku, index) => (
+              <article key={sku.salesAttrValueKey || `sku-${index}`} className="rounded-[24px] border border-black/10 bg-[#fffaf5] p-4">
+                <div className={SKU_GRID_CLASS}>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/45 xl:hidden">组合</p>
+                    <p className="mt-2 text-sm font-semibold xl:mt-0">{sku.salesAttrValueText || "默认 SKU"}</p>
+                  </div>
+                  <input
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="SKU 编码"
+                    placeholder="SKU 编码，可留空"
+                    value={sku.skuCode}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        skus: current.skus.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, skuCode: event.target.value } : item
+                        )
+                      }))
+                    }
+                  />
+                  <input
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="SKU 价格"
+                    min="0"
+                    placeholder="价格"
+                    step="0.01"
+                    type="number"
+                    value={sku.price}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        skus: current.skus.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, price: event.target.value } : item
+                        )
+                      }))
+                    }
+                  />
+                  <input
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="SKU 库存"
+                    min="0"
+                    placeholder="库存"
+                    type="number"
+                    value={sku.stock}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        skus: current.skus.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, stock: Number(event.target.value) } : item
+                        )
+                      }))
+                    }
+                  />
+                  <input
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="SKU 低库存阈值"
+                    min="0"
+                    placeholder="低库存阈值"
+                    type="number"
+                    value={sku.lowStockThreshold}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        skus: current.skus.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, lowStockThreshold: Number(event.target.value) } : item
+                        )
+                      }))
+                    }
+                  />
+                  <select
+                    className="rounded-2xl border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+                    aria-label="SKU 状态"
+                    value={sku.status}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        skus: current.skus.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, status: event.target.value as SkuStatus } : item
+                        )
+                      }))
+                    }
+                  >
+                    {SKU_STATUS_OPTIONS.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </article>
+            ))}
+          />
           {form.skus.length === 0 ? (
             <p className="rounded-[24px] border border-dashed border-black/10 px-5 py-10 text-center text-sm text-black/55">
               先配置销售属性。若不需要销售属性，也可以直接保存一个默认 SKU 组合。

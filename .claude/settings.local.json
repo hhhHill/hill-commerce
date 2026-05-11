@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"D:\\\\hill-commerce\\\\specs\\\\hill-commerce-mvp\" -Recurse -Depth 3)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}

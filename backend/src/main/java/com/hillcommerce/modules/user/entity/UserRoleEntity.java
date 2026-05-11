@@ -4,6 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * 用户-角色多对多关联表实体。
+ *
+ * user_id + role_id 由数据库 uk_user_roles_user_role 唯一约束保证同一用户不会重复分配同一角色。
+ */
 @TableName("user_roles")
 public class UserRoleEntity {
 

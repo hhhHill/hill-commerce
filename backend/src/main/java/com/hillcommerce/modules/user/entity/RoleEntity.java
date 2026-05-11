@@ -6,11 +6,18 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * 角色字典表实体。
+ *
+ * code 用于 Spring Security 的 hasRole/hasAnyRole 校验（自动拼接 ROLE_ 前缀），
+ * 由 V2 迁移脚本种子 CUSTOMER / SALES / ADMIN 三个固定角色。
+ */
 @TableName("roles")
 public class RoleEntity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+    /** 角色编码，与 Spring Security GrantedAuthority 中 ROLE_xxx 的 xxx 部分对应 */
     private String code;
     private String name;
     private LocalDateTime createdAt;

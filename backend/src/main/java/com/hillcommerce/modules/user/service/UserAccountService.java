@@ -1,5 +1,6 @@
 package com.hillcommerce.modules.user.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -15,6 +16,12 @@ import com.hillcommerce.modules.user.mapper.UserMapper;
 import com.hillcommerce.modules.user.mapper.UserRoleMapper;
 import com.hillcommerce.modules.user.model.AuthUser;
 
+/**
+ * 用户账户核心服务，管理注册与凭据加载。
+ *
+ * 注册在一个 @Transactional 中完成：插入用户 → 查找 CUSTOMER 角色 → 分配 user_roles 关联。
+ * loadByEmail 返回 null 而非抛异常，由 AppUserDetailsService 决定如何转换为 Spring Security 异常。
+ */
 @Service
 public class UserAccountService {
 
@@ -38,6 +45,11 @@ public class UserAccountService {
         this.passwordService = passwordService;
     }
 
+    /**
+     * 注册新账户，默认分配 CUSTOMER 角色。
+     * DuplicateKeyException 来自数据库 uk_users_email 唯一约束，转换为业务异常。
+     * customerRole 不存在时抛 IllegalStateException——说明 V2 迁移脚本未执行。
+     */
     @Transactional
     public AuthUser register(String email, String rawPassword, String nickname) {
         UserEntity user = new UserEntity();
@@ -66,6 +78,10 @@ public class UserAccountService {
         return loadByEmail(email);
     }
 
+    /**
+     * 按邮箱加载用户及角色列表，返回 null 表示用户不存在。
+     * 返回的 AuthUser 包含 passwordHash，仅供认证阶段校验；认证成功后不得直接写入 HTTP Session。
+     */
     public AuthUser loadByEmail(String email) {
         UserEntity user = userMapper.selectOne(
             new LambdaQueryWrapper<UserEntity>().eq(UserEntity::getEmail, email));
@@ -81,5 +97,13 @@ public class UserAccountService {
             user.getNickname(),
             user.getStatus(),
             roleCodes);
+    }
+
+    /** 成功登录后记录最近一次登录时间。 */
+    public void recordSuccessfulLogin(Long userId) {
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        user.setLastLoginAt(LocalDateTime.now());
+        userMapper.updateById(user);
     }
 }

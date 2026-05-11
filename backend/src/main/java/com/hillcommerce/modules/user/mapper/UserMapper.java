@@ -8,6 +8,10 @@ import org.apache.ibatis.annotations.Select;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hillcommerce.modules.user.entity.UserEntity;
 
+/**
+ * 用户表 Mapper，继承 MyBatis-Plus BaseMapper 获得标准 CRUD。
+ * findRoleCodesByUserId 通过自写 SQL 联查 roles / user_roles 以返回纯角色编码列表。
+ */
 @Mapper
 public interface UserMapper extends BaseMapper<UserEntity> {
 

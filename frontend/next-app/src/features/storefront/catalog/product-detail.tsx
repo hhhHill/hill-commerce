@@ -1,10 +1,13 @@
 import type { StorefrontProductDetail } from "@/lib/storefront/types";
+import { AddToCartPanel } from "@/features/storefront/cart/add-to-cart-panel";
 
 type ProductDetailPanelProps = {
   product: StorefrontProductDetail;
+  isAuthenticated: boolean;
+  loginHref: string;
 };
 
-export function ProductDetailPanel({ product }: ProductDetailPanelProps) {
+export function ProductDetailPanel({ product, isAuthenticated, loginHref }: ProductDetailPanelProps) {
   return (
     <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flex flex-col gap-4">
@@ -49,6 +52,8 @@ export function ProductDetailPanel({ product }: ProductDetailPanelProps) {
           <InfoTile label="可售状态" value={renderSaleStatus(product.saleStatus)} />
           <InfoTile label="SKU 数量" value={`${product.skus.length} 个可查看选项`} />
         </div>
+
+        <AddToCartPanel isAuthenticated={isAuthenticated} loginHref={loginHref} product={product} />
 
         {product.salesAttributes.length > 0 ? (
           <section className="flex flex-col gap-3">

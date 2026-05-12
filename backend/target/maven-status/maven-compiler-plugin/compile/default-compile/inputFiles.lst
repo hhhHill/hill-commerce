@@ -8,6 +8,14 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\framework\web\ApiExcepti
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\framework\web\HealthController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\HillCommerceApplication.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminAuthController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\entity\CartEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\entity\CartItemEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\mapper\CartItemMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\mapper\CartMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\service\CartService.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartDtos.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartSummaryController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\entity\ProductAttributeValueEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\entity\ProductCategoryEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\entity\ProductEntity.java
@@ -31,9 +39,11 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\web\Stor
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\web\StorefrontProductController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\product\web\StorefrontProductDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\entity\RoleEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\entity\UserAddressEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\entity\UserEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\entity\UserRoleEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\mapper\RoleMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\mapper\UserAddressMapper.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\mapper\UserMapper.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\mapper\UserRoleMapper.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\model\AuthUser.java
@@ -44,5 +54,8 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\Au
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\security\SessionUserPrincipal.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\service\PasswordService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\service\UserAccountService.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\service\UserAddressService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\web\AuthController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\web\AuthDtos.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\web\UserAddressController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\user\web\UserAddressDtos.java

@@ -1,4 +1,5 @@
 com\hillcommerce\product\ProductDiscoveryIntegrationTest.class
+com\hillcommerce\cart\CartPreparationIntegrationTest.class
 com\hillcommerce\product\StorefrontControllerWebMvcTest.class
 com\hillcommerce\product\StorefrontProductServiceTest.class
 com\hillcommerce\auth\AuthFlowIntegrationTest.class

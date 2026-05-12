@@ -125,12 +125,11 @@ public class ProductAdminService {
     public void deleteCategory(Long categoryId) {
         requireCategory(categoryId);
 
-        Long activeProductCount = productMapper.selectCount(
+        Long relatedProductCount = productMapper.selectCount(
             new LambdaQueryWrapper<ProductEntity>()
-                .eq(ProductEntity::getCategoryId, categoryId)
-                .eq(ProductEntity::getDeleted, false));
-        if (activeProductCount > 0) {
-            throw new IllegalStateException("Category still has active products");
+                .eq(ProductEntity::getCategoryId, categoryId));
+        if (relatedProductCount > 0) {
+            throw new IllegalStateException("Category has been used by products");
         }
 
         productCategoryMapper.deleteById(categoryId);
@@ -142,13 +141,17 @@ public class ProductAdminService {
             .orderByDesc(ProductEntity::getUpdatedAt, ProductEntity::getId);
 
         if (name != null && !name.isBlank()) {
-            queryWrapper.like(ProductEntity::getName, name.trim());
+            String keyword = name.trim();
+            queryWrapper.and(wrapper -> wrapper
+                .like(ProductEntity::getName, keyword)
+                .or()
+                .eq(ProductEntity::getSpuCode, keyword));
         }
         if (categoryId != null) {
             queryWrapper.eq(ProductEntity::getCategoryId, categoryId);
         }
         if (status != null && !status.isBlank()) {
-            queryWrapper.eq(ProductEntity::getStatus, status.trim());
+            queryWrapper.eq(ProductEntity::getStatus, normalizeProductStatus(status));
         }
 
         List<ProductEntity> products = productMapper.selectList(queryWrapper);

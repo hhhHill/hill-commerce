@@ -358,6 +358,131 @@ class ProductAdminIntegrationTest {
             .andExpect(jsonPath("$.skus[0].status").value("ENABLED"));
     }
 
+    @Test
+    void productKeywordFilterMatchesNameFuzzilyOrSpuExactly() throws Exception {
+        MockHttpSession salesSession = loginAsSales("task4-filter-sales@example.com", "Sales@123456");
+        Long categoryId = createCategory(salesSession, "Task4-Filter");
+
+        mockMvc.perform(post("/api/admin/products")
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "categoryId": %d,
+                      "name": "Task4 Cotton Tee",
+                      "spuCode": "TASK4-TEE",
+                      "subtitle": "",
+                      "coverImageUrl": "",
+                      "description": "",
+                      "status": "DRAFT",
+                      "detailImages": [],
+                      "attributes": [],
+                      "salesAttributes": [],
+                      "skus": [
+                        {
+                          "skuCode": "",
+                          "salesAttrValueKey": "default",
+                          "salesAttrValueText": "默认 SKU",
+                          "price": 99.00,
+                          "stock": 10,
+                          "lowStockThreshold": 2,
+                          "status": "ENABLED"
+                        }
+                      ]
+                    }
+                    """.formatted(categoryId)))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/admin/products")
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "categoryId": %d,
+                      "name": "Task4 Hoodie",
+                      "spuCode": "TASK4-HOODIE",
+                      "subtitle": "",
+                      "coverImageUrl": "",
+                      "description": "",
+                      "status": "DRAFT",
+                      "detailImages": [],
+                      "attributes": [],
+                      "salesAttributes": [],
+                      "skus": [
+                        {
+                          "skuCode": "",
+                          "salesAttrValueKey": "default",
+                          "salesAttrValueText": "默认 SKU",
+                          "price": 129.00,
+                          "stock": 8,
+                          "lowStockThreshold": 2,
+                          "status": "ENABLED"
+                        }
+                      ]
+                    }
+                    """.formatted(categoryId)))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/admin/products")
+                .session(salesSession)
+                .param("name", "Cotton"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].spuCode").value("TASK4-TEE"));
+
+        mockMvc.perform(get("/api/admin/products")
+                .session(salesSession)
+                .param("name", "TASK4-HOODIE"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].name").value("Task4 Hoodie"));
+    }
+
+    @Test
+    void categoryCannotBeDeletedAfterItHasEverBeenUsedByProduct() throws Exception {
+        MockHttpSession salesSession = loginAsSales("task4-category-guard-sales@example.com", "Sales@123456");
+        Long categoryId = createCategory(salesSession, "Task4-Delete-Guard");
+
+        MvcResult productResult = mockMvc.perform(post("/api/admin/products")
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "categoryId": %d,
+                      "name": "Task4 Delete Guard Product",
+                      "spuCode": "TASK4-DELETE-GUARD",
+                      "subtitle": "",
+                      "coverImageUrl": "",
+                      "description": "",
+                      "status": "DRAFT",
+                      "detailImages": [],
+                      "attributes": [],
+                      "salesAttributes": [],
+                      "skus": [
+                        {
+                          "skuCode": "",
+                          "salesAttrValueKey": "default",
+                          "salesAttrValueText": "默认 SKU",
+                          "price": 88.00,
+                          "stock": 6,
+                          "lowStockThreshold": 1,
+                          "status": "ENABLED"
+                        }
+                      ]
+                    }
+                    """.formatted(categoryId)))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        Long productId = readId(productResult);
+
+        mockMvc.perform(delete("/api/admin/products/{id}", productId).session(salesSession))
+            .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/api/admin/categories/{id}", categoryId).session(salesSession))
+            .andExpect(status().isBadRequest());
+    }
+
     private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
         seedSalesUser(email, rawPassword);
         return login(email, rawPassword);

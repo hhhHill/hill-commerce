@@ -32,7 +32,17 @@ public class SecurityConfig {
                 .authenticationEntryPoint(jsonAuthenticationEntryPoint())
                 .accessDeniedHandler(jsonAccessDeniedHandler()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/health", "/actuator/health", "/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers(
+                    "/api/health",
+                    "/actuator/health",
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/api/categories",
+                    "/api/categories/*/products",
+                    "/api/products",
+                    "/api/products/*",
+                    "/api/search")
+                .permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SALES")
                 .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
                 .anyRequest().authenticated())

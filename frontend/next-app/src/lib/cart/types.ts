@@ -14,6 +14,9 @@ export type CartItem = {
   quantity: number;
   selected: boolean;
   subtotalAmount: number;
+  anomalyCode: string | null;
+  anomalyMessage: string | null;
+  canCheckout: boolean;
 };
 
 export type CartSummary = {

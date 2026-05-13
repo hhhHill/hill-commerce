@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { HomeShortcut } from "@/features/storefront/catalog/home-shortcut";
 import { SearchForm } from "@/features/storefront/catalog/search-form";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
 import { StorefrontRequestError } from "@/lib/storefront/errors";
@@ -26,7 +27,10 @@ export default async function CategoryProductsPage({ params, searchParams }: Cat
     return (
       <main className="min-h-screen px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col gap-8">
-          <SearchForm className="self-end" />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <HomeShortcut />
+            <SearchForm className="w-full max-w-md" />
+          </div>
           <StorefrontProductList
             buildPageHref={(nextPage) => `/categories/${categoryId}?page=${nextPage}`}
             emptyDescription="这个分类下暂时还没有可浏览的商品。"

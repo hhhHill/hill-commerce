@@ -3,7 +3,18 @@
     "allow": [
       "Bash(Get-ChildItem -Path \"D:\\\\hill-commerce\\\\specs\\\\hill-commerce-mvp\" -Recurse -Depth 3)",
       "Bash(Select-Object FullName)",
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\specs\\\\cart-preparation\")",
+      "Bash(Select-Object FullName, Length)",
+      "PowerShell(Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\specs\\\\cart-preparation\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\lib\\\\cart\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\lib\\\\cart\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"lib/cart directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\api\\\\cart\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\api\\\\cart\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"api/cart directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\api\\\\user\\\\addresses\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\api\\\\user\\\\addresses\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"api/user/addresses directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\features\\\\storefront\\\\cart\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\features\\\\storefront\\\\cart\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"features/storefront/cart directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\cart\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\cart\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/cart directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\checkout-summary\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\checkout-summary\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/checkout-summary directory does not exist\" })",
+      "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\account\\\\addresses\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\account\\\\addresses\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/account/addresses directory does not exist\" })",
+      "PowerShell(Stop-Process *)"
     ]
   }
 }

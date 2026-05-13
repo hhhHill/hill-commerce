@@ -1,3 +1,4 @@
+import { HomeShortcut } from "@/features/storefront/catalog/home-shortcut";
 import { SearchForm } from "@/features/storefront/catalog/search-form";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
 import { searchServerStorefrontProducts } from "@/lib/storefront/server";
@@ -22,7 +23,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <SearchForm className="self-end" defaultKeyword={keyword} />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <HomeShortcut />
+          <SearchForm className="w-full max-w-md" defaultKeyword={keyword} />
+        </div>
         <StorefrontProductList
           buildPageHref={(nextPage) => `/search?keyword=${encodeURIComponent(keyword)}&page=${nextPage}`}
           emptyDescription={keyword.trim() ? `没有找到与“${keyword}”相关的商品。` : "请输入商品名称后开始搜索。"}

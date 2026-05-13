@@ -1,5 +1,7 @@
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\auth\AuthFlowIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\cart\CartPreparationIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutFoundationIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\ProductAdminIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\ProductDiscoveryIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\StorefrontControllerWebMvcTest.java

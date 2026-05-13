@@ -48,9 +48,16 @@ export function CartList({ items }: CartListProps) {
             </div>
 
             <div className="grid gap-4 rounded-[22px] border border-black/10 bg-[var(--surface)] px-4 py-4 md:grid-cols-[1fr_auto] md:items-center">
-              <div className="flex flex-wrap gap-6 text-sm text-black/65">
-                <span>单价：{formatPrice(item.unitPrice)}</span>
-                <span>数量：{item.quantity}</span>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-6 text-sm text-black/65">
+                  <span>单价：{formatPrice(item.unitPrice)}</span>
+                  <span>数量：{item.quantity}</span>
+                </div>
+                {item.canCheckout ? null : (
+                  <p className="rounded-[18px] bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+                    {item.anomalyMessage ?? "当前条目暂不可结算"}
+                  </p>
+                )}
               </div>
               <CartItemActions item={item} />
             </div>

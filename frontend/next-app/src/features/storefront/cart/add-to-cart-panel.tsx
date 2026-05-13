@@ -124,7 +124,14 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
         </p>
       ) : null}
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
-      {success ? <p className="mt-3 text-sm text-emerald-700">{success}</p> : null}
+      {success ? (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <p className="text-sm text-emerald-700">{success}</p>
+          <Link className="rounded-full border border-emerald-200 px-3 py-1 text-sm font-medium text-emerald-700" href="/cart">
+            去购物车
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

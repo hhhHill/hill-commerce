@@ -251,6 +251,7 @@ public class CartService {
                 }
                 BigDecimal unitPrice = sku.getPrice();
                 BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
+                ItemAnomaly anomaly = detectAnomaly(product, sku, item.getQuantity());
                 return new CartItemView(
                     new CartItemResponse(
                         item.getId(),
@@ -263,7 +264,10 @@ public class CartService {
                         unitPrice,
                         item.getQuantity(),
                         Boolean.TRUE.equals(item.getSelected()),
-                        subtotal),
+                        subtotal,
+                        anomaly.code(),
+                        anomaly.message(),
+                        anomaly.code() == null),
                     subtotal);
             })
             .sorted(Comparator.comparing((CartItemView view) -> view.response().id()).reversed())
@@ -290,29 +294,7 @@ public class CartService {
     private CheckoutItemResponse toCheckoutItem(CartItemView itemView) {
         ProductEntity product = productMapper.selectById(itemView.response().productId());
         ProductSkuEntity sku = productSkuMapper.selectById(itemView.response().skuId());
-
-        String anomalyCode = null;
-        String anomalyMessage = null;
-
-        if (product == null || Boolean.TRUE.equals(product.getDeleted()) || !PRODUCT_STATUS_ON_SHELF.equals(product.getStatus())) {
-            anomalyCode = ANOMALY_PRODUCT_OFF_SHELF;
-            anomalyMessage = "商品已下架或不可售";
-        }
-        else if (sku == null || Boolean.TRUE.equals(sku.getDeleted())) {
-            anomalyCode = ANOMALY_SKU_INVALID;
-            anomalyMessage = "SKU 已失效";
-        }
-        else if (!SKU_STATUS_ENABLED.equals(sku.getStatus())) {
-            anomalyCode = ANOMALY_SKU_DISABLED;
-            anomalyMessage = "SKU 已禁用";
-        }
-        else {
-            int stock = sku.getStock() == null ? 0 : sku.getStock();
-            if (stock < itemView.response().quantity()) {
-                anomalyCode = ANOMALY_INSUFFICIENT_STOCK;
-                anomalyMessage = "库存不足";
-            }
-        }
+        ItemAnomaly anomaly = detectAnomaly(product, sku, itemView.response().quantity());
 
         return new CheckoutItemResponse(
             itemView.response().id(),
@@ -326,9 +308,26 @@ public class CartService {
             itemView.response().quantity(),
             itemView.response().selected(),
             itemView.response().subtotalAmount(),
-            anomalyCode,
-            anomalyMessage,
-            anomalyCode == null);
+            anomaly.code(),
+            anomaly.message(),
+            anomaly.code() == null);
+    }
+
+    private ItemAnomaly detectAnomaly(ProductEntity product, ProductSkuEntity sku, int quantity) {
+        if (product == null || Boolean.TRUE.equals(product.getDeleted()) || !PRODUCT_STATUS_ON_SHELF.equals(product.getStatus())) {
+            return new ItemAnomaly(ANOMALY_PRODUCT_OFF_SHELF, "商品已下架或不可售");
+        }
+        if (sku == null || Boolean.TRUE.equals(sku.getDeleted())) {
+            return new ItemAnomaly(ANOMALY_SKU_INVALID, "SKU 已失效");
+        }
+        if (!SKU_STATUS_ENABLED.equals(sku.getStatus())) {
+            return new ItemAnomaly(ANOMALY_SKU_DISABLED, "SKU 已禁用");
+        }
+        int stock = sku.getStock() == null ? 0 : sku.getStock();
+        if (stock < quantity) {
+            return new ItemAnomaly(ANOMALY_INSUFFICIENT_STOCK, "库存不足");
+        }
+        return new ItemAnomaly(null, null);
     }
 
     private CheckoutAddressResponse toCheckoutAddress(UserAddressEntity address) {
@@ -400,6 +399,12 @@ public class CartService {
     private record CartItemView(
         CartItemResponse response,
         BigDecimal subtotalAmount
+    ) {
+    }
+
+    private record ItemAnomaly(
+        String code,
+        String message
     ) {
     }
 

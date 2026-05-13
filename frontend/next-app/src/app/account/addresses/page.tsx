@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AddressBook } from "@/features/storefront/cart/address-book";
+import { HomeShortcut } from "@/features/storefront/catalog/home-shortcut";
 import { SearchForm } from "@/features/storefront/catalog/search-form";
 import { requireUser } from "@/lib/auth/server";
 import { getServerUserAddresses } from "@/lib/cart/server";
@@ -13,9 +14,12 @@ export default async function AddressManagementPage() {
     <main className="min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
-            返回购物车
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <HomeShortcut />
+            <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
+              返回购物车
+            </Link>
+          </div>
           <SearchForm className="w-full max-w-md" />
         </div>
 

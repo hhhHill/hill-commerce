@@ -34,7 +34,10 @@ public final class CartDtos {
         BigDecimal unitPrice,
         Integer quantity,
         Boolean selected,
-        BigDecimal subtotalAmount
+        BigDecimal subtotalAmount,
+        String anomalyCode,
+        String anomalyMessage,
+        Boolean canCheckout
     ) {
     }
 

@@ -275,6 +275,35 @@ class CartPreparationIntegrationTest {
             .andExpect(jsonPath("$.summary.validSelectedItemCount").value(0));
     }
 
+    @Test
+    void cartPageResponseAlsoMarksOffShelfItemAnomaly() throws Exception {
+        MockHttpSession salesSession = loginAsSales("cart-anomaly-sales@example.com", "Sales@123456");
+        MockHttpSession customerSession = loginAsCustomer("cart-anomaly-customer@example.com", "Customer@123456");
+
+        Long categoryId = createCategory(salesSession, "Cart-Anomaly");
+        Long productId = createProduct(salesSession, categoryId, "Cart Anomaly Tee", "CART-ANOMALY", "ON_SHELF", 149.00, 6, 2, "ENABLED");
+        Long skuId = readSkuId("CART-ANOMALY-001");
+
+        mockMvc.perform(post("/api/cart")
+                .session(customerSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "skuId": %d,
+                      "quantity": 2
+                    }
+                    """.formatted(skuId)))
+            .andExpect(status().isCreated());
+
+        jdbcTemplate.update("update products set status = 'OFF_SHELF' where id = ?", productId);
+
+        mockMvc.perform(get("/api/cart").session(customerSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items[0].anomalyCode").value("PRODUCT_OFF_SHELF"))
+            .andExpect(jsonPath("$.items[0].anomalyMessage").value("商品已下架或不可售"))
+            .andExpect(jsonPath("$.items[0].canCheckout").value(false));
+    }
+
     private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
         seedUser(email, rawPassword, "cart-sales", "SALES");
         return login(email, rawPassword);

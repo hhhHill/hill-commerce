@@ -123,13 +123,15 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
           <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/cart">
             返回购物车调整
           </Link>
-          <span
+          <Link
+            aria-disabled={!summary.summary.canProceed}
             className={`rounded-full px-5 py-3 text-center text-sm font-semibold text-white ${
-              summary.summary.canProceed ? "bg-[var(--accent)]" : "bg-black/30"
+              summary.summary.canProceed ? "bg-[var(--accent)]" : "cursor-not-allowed bg-black/30"
             }`}
+            href={summary.summary.canProceed ? "/checkout" : "/checkout-summary"}
           >
-            {summary.summary.canProceed ? "已准备好进入下单阶段" : "当前不可继续"}
-          </span>
+            {summary.summary.canProceed ? "继续进入最终下单确认" : "当前不可继续"}
+          </Link>
         </div>
       </aside>
     </section>

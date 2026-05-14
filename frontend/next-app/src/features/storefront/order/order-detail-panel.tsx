@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { cancelOrder } from "@/lib/order/client";
+import { cancelOrder, confirmReceipt } from "@/lib/order/client";
 import type { OrderDetail } from "@/lib/order/types";
 
 type OrderDetailPanelProps = {
@@ -17,6 +17,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
   const [isPending, startTransition] = useTransition();
   const canCancel = order.orderStatus === "PENDING_PAYMENT";
   const canPay = order.orderStatus === "PENDING_PAYMENT";
+  const canConfirmReceipt = order.orderStatus === "SHIPPED";
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
@@ -77,6 +78,36 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
             ))}
           </div>
         </article>
+
+        {(order.orderStatus === "SHIPPED" || order.orderStatus === "COMPLETED") && order.shipment ? (
+          <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+            <h2 className="text-2xl font-semibold tracking-tight">物流信息</h2>
+            <div className="mt-5 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+              <Metric label="快递公司" value={order.shipment.carrierName} />
+              <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3">
+                <dt className="text-sm text-black/50">运单号</dt>
+                <dd className="flex items-center gap-3 text-right">
+                  <span className="text-lg font-semibold">{order.shipment.trackingNo}</span>
+                  <button
+                    className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold"
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(order.shipment?.trackingNo ?? "");
+                        setMessage("运单号已复制");
+                      } catch {
+                        setMessage("复制失败，请手动复制运单号");
+                      }
+                    }}
+                  >
+                    复制
+                  </button>
+                </dd>
+              </div>
+              <Metric label="发货时间" value={formatDateTime(order.shipment.shippedAt)} />
+            </div>
+          </article>
+        ) : null}
 
         <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
           <h2 className="text-2xl font-semibold tracking-tight">状态历史</h2>
@@ -143,6 +174,29 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
             ) : (
               <div className="rounded-[22px] bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再支持未支付取消。</div>
             )}
+            {canConfirmReceipt ? (
+              <button
+                className="rounded-full bg-[var(--accent-strong)] px-5 py-3 text-sm font-semibold text-white"
+                disabled={isPending}
+                type="button"
+                onClick={() => {
+                  if (!window.confirm("确认已收到商品？确认后订单将变更为已完成。")) {
+                    return;
+                  }
+                  setMessage("");
+                  startTransition(async () => {
+                    try {
+                      await confirmReceipt(order.id);
+                      router.refresh();
+                    } catch (error) {
+                      setMessage(error instanceof Error ? error.message : "确认收货失败");
+                    }
+                  });
+                }}
+              >
+                {isPending ? "提交中..." : "确认收货"}
+              </button>
+            ) : null}
             <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/cart">
               返回购物车
             </Link>
@@ -190,6 +244,10 @@ function renderStatus(status: string) {
       return "已关闭";
     case "PAID":
       return "已支付";
+    case "SHIPPED":
+      return "已发货";
+    case "COMPLETED":
+      return "已完成";
     default:
       return status;
   }
@@ -203,6 +261,10 @@ function renderPaymentHint(status: string) {
       return "当前订单已取消，支付入口已关闭。";
     case "CLOSED":
       return "当前订单已关闭，支付入口已关闭。";
+    case "SHIPPED":
+      return "当前订单已发货，请在收到商品后确认收货。";
+    case "COMPLETED":
+      return "当前订单已完成，无需再次支付。";
     default:
       return "当前订单不处于可支付状态。";
   }

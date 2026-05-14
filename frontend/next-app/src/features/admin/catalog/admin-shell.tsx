@@ -14,7 +14,8 @@ type AdminShellProps = {
 const NAV_ITEMS = [
   { href: "/admin", label: "后台总览" },
   { href: "/admin/categories", label: "分类管理" },
-  { href: "/admin/products", label: "商品管理" }
+  { href: "/admin/products", label: "商品管理" },
+  { href: "/admin/orders", label: "订单管理" }
 ];
 
 export function AdminShell({ title, description, user, children }: AdminShellProps) {

@@ -15,7 +15,7 @@ type OrdersPageProps = {
   }>;
 };
 
-const ALLOWED_STATUSES = new Set<OrderListStatus>(["PENDING_PAYMENT", "PAID", "CANCELLED", "CLOSED"]);
+const ALLOWED_STATUSES = new Set<OrderListStatus>(["PENDING_PAYMENT", "PAID", "SHIPPED", "COMPLETED", "CANCELLED", "CLOSED"]);
 
 export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   await requireUser("/orders");

@@ -29,6 +29,8 @@ public class OrderCenterService {
     private static final Set<String> ALLOWED_STATUSES = Set.of(
         OrderStatus.PENDING_PAYMENT.name(),
         OrderStatus.PAID.name(),
+        OrderStatus.SHIPPED.name(),
+        OrderStatus.COMPLETED.name(),
         OrderStatus.CANCELLED.name(),
         OrderStatus.CLOSED.name());
 
@@ -41,6 +43,14 @@ public class OrderCenterService {
     }
 
     public OrderListResponse listOrders(Long userId, OrderListQuery query) {
+        return listOrdersInternal(query, userId);
+    }
+
+    public OrderListResponse listAllOrders(OrderListQuery query) {
+        return listOrdersInternal(query, null);
+    }
+
+    private OrderListResponse listOrdersInternal(OrderListQuery query, Long userId) {
         int page = normalizePage(query.page());
         int size = normalizeSize(query.size());
         String status = normalizeStatus(query.status());
@@ -48,7 +58,7 @@ public class OrderCenterService {
 
         List<OrderEntity> matchedOrders = orderMapper.selectList(
             new LambdaQueryWrapper<OrderEntity>()
-                .eq(OrderEntity::getUserId, userId)
+                .eq(userId != null, OrderEntity::getUserId, userId)
                 .eq(status != null, OrderEntity::getOrderStatus, status)
                 .likeRight(orderNo != null, OrderEntity::getOrderNo, orderNo)
                 .orderByDesc(OrderEntity::getCreatedAt)
@@ -68,6 +78,7 @@ public class OrderCenterService {
                 return new OrderListItemResponse(
                     order.getId(),
                     order.getOrderNo(),
+                    order.getUserId(),
                     order.getOrderStatus(),
                     order.getPayableAmount(),
                     order.getCreatedAt(),

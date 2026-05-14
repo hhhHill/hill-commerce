@@ -20,6 +20,7 @@ public final class OrderCenterDtos {
     public record OrderListItemResponse(
         Long orderId,
         String orderNo,
+        Long userId,
         String orderStatus,
         BigDecimal payableAmount,
         LocalDateTime createdAt,

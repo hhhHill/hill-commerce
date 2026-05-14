@@ -97,3 +97,35 @@ export type ProductListFilters = {
 export type ApiErrorResponse = {
   message?: string;
 };
+
+export type AdminOrderStatus = "PENDING_PAYMENT" | "PAID" | "SHIPPED" | "COMPLETED" | "CANCELLED" | "CLOSED";
+
+export type AdminOrderListItem = {
+  orderId: number;
+  orderNo: string;
+  userId: number;
+  orderStatus: AdminOrderStatus;
+  payableAmount: number;
+  createdAt: string;
+  summaryProductName: string | null;
+  summaryItemCount: number;
+};
+
+export type AdminOrderListResult = {
+  items: AdminOrderListItem[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+};
+
+export type ShipOrderResult = {
+  orderId: number;
+  orderStatus: string;
+  shipmentId: number;
+  shipmentStatus: string;
+};
+
+export type AutoCompleteResult = {
+  completedCount: number;
+};

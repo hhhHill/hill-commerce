@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 
 import { getBackendBaseUrl } from "@/lib/config";
-import type { Category, ProductDetail, ProductListFilters, ProductSummary } from "@/lib/admin/types";
+import type { AdminOrderListResult, Category, ProductDetail, ProductListFilters, ProductSummary } from "@/lib/admin/types";
+import type { OrderDetail, OrderListStatus } from "@/lib/order/types";
 
 export async function getAdminCategories(): Promise<Category[]> {
   return fetchAdminJson<Category[]>("/api/admin/categories");
@@ -25,6 +26,25 @@ export async function getAdminProducts(filters: ProductListFilters = {}): Promis
 
 export async function getAdminProduct(productId: number): Promise<ProductDetail> {
   return fetchAdminJson<ProductDetail>(`/api/admin/products/${productId}`);
+}
+
+export async function getAdminOrders(status?: OrderListStatus, page = 1, size = 10): Promise<AdminOrderListResult> {
+  const search = new URLSearchParams();
+  if (status) {
+    search.set("status", status);
+  }
+  if (page > 1) {
+    search.set("page", String(page));
+  }
+  if (size !== 10) {
+    search.set("size", String(size));
+  }
+  const query = search.toString();
+  return fetchAdminJson<AdminOrderListResult>(`/api/admin/orders${query ? `?${query}` : ""}`);
+}
+
+export async function getAdminShipOrder(orderId: number): Promise<OrderDetail> {
+  return fetchAdminJson<OrderDetail>(`/api/admin/orders/${orderId}/ship`);
 }
 
 async function fetchAdminJson<T>(pathname: string): Promise<T> {

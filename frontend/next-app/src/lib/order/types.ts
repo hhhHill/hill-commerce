@@ -5,6 +5,8 @@ export type ApiErrorResponse = {
 export type OrderListStatus =
   | "PENDING_PAYMENT"
   | "PAID"
+  | "SHIPPED"
+  | "COMPLETED"
   | "CANCELLED"
   | "CLOSED";
 
@@ -107,6 +109,12 @@ export type OrderStatusHistory = {
   createdAt: string;
 };
 
+export type ShipmentInfo = {
+  carrierName: string;
+  trackingNo: string;
+  shippedAt: string | null;
+};
+
 export type OrderDetail = {
   id: number;
   orderNo: string;
@@ -117,9 +125,16 @@ export type OrderDetail = {
   address: OrderCheckoutAddress;
   items: OrderLineItem[];
   statusHistory: OrderStatusHistory[];
+  shipment: ShipmentInfo | null;
 };
 
 export type CancelOrderResult = {
   orderId: number;
   orderStatus: string;
+};
+
+export type ConfirmReceiptResult = {
+  orderId: number;
+  orderStatus: string;
+  shipmentStatus: string;
 };

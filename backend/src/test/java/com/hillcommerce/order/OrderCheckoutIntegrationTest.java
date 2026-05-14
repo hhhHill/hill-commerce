@@ -58,6 +58,7 @@ class OrderCheckoutIntegrationTest {
             .apply(springSecurity())
             .build();
 
+        jdbcTemplate.update("delete from shipments");
         jdbcTemplate.update("delete from order_status_histories");
         jdbcTemplate.update("delete from order_items");
         jdbcTemplate.update("delete from orders");

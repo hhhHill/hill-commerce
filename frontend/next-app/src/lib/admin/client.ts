@@ -2,12 +2,14 @@
 
 import type {
   ApiErrorResponse,
+  AutoCompleteResult,
   Category,
   CategoryStatus,
   ProductDetail,
   ProductPayload,
   ProductStatus,
-  ProductSummary
+  ProductSummary,
+  ShipOrderResult
 } from "@/lib/admin/types";
 
 type CategoryInput = {
@@ -60,6 +62,19 @@ export async function updateProductStatus(productId: number, status: ProductStat
 export async function deleteProduct(productId: number): Promise<void> {
   await sendAdminRequest(`/api/admin/products/${productId}`, {
     method: "DELETE"
+  });
+}
+
+export async function shipOrder(orderId: number, carrierName: string, trackingNo: string): Promise<ShipOrderResult> {
+  return sendAdminRequest<ShipOrderResult>(`/api/admin/orders/${orderId}/ship`, {
+    method: "POST",
+    body: JSON.stringify({ carrierName, trackingNo })
+  });
+}
+
+export async function triggerAutoComplete(): Promise<AutoCompleteResult> {
+  return sendAdminRequest<AutoCompleteResult>("/api/admin/orders/auto-complete", {
+    method: "POST"
   });
 }
 

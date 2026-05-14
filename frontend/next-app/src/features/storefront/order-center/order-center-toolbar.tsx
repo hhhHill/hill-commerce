@@ -11,6 +11,8 @@ const STATUS_OPTIONS: Array<{ label: string; value?: OrderListStatus }> = [
   { label: "全部订单" },
   { label: "待支付", value: "PENDING_PAYMENT" },
   { label: "已支付", value: "PAID" },
+  { label: "已发货", value: "SHIPPED" },
+  { label: "已完成", value: "COMPLETED" },
   { label: "已取消", value: "CANCELLED" },
   { label: "已关闭", value: "CLOSED" }
 ];

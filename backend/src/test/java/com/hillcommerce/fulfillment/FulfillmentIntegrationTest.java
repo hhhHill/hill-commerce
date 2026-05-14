@@ -1,6 +1,7 @@
-package com.hillcommerce.order;
+package com.hillcommerce.fulfillment;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.hillcommerce.modules.user.service.PasswordService;
 
 @SpringBootTest
-class OrderCenterIntegrationTest {
+class FulfillmentIntegrationTest {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -72,246 +74,196 @@ class OrderCenterIntegrationTest {
             delete psav from product_sales_attribute_values psav
             join product_sales_attributes psa on psa.id = psav.sales_attribute_id
             join products p on p.id = psa.product_id
-            where p.spu_code like 'ORDER-CENTER-%'
+            where p.spu_code like 'FULFILLMENT-%'
             """);
         jdbcTemplate.update(
             """
             delete pa from product_attribute_values pa
             join products p on p.id = pa.product_id
-            where p.spu_code like 'ORDER-CENTER-%'
+            where p.spu_code like 'FULFILLMENT-%'
             """);
         jdbcTemplate.update(
             """
             delete pi from product_images pi
             join products p on p.id = pi.product_id
-            where p.spu_code like 'ORDER-CENTER-%'
+            where p.spu_code like 'FULFILLMENT-%'
             """);
-        jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-CENTER-%'");
-        jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'ORDER-CENTER-%')");
-        jdbcTemplate.update("delete from products where spu_code like 'ORDER-CENTER-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Order Center-%'");
+        jdbcTemplate.update("delete from product_skus where sku_code like 'FULFILLMENT-%'");
+        jdbcTemplate.update(
+            "delete from product_sales_attributes where product_id in (select id from products where spu_code like 'FULFILLMENT-%')");
+        jdbcTemplate.update("delete from products where spu_code like 'FULFILLMENT-%'");
+        jdbcTemplate.update("delete from product_categories where name like 'Fulfillment-%'");
         jdbcTemplate.update(
             """
             delete ur from user_roles ur
             join users u on u.id = ur.user_id
-            where u.email like 'order-center-%@example.com'
+            where u.email like 'fulfillment-%@example.com'
             """);
-        jdbcTemplate.update("delete from users where email like 'order-center-%@example.com'");
+        jdbcTemplate.update("delete from users where email like 'fulfillment-%@example.com'");
     }
 
     @Test
-    void loggedInUserCanReadOwnOrdersInCreatedAtDescPagination() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-sales@example.com", "Sales@123456");
-        MockHttpSession customerSession = loginAsCustomer("order-center-customer@example.com", "Customer@123456");
+    void paidOrderCanBeShippedAndCustomerCanReadShipmentInfo() throws Exception {
+        MockHttpSession salesSession = loginAsSales("fulfillment-ship-sales@example.com", "Sales@123456");
+        MockHttpSession customerSession = loginAsCustomer("fulfillment-ship-customer@example.com", "Customer@123456");
 
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Shirts",
-            "Order Center Tee A",
-            "ORDER-CENTER-A",
-            "ORDCENTER-A001",
-            LocalDateTime.of(2026, 5, 10, 10, 0, 0));
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Shirts",
-            "Order Center Tee B",
-            "ORDER-CENTER-B",
-            "ORDCENTER-B001",
-            LocalDateTime.of(2026, 5, 11, 10, 0, 0));
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Shirts",
-            "Order Center Tee C",
-            "ORDER-CENTER-C",
-            "ORDCENTER-C001",
-            LocalDateTime.of(2026, 5, 12, 10, 0, 0));
+        Long orderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-SHIP");
 
-        mockMvc.perform(get("/api/orders?page=1&size=2").session(customerSession))
+        mockMvc.perform(get("/api/admin/orders/{orderId}/ship", orderId).session(salesSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page").value(1))
-            .andExpect(jsonPath("$.size").value(2))
-            .andExpect(jsonPath("$.total").value(3))
-            .andExpect(jsonPath("$.totalPages").value(2))
-            .andExpect(jsonPath("$.items", hasSize(2)))
-            .andExpect(jsonPath("$.items[0].orderNo").value("ORDCENTER-C001"))
-            .andExpect(jsonPath("$.items[1].orderNo").value("ORDCENTER-B001"));
+            .andExpect(jsonPath("$.id").value(orderId))
+            .andExpect(jsonPath("$.orderStatus").value("PAID"));
+
+        mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "carrierName": "SF Express",
+                      "trackingNo": "SF123456789CN"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderId").value(orderId))
+            .andExpect(jsonPath("$.orderStatus").value("SHIPPED"))
+            .andExpect(jsonPath("$.shipmentStatus").value("SHIPPED"));
+
+        mockMvc.perform(get("/api/orders/{orderId}", orderId).session(customerSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderStatus").value("SHIPPED"))
+            .andExpect(jsonPath("$.shipment.carrierName").value("SF Express"))
+            .andExpect(jsonPath("$.shipment.trackingNo").value("SF123456789CN"))
+            .andExpect(jsonPath("$.shipment.shippedAt").isNotEmpty());
     }
 
     @Test
-    void userCanFilterOwnOrdersBySingleStatus() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-filter-sales@example.com", "Sales@123456");
-        MockHttpSession customerSession = loginAsCustomer("order-center-filter-customer@example.com", "Customer@123456");
+    void nonPaidOrderCannotBeShippedAndShipmentRemainsNull() throws Exception {
+        MockHttpSession salesSession = loginAsSales("fulfillment-not-paid-sales@example.com", "Sales@123456");
+        MockHttpSession customerSession = loginAsCustomer("fulfillment-not-paid-customer@example.com", "Customer@123456");
 
-        Long pendingOrderId = createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Filter",
-            "Order Center Pending Tee",
-            "ORDER-CENTER-PENDING",
-            "ORDCENTER-PENDING-001",
-            LocalDateTime.of(2026, 5, 10, 8, 0, 0));
-        Long paidOrderId = createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Filter",
-            "Order Center Paid Tee",
-            "ORDER-CENTER-PAID",
-            "ORDCENTER-PAID-001",
-            LocalDateTime.of(2026, 5, 11, 8, 0, 0));
+        Long orderId = createPendingOrder(salesSession, customerSession, "FULFILLMENT-PENDING");
 
-        jdbcTemplate.update("update orders set order_status = 'PAID' where id = ?", paidOrderId);
-        jdbcTemplate.update("update orders set order_status = 'PENDING_PAYMENT' where id = ?", pendingOrderId);
+        mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "carrierName": "JD Logistics",
+                      "trackingNo": "JD0000001"
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
 
-        mockMvc.perform(get("/api/orders?status=PAID").session(customerSession))
+        mockMvc.perform(get("/api/orders/{orderId}", orderId).session(customerSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1))
-            .andExpect(jsonPath("$.items", hasSize(1)))
-            .andExpect(jsonPath("$.items[0].orderNo").value("ORDCENTER-PAID-001"))
-            .andExpect(jsonPath("$.items[0].orderStatus").value("PAID"));
+            .andExpect(jsonPath("$.orderStatus").value("PENDING_PAYMENT"))
+            .andExpect(jsonPath("$.shipment").value(nullValue()));
     }
 
     @Test
-    void userCanSearchOwnOrdersByOrderNoPrefixAndShortKeywordFallsBackToDefaultList() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-search-sales@example.com", "Sales@123456");
-        MockHttpSession customerSession = loginAsCustomer("order-center-search-customer@example.com", "Customer@123456");
+    void confirmReceiptCompletesOrderAndRepeatRequestIsIdempotent() throws Exception {
+        MockHttpSession salesSession = loginAsSales("fulfillment-receive-sales@example.com", "Sales@123456");
+        MockHttpSession customerSession = loginAsCustomer("fulfillment-receive-customer@example.com", "Customer@123456");
 
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Search",
-            "Order Center Search Tee",
-            "ORDER-CENTER-SEARCH",
-            "ORDCENTER-SEARCH-001",
-            LocalDateTime.of(2026, 5, 10, 9, 0, 0));
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Search",
-            "Order Center Other Tee",
-            "ORDER-CENTER-OTHER",
-            "ORDCENTER-OTHER-001",
-            LocalDateTime.of(2026, 5, 11, 9, 0, 0));
+        Long orderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-RECEIVE");
+        shipOrder(salesSession, orderId, "YTO", "YTO123456");
 
-        mockMvc.perform(get("/api/orders?orderNo=ORDCENTER-SEARCH").session(customerSession))
+        mockMvc.perform(post("/api/orders/{orderId}/receive", orderId).session(customerSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1))
-            .andExpect(jsonPath("$.items[0].orderNo").value("ORDCENTER-SEARCH-001"));
+            .andExpect(jsonPath("$.orderId").value(orderId))
+            .andExpect(jsonPath("$.orderStatus").value("COMPLETED"))
+            .andExpect(jsonPath("$.shipmentStatus").value("DELIVERED"));
 
-        mockMvc.perform(get("/api/orders?orderNo=ORD").session(customerSession))
+        mockMvc.perform(post("/api/orders/{orderId}/receive", orderId).session(customerSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(2))
-            .andExpect(jsonPath("$.items", hasSize(2)));
-    }
+            .andExpect(jsonPath("$.orderStatus").value("COMPLETED"))
+            .andExpect(jsonPath("$.shipmentStatus").value("DELIVERED"));
 
-    @Test
-    void userCannotSeeAnotherUsersOrdersInListResults() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-isolation-sales@example.com", "Sales@123456");
-        MockHttpSession ownerSession = loginAsCustomer("order-center-owner@example.com", "Customer@123456");
-        MockHttpSession otherSession = loginAsCustomer("order-center-other@example.com", "Customer@123456");
-
-        createReadyOrder(
-            salesSession,
-            ownerSession,
-            "Order Center-Isolation",
-            "Order Center Owner Tee",
-            "ORDER-CENTER-OWNER",
-            "ORDCENTER-OWNER-001",
-            LocalDateTime.of(2026, 5, 10, 11, 0, 0));
-        createReadyOrder(
-            salesSession,
-            otherSession,
-            "Order Center-Isolation",
-            "Order Center Other Tee",
-            "ORDER-CENTER-ISOLATION-OTHER",
-            "ORDCENTER-OTHER-001",
-            LocalDateTime.of(2026, 5, 11, 11, 0, 0));
-
-        mockMvc.perform(get("/api/orders").session(ownerSession))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1))
-            .andExpect(jsonPath("$.items", hasSize(1)))
-            .andExpect(jsonPath("$.items[0].orderNo").value("ORDCENTER-OWNER-001"));
-    }
-
-    @Test
-    void listProjectionUsesSmallestOrderItemAsSummaryAndCountsItems() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-summary-sales@example.com", "Sales@123456");
-        MockHttpSession customerSession = loginAsCustomer("order-center-summary-customer@example.com", "Customer@123456");
-
-        Long firstCategoryId = createCategory(salesSession, "Order Center-Summary-First");
-        Long secondCategoryId = createCategory(salesSession, "Order Center-Summary-Second");
-        createProduct(salesSession, firstCategoryId, "Order Center First Tee", "ORDER-CENTER-SUMMARY-FIRST", 88.00, 10);
-        createProduct(salesSession, secondCategoryId, "Order Center Second Tee", "ORDER-CENTER-SUMMARY-SECOND", 66.00, 10);
-
-        addCartItem(customerSession, readSkuId("ORDER-CENTER-SUMMARY-FIRST-001"), 1);
-        addCartItem(customerSession, readSkuId("ORDER-CENTER-SUMMARY-SECOND-001"), 1);
-        createAddress(customerSession, "李摘要", "13800008888", "浙江省", "杭州市", "西湖区", "摘要路 8 号", "310000");
-
-        Long orderId = createOrder(customerSession);
-        jdbcTemplate.update("update orders set order_no = ?, created_at = ? where id = ?", "ORDCENTER-SUMMARY-001",
-            LocalDateTime.of(2026, 5, 13, 10, 0, 0), orderId);
-        String expectedSummaryProductName = jdbcTemplate.queryForObject(
-            """
-            select product_name_snapshot
-            from order_items
-            where order_id = ?
-            order by id asc
-            limit 1
-            """,
-            String.class,
+        Integer historyCount = jdbcTemplate.queryForObject(
+            "select count(*) from order_status_histories where order_id = ?",
+            Integer.class,
             orderId);
-
-        mockMvc.perform(get("/api/orders?orderNo=ORDCENTER-SUMMARY").session(customerSession))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.total").value(1))
-            .andExpect(jsonPath("$.items[0].summaryProductName").value(expectedSummaryProductName))
-            .andExpect(jsonPath("$.items[0].summaryItemCount").value(2));
+        Assertions.assertThat(historyCount).isEqualTo(4);
     }
 
     @Test
-    void unmatchedFilterReturnsEmptyPagedResult() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-empty-sales@example.com", "Sales@123456");
-        MockHttpSession customerSession = loginAsCustomer("order-center-empty-customer@example.com", "Customer@123456");
+    void otherCustomerCannotConfirmReceiptForForeignOrder() throws Exception {
+        MockHttpSession salesSession = loginAsSales("fulfillment-owner-sales@example.com", "Sales@123456");
+        MockHttpSession ownerSession = loginAsCustomer("fulfillment-owner@example.com", "Customer@123456");
+        MockHttpSession otherSession = loginAsCustomer("fulfillment-other@example.com", "Customer@123456");
 
-        createReadyOrder(
-            salesSession,
-            customerSession,
-            "Order Center-Empty",
-            "Order Center Empty Tee",
-            "ORDER-CENTER-EMPTY",
-            "ORDCENTER-EMPTY-001",
-            LocalDateTime.of(2026, 5, 12, 8, 0, 0));
+        Long orderId = createPaidOrder(salesSession, ownerSession, "FULFILLMENT-OWNER");
+        shipOrder(salesSession, orderId, "ZTO", "ZTO998877");
 
-        mockMvc.perform(get("/api/orders?status=CLOSED").session(customerSession))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page").value(1))
-            .andExpect(jsonPath("$.size").value(10))
-            .andExpect(jsonPath("$.total").value(0))
-            .andExpect(jsonPath("$.totalPages").value(0))
-            .andExpect(jsonPath("$.items", hasSize(0)));
+        mockMvc.perform(post("/api/orders/{orderId}/receive", orderId).session(otherSession))
+            .andExpect(status().isNotFound());
     }
 
-    private Long createReadyOrder(
-        MockHttpSession salesSession,
-        MockHttpSession customerSession,
-        String categoryName,
-        String productName,
-        String spuCode,
-        String orderNo,
-        LocalDateTime createdAt
-    ) throws Exception {
-        Long categoryId = createCategory(salesSession, categoryName + "-" + spuCode);
-        createProduct(salesSession, categoryId, productName, spuCode, 99.00, 12);
+    @Test
+    void manualAutoCompleteOnlyCompletesExpiredShippedOrders() throws Exception {
+        MockHttpSession salesSession = loginAsSales("fulfillment-auto-sales@example.com", "Sales@123456");
+        MockHttpSession customerSession = loginAsCustomer("fulfillment-auto-customer@example.com", "Customer@123456");
+
+        Long expiredOrderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-AUTO-OLD");
+        Long freshOrderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-AUTO-NEW");
+        shipOrder(salesSession, expiredOrderId, "STO", "STO001");
+        shipOrder(salesSession, freshOrderId, "STO", "STO002");
+        jdbcTemplate.update(
+            "update orders set shipped_at = date_sub(now(3), interval 11 day) where id = ?",
+            expiredOrderId);
+
+        mockMvc.perform(post("/api/admin/orders/auto-complete").session(salesSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.completedCount").value(1));
+
+        mockMvc.perform(get("/api/orders/{orderId}", expiredOrderId).session(customerSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderStatus").value("COMPLETED"))
+            .andExpect(jsonPath("$.shipment.shippedAt").isNotEmpty())
+            .andExpect(jsonPath("$.statusHistory", hasSize(4)))
+            .andExpect(jsonPath("$.statusHistory[3].toStatus").value("COMPLETED"));
+
+        mockMvc.perform(get("/api/orders/{orderId}", freshOrderId).session(customerSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderStatus").value("SHIPPED"));
+    }
+
+    private Long createPendingOrder(MockHttpSession salesSession, MockHttpSession customerSession, String spuCode)
+        throws Exception {
+        Long categoryId = createCategory(salesSession, "Fulfillment-" + spuCode);
+        createProduct(salesSession, categoryId, "Fulfillment Tee " + spuCode, spuCode, 129.00, 10);
         Long skuId = readSkuId(spuCode + "-001");
 
         addCartItem(customerSession, skuId, 1);
-        createAddress(customerSession, "李订单", "13800009999", "上海市", "上海市", "徐汇区", "订单中心 99 号", "200030");
-        Long orderId = createOrder(customerSession);
-        jdbcTemplate.update("update orders set order_no = ?, created_at = ? where id = ?", orderNo, createdAt, orderId);
+        createAddress(customerSession, "履约用户", "13800018888", "上海市", "上海市", "浦东新区", "履约路 1 号", "200120");
+        return createOrder(customerSession);
+    }
+
+    private Long createPaidOrder(MockHttpSession salesSession, MockHttpSession customerSession, String spuCode)
+        throws Exception {
+        Long orderId = createPendingOrder(salesSession, customerSession, spuCode);
+        MvcResult attempt = mockMvc.perform(post("/api/payments/orders/{orderId}/attempts", orderId).session(customerSession))
+            .andExpect(status().isCreated())
+            .andReturn();
+        Long paymentId = readLongField(attempt.getResponse().getContentAsString(), "paymentId");
+        mockMvc.perform(post("/api/payments/{paymentId}/succeed", paymentId).session(customerSession))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderStatus").value("PAID"));
         return orderId;
+    }
+
+    private void shipOrder(MockHttpSession salesSession, Long orderId, String carrierName, String trackingNo) throws Exception {
+        mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
+                .session(salesSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "carrierName": "%s",
+                      "trackingNo": "%s"
+                    }
+                    """.formatted(carrierName, trackingNo)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orderStatus").value("SHIPPED"));
     }
 
     private void addCartItem(MockHttpSession session, Long skuId, int quantity) throws Exception {
@@ -345,12 +297,12 @@ class OrderCenterIntegrationTest {
     }
 
     private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "order-center-sales", "SALES");
+        seedUser(email, rawPassword, "fulfillment-sales", "SALES");
         return login(email, rawPassword);
     }
 
     private MockHttpSession loginAsCustomer(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "order-center-customer", "CUSTOMER");
+        seedUser(email, rawPassword, "fulfillment-customer", "CUSTOMER");
         return login(email, rawPassword);
     }
 
@@ -418,7 +370,7 @@ class OrderCenterIntegrationTest {
                       "categoryId": %d,
                       "name": "%s",
                       "spuCode": "%s",
-                      "subtitle": "Order center subtitle",
+                      "subtitle": "Fulfillment subtitle",
                       "coverImageUrl": "https://img.example.com/%s-cover.jpg",
                       "description": "<p>%s description</p>",
                       "status": "ON_SHELF",

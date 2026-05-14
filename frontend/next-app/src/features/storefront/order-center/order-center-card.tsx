@@ -53,6 +53,10 @@ function renderStatus(status: string) {
       return "待支付";
     case "PAID":
       return "已支付";
+    case "SHIPPED":
+      return "已发货";
+    case "COMPLETED":
+      return "已完成";
     case "CANCELLED":
       return "已取消";
     case "CLOSED":

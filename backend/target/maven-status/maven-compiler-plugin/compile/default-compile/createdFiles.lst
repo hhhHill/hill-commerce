@@ -1,3 +1,4 @@
+com\hillcommerce\modules\order\web\ShipmentDtos$ShipOrderRequest.class
 com\hillcommerce\modules\order\entity\OrderEntity.class
 com\hillcommerce\modules\cart\web\CartDtos$AddCartItemRequest.class
 com\hillcommerce\modules\user\mapper\UserMapper.class
@@ -10,6 +11,7 @@ com\hillcommerce\modules\product\web\StorefrontProductController.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductImageResponse.class
 com\hillcommerce\modules\cart\web\CartDtos.class
 com\hillcommerce\modules\product\entity\ProductAttributeValueEntity.class
+com\hillcommerce\modules\order\web\ShipmentController.class
 com\hillcommerce\framework\events\DomainEvent.class
 com\hillcommerce\modules\order\mapper\OrderItemMapper.class
 com\hillcommerce\modules\product\web\StorefrontCategoryController.class
@@ -25,6 +27,7 @@ com\hillcommerce\modules\product\entity\ProductSalesAttributeEntity.class
 com\hillcommerce\modules\order\web\OrderCenterDtos$OrderListResponse.class
 com\hillcommerce\modules\order\mapper\OrderMapper.class
 com\hillcommerce\modules\user\entity\UserAddressEntity.class
+com\hillcommerce\modules\order\web\ShipmentDtos$AdminOrderListResponse.class
 com\hillcommerce\modules\user\mapper\UserRoleMapper.class
 com\hillcommerce\modules\product\entity\ProductImageEntity.class
 com\hillcommerce\modules\product\entity\ProductCategoryEntity.class
@@ -46,6 +49,7 @@ com\hillcommerce\modules\product\entity\ProductEntity.class
 com\hillcommerce\modules\user\entity\UserRoleEntity.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductAttributeRequest.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$ProductCardResponse.class
+com\hillcommerce\modules\order\web\ShipmentDtos$AutoCompleteResponse.class
 com\hillcommerce\modules\cart\web\CartDtos$CartResponse.class
 com\hillcommerce\framework\events\DomainEventPublisher.class
 com\hillcommerce\modules\user\service\PasswordService.class
@@ -55,12 +59,14 @@ com\hillcommerce\modules\product\web\StorefrontProductDtos$ProductDetailResponse
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductRequest.class
 com\hillcommerce\modules\cart\service\CartService.class
 com\hillcommerce\modules\cart\web\CartDtos$CheckoutSummaryMetaResponse.class
+com\hillcommerce\modules\order\entity\ShipmentEntity.class
 com\hillcommerce\modules\order\web\OrderCenterDtos$OrderListItemResponse.class
 com\hillcommerce\modules\cart\service\CartService$ItemAnomaly.class
 com\hillcommerce\modules\user\entity\RoleEntity.class
 com\hillcommerce\modules\product\entity\ProductSalesAttributeValueEntity.class
 com\hillcommerce\modules\product\mapper\ProductMapper.class
 com\hillcommerce\modules\cart\web\CartDtos$CartItemResponse.class
+com\hillcommerce\modules\order\web\ShipmentDtos.class
 com\hillcommerce\modules\payment\service\PaymentService.class
 com\hillcommerce\modules\user\web\AuthDtos$RegisterRequest.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSalesAttributeValueResponse.class
@@ -78,16 +84,20 @@ com\hillcommerce\modules\product\service\ProductAdminService.class
 com\hillcommerce\framework\cache\CacheService.class
 com\hillcommerce\modules\order\web\OrderDtos.class
 com\hillcommerce\modules\order\service\OrderCheckoutService.class
+com\hillcommerce\modules\order\service\ShipmentService.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$CategoryResponse.class
 com\hillcommerce\framework\web\ApiExceptionHandler.class
 com\hillcommerce\modules\payment\web\PaymentDtos$PaymentOrderResponse.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$CategorySummaryResponse.class
 com\hillcommerce\modules\user\security\AppUserPrincipal.class
+com\hillcommerce\modules\order\web\ShipmentDtos$AdminOrderListItemResponse.class
 com\hillcommerce\modules\order\web\OrderCenterDtos$OrderListQuery.class
 com\hillcommerce\modules\payment\service\PaymentNumberGenerator.class
 com\hillcommerce\modules\product\entity\ProductSkuEntity.class
+com\hillcommerce\modules\order\web\ShipmentDtos$ConfirmReceiptResponse.class
 com\hillcommerce\modules\product\mapper\ProductSkuMapper.class
 com\hillcommerce\modules\payment\service\PaymentCloseService.class
+com\hillcommerce\modules\order\service\ShipmentStatus.class
 com\hillcommerce\modules\order\web\OrderDtos$CancelOrderResponse.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$ProductSkuResponse.class
 com\hillcommerce\modules\order\web\OrderDtos$CheckoutSummaryMetaResponse.class
@@ -105,12 +115,14 @@ com\hillcommerce\modules\order\web\OrderCenterController.class
 com\hillcommerce\modules\cart\entity\CartEntity.class
 com\hillcommerce\modules\payment\entity\PaymentEntity.class
 com\hillcommerce\modules\cart\web\CartSummaryController.class
+com\hillcommerce\modules\order\mapper\ShipmentMapper.class
 com\hillcommerce\modules\user\web\UserAddressDtos$UserAddressRequest.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductAttributeResponse.class
 com\hillcommerce\modules\product\web\ProductAdminDtos.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSummaryResponse.class
 com\hillcommerce\modules\user\entity\UserEntity.class
 com\hillcommerce\modules\order\service\OrderCenterService.class
+com\hillcommerce\modules\order\web\ShipmentDtos$ShipOrderResponse.class
 com\hillcommerce\modules\user\security\AppUserDetailsService.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSkuRequest.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSkuResponse.class
@@ -120,6 +132,7 @@ com\hillcommerce\modules\order\web\OrderCenterDtos.class
 com\hillcommerce\HillCommerceApplication.class
 com\hillcommerce\modules\cart\web\CartDtos$CartSummaryResponse.class
 com\hillcommerce\modules\cart\entity\CartItemEntity.class
+com\hillcommerce\modules\order\web\ShipmentDtos$ShipmentInfoResponse.class
 com\hillcommerce\modules\admin\web\AdminAuthController.class
 com\hillcommerce\modules\order\web\OrderDtos$OrderItemResponse.class
 com\hillcommerce\modules\user\service\UserAddressService.class

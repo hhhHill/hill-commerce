@@ -54,6 +54,12 @@ class PaymentFoundationIntegrationTest {
 
     @BeforeEach
     void cleanUp() {
+        jdbcTemplate.update(
+            """
+            delete s from shipments s
+            join orders o on o.id = s.order_id
+            where o.order_no like 'ORD-FOUNDATION-%'
+            """);
         jdbcTemplate.update("delete from payments where payment_no like 'PAY-FOUNDATION-%'");
         jdbcTemplate.update("delete from orders where order_no like 'ORD-FOUNDATION-%'");
         jdbcTemplate.update("delete from user_addresses where user_id in (select id from users where email like 'payment-foundation-%@example.com')");

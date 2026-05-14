@@ -30,17 +30,20 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final OrderStatusHistoryMapper orderStatusHistoryMapper;
     private final ProductSkuMapper productSkuMapper;
+    private final ShipmentService shipmentService;
 
     public OrderService(
         OrderMapper orderMapper,
         OrderItemMapper orderItemMapper,
         OrderStatusHistoryMapper orderStatusHistoryMapper,
-        ProductSkuMapper productSkuMapper
+        ProductSkuMapper productSkuMapper,
+        ShipmentService shipmentService
     ) {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.orderStatusHistoryMapper = orderStatusHistoryMapper;
         this.productSkuMapper = productSkuMapper;
+        this.shipmentService = shipmentService;
     }
 
     public OrderDetailResponse getOrder(Long userId, Long orderId) {
@@ -99,7 +102,8 @@ public class OrderService {
                 order.getAddressSnapshotPostalCode(),
                 true),
             items,
-            statusHistory);
+            statusHistory,
+            shipmentService.getShipmentInfo(orderId));
     }
 
     @Transactional

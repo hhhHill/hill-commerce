@@ -59,6 +59,7 @@ class PaymentIntegrationTest {
             .apply(springSecurity())
             .build();
 
+        jdbcTemplate.update("delete from shipments");
         jdbcTemplate.update("delete from payments where payment_no like 'PAY%'");
         jdbcTemplate.update("delete from order_status_histories");
         jdbcTemplate.update("delete from order_items");

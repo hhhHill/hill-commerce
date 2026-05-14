@@ -8,4 +8,5 @@ com\hillcommerce\product\StorefrontProductServiceTest.class
 com\hillcommerce\auth\AuthFlowIntegrationTest.class
 com\hillcommerce\product\ProductAdminIntegrationTest.class
 com\hillcommerce\order\OrderCenterIntegrationTest.class
+com\hillcommerce\fulfillment\FulfillmentIntegrationTest.class
 com\hillcommerce\payment\PaymentIntegrationTest.class

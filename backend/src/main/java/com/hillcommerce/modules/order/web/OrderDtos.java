@@ -1,5 +1,7 @@
 package com.hillcommerce.modules.order.web;
 
+import static com.hillcommerce.modules.order.web.ShipmentDtos.ShipmentInfoResponse;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -99,7 +101,8 @@ public final class OrderDtos {
         LocalDateTime paymentDeadlineAt,
         CheckoutAddressResponse address,
         List<OrderItemResponse> items,
-        List<OrderStatusHistoryResponse> statusHistory
+        List<OrderStatusHistoryResponse> statusHistory,
+        ShipmentInfoResponse shipment
     ) {
     }
 

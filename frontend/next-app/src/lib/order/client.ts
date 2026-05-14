@@ -4,6 +4,7 @@ import { OrderRequestError } from "@/lib/order/errors";
 import type {
   ApiErrorResponse,
   CancelOrderResult,
+  ConfirmReceiptResult,
   CreateOrderResult,
   OrderCheckout,
   OrderDetail,
@@ -31,6 +32,12 @@ export async function getOrder(orderId: number): Promise<OrderDetail> {
 
 export async function cancelOrder(orderId: number): Promise<CancelOrderResult> {
   return sendOrderRequest<CancelOrderResult>(`/api/orders/${orderId}/cancel`, {
+    method: "POST"
+  });
+}
+
+export async function confirmReceipt(orderId: number): Promise<ConfirmReceiptResult> {
+  return sendOrderRequest<ConfirmReceiptResult>(`/api/orders/${orderId}/receive`, {
     method: "POST"
   });
 }

@@ -16,6 +16,7 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const canCancel = order.orderStatus === "PENDING_PAYMENT";
+  const canPay = order.orderStatus === "PENDING_PAYMENT";
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
@@ -23,8 +24,8 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
         <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
           Order Created
         </span>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">订单已创建，等待支付</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-black/65">当前 `order-checkout` 阶段已经完成：订单、订单项、地址快照和库存扣减都已落库。下一阶段 `payment` 会承接支付成功与超时关闭。</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight">{renderHeadline(order.orderStatus)}</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-black/65">{renderDescription(order.orderStatus)}</p>
 
         <dl className="mt-6 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
           <Metric label="订单号" value={order.orderNo} />
@@ -36,6 +37,9 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white" href={`/orders/${order.id}`}>
             查看订单详情
+          </Link>
+          <Link className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium" href="/orders">
+            返回我的订单
           </Link>
           <Link className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium" href="/cart">
             返回购物车
@@ -61,7 +65,13 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          <span className="rounded-full bg-black/5 px-5 py-3 text-center text-sm font-medium text-black/55">去支付入口将在 payment feature 接入</span>
+          {canPay ? (
+            <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-center text-sm font-semibold text-white" href={`/pay/${order.id}`}>
+              去支付
+            </Link>
+          ) : (
+            <div className="rounded-[22px] bg-black/5 px-4 py-4 text-sm font-medium text-black/60">{renderPaymentHint(order.orderStatus)}</div>
+          )}
           {canCancel ? (
             <button
               className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700"
@@ -120,9 +130,50 @@ function renderStatus(status: string) {
       return "待支付";
     case "CANCELLED":
       return "已取消";
+    case "CLOSED":
+      return "已关闭";
     case "PAID":
       return "已支付";
     default:
       return status;
+  }
+}
+
+function renderHeadline(status: string) {
+  switch (status) {
+    case "PAID":
+      return "订单已支付";
+    case "CANCELLED":
+      return "订单已取消";
+    case "CLOSED":
+      return "订单已关闭";
+    default:
+      return "订单已创建，等待支付";
+  }
+}
+
+function renderDescription(status: string) {
+  switch (status) {
+    case "PAID":
+      return "支付已经完成，订单、订单项、地址快照和库存扣减都已稳定落库。";
+    case "CANCELLED":
+      return "这笔订单已被用户主动取消，不再允许进入支付链路。";
+    case "CLOSED":
+      return "这笔订单因超时未支付已被系统关闭，不再允许进入支付链路。";
+    default:
+      return "当前 `order-checkout` 阶段已经完成：订单、订单项、地址快照和库存扣减都已落库。接下来由 `payment` 承接支付成功与超时关闭。";
+  }
+}
+
+function renderPaymentHint(status: string) {
+  switch (status) {
+    case "PAID":
+      return "当前订单已支付，无需再次发起支付。";
+    case "CANCELLED":
+      return "当前订单已取消，支付入口已关闭。";
+    case "CLOSED":
+      return "当前订单已关闭，支付入口已关闭。";
+    default:
+      return "当前订单不处于可支付状态。";
   }
 }

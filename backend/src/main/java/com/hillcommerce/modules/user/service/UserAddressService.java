@@ -5,6 +5,8 @@ import static com.hillcommerce.modules.user.web.UserAddressDtos.UserAddressRespo
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,8 @@ import com.hillcommerce.modules.user.mapper.UserAddressMapper;
 
 @Service
 public class UserAddressService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserAddressService.class);
 
     private final UserAddressMapper userAddressMapper;
 
@@ -41,14 +45,19 @@ public class UserAddressService {
         applyRequest(entity, request);
         entity.setIsDefault(shouldBeDefault);
         userAddressMapper.insert(entity);
+        log.info("Address created: userId={}, addressId={}, receiverName={}, isDefault={}",
+            userId, entity.getId(), entity.getReceiverName(), shouldBeDefault);
         return toResponse(entity);
     }
 
     @Transactional
     public UserAddressResponse updateAddress(Long userId, Long addressId, UserAddressRequest request) {
         UserAddressEntity entity = requireOwnedAddress(userId, addressId);
+        boolean wasDefault = Boolean.TRUE.equals(entity.getIsDefault());
         applyRequest(entity, request);
         userAddressMapper.updateById(entity);
+        log.info("Address updated: userId={}, addressId={}, receiverName={}, isDefaultPreserved={}",
+            userId, addressId, entity.getReceiverName(), wasDefault);
         return toResponse(entity);
     }
 

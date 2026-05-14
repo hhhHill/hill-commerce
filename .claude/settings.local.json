@@ -14,7 +14,9 @@
       "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\cart\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\cart\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/cart directory does not exist\" })",
       "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\checkout-summary\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\checkout-summary\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/checkout-summary directory does not exist\" })",
       "PowerShell(if \\(Test-Path \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\account\\\\addresses\"\\) { Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\frontend\\\\next-app\\\\src\\\\app\\\\account\\\\addresses\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\hill-commerce\\\\\", \"\"\\) } } else { Write-Output \"app/account/addresses directory does not exist\" })",
-      "PowerShell(Stop-Process *)"
+      "PowerShell(Stop-Process *)",
+      "Bash(docker exec hill-commerce-mysql *)",
+      "Bash(curl *)"
     ]
   }
 }

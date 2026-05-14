@@ -47,6 +47,9 @@ export default async function HomePage() {
                     <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/account">
                       账户页
                     </Link>
+                    <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/orders">
+                      我的订单
+                    </Link>
                     <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
                       购物车
                     </Link>

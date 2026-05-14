@@ -6,8 +6,14 @@ import type {
   CancelOrderResult,
   CreateOrderResult,
   OrderCheckout,
-  OrderDetail
+  OrderDetail,
+  OrderListQuery,
+  OrderListResult
 } from "@/lib/order/types";
+
+export async function listOrders(query?: OrderListQuery): Promise<OrderListResult> {
+  return sendOrderRequest<OrderListResult>(`/api/orders${buildOrderListSearch(query)}`);
+}
 
 export async function getOrderCheckout(): Promise<OrderCheckout> {
   return sendOrderRequest<OrderCheckout>("/api/orders/checkout");
@@ -45,6 +51,29 @@ async function sendOrderRequest<T>(input: RequestInfo, init?: RequestInit): Prom
   }
 
   return (await response.json()) as T;
+}
+
+function buildOrderListSearch(query?: OrderListQuery): string {
+  if (!query) {
+    return "";
+  }
+
+  const searchParams = new URLSearchParams();
+  if (query.page !== undefined) {
+    searchParams.set("page", String(query.page));
+  }
+  if (query.size !== undefined) {
+    searchParams.set("size", String(query.size));
+  }
+  if (query.status) {
+    searchParams.set("status", query.status);
+  }
+  if (query.orderNo?.trim()) {
+    searchParams.set("orderNo", query.orderNo.trim());
+  }
+
+  const search = searchParams.toString();
+  return search ? `?${search}` : "";
 }
 
 async function safeJson(response: Response): Promise<unknown | null> {

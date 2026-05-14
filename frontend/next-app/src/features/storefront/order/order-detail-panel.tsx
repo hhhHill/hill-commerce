@@ -16,6 +16,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const canCancel = order.orderStatus === "PENDING_PAYMENT";
+  const canPay = order.orderStatus === "PENDING_PAYMENT";
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
@@ -113,7 +114,13 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
         <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
           <h2 className="text-2xl font-semibold tracking-tight">订单动作</h2>
           <div className="mt-5 flex flex-col gap-3">
-            <span className="rounded-full bg-black/5 px-5 py-3 text-center text-sm font-medium text-black/55">支付入口将在 payment feature 接入</span>
+            {canPay ? (
+              <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-center text-sm font-semibold text-white" href={`/pay/${order.id}`}>
+                去支付
+              </Link>
+            ) : (
+              <div className="rounded-[22px] bg-black/5 px-4 py-4 text-sm font-medium text-black/60">{renderPaymentHint(order.orderStatus)}</div>
+            )}
             {canCancel ? (
               <button
                 className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700"
@@ -138,6 +145,9 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
             )}
             <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/cart">
               返回购物车
+            </Link>
+            <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/orders">
+              返回我的订单
             </Link>
             {message ? <p className="text-sm text-red-700">{message}</p> : null}
           </div>
@@ -176,9 +186,24 @@ function renderStatus(status: string) {
       return "待支付";
     case "CANCELLED":
       return "已取消";
+    case "CLOSED":
+      return "已关闭";
     case "PAID":
       return "已支付";
     default:
       return status;
+  }
+}
+
+function renderPaymentHint(status: string) {
+  switch (status) {
+    case "PAID":
+      return "当前订单已支付，无需再次发起支付。";
+    case "CANCELLED":
+      return "当前订单已取消，支付入口已关闭。";
+    case "CLOSED":
+      return "当前订单已关闭，支付入口已关闭。";
+    default:
+      return "当前订单不处于可支付状态。";
   }
 }

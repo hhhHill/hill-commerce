@@ -32,6 +32,12 @@ export default async function AccountPage() {
           <Link className="rounded-full border border-black/10 px-5 py-2 font-medium" href="/">
             返回首页
           </Link>
+          <Link className="rounded-full border border-black/10 px-5 py-2 font-medium" href="/orders">
+            我的订单
+          </Link>
+          <Link className="rounded-full border border-black/10 px-5 py-2 font-medium" href="/cart">
+            购物车
+          </Link>
           <Link className="rounded-full border border-black/10 px-5 py-2 font-medium" href="/admin">
             访问后台示例页
           </Link>

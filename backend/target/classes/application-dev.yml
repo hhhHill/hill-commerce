@@ -6,3 +6,8 @@ logging:
   level:
     root: INFO
     com.hillcommerce: DEBUG
+    com.hillcommerce.modules.order.mapper: WARN
+    com.hillcommerce.modules.payment.mapper: WARN
+    com.hillcommerce.modules.product.mapper: WARN
+    com.hillcommerce.modules.user.mapper: WARN
+    com.hillcommerce.modules.cart.mapper: WARN

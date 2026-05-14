@@ -2,6 +2,37 @@ export type ApiErrorResponse = {
   message?: string;
 };
 
+export type OrderListStatus =
+  | "PENDING_PAYMENT"
+  | "PAID"
+  | "CANCELLED"
+  | "CLOSED";
+
+export type OrderListQuery = {
+  page?: number;
+  size?: number;
+  status?: OrderListStatus;
+  orderNo?: string;
+};
+
+export type OrderListItem = {
+  orderId: number;
+  orderNo: string;
+  orderStatus: OrderListStatus;
+  payableAmount: number;
+  createdAt: string;
+  summaryProductName: string | null;
+  summaryItemCount: number;
+};
+
+export type OrderListResult = {
+  items: OrderListItem[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+};
+
 export type OrderCheckoutAddress = {
   id: number | null;
   receiverName: string;

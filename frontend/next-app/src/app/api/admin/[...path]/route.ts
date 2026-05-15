@@ -32,7 +32,7 @@ async function proxyAdminRequest(request: NextRequest, context: Params, method: 
     .getAll()
     .map(({ name, value }) => `${name}=${value}`)
     .join("; ");
-  const body = method === "GET" || method === "DELETE" ? undefined : await request.json();
+  const body = method === "GET" || method === "DELETE" ? undefined : await safeJsonBody(request);
 
   return proxyBackendRequest({
     method,
@@ -41,4 +41,16 @@ async function proxyAdminRequest(request: NextRequest, context: Params, method: 
     cookieHeader,
     body
   });
+}
+
+async function safeJsonBody(request: NextRequest): Promise<unknown> {
+  const contentLength = request.headers.get("content-length");
+  if (!contentLength || contentLength === "0") {
+    return undefined;
+  }
+  try {
+    return await request.json();
+  } catch {
+    return undefined;
+  }
 }

@@ -2,6 +2,7 @@ package com.hillcommerce.modules.user.security;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -39,6 +40,9 @@ public class AppAuthenticationProvider implements AuthenticationProvider {
         String rawPassword = String.valueOf(authentication.getCredentials());
 
         AppUserPrincipal principal = (AppUserPrincipal) userDetailsService.loadUserByUsername(email);
+        if (!principal.isEnabled()) {
+            throw new DisabledException("User is disabled");
+        }
         if (!passwordService.matches(rawPassword, principal.getPassword())) {
             throw new BadCredentialsException("Invalid email or password");
         }

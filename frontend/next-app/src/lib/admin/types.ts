@@ -98,6 +98,44 @@ export type ApiErrorResponse = {
   message?: string;
 };
 
+export type SalesUser = {
+  id: number;
+  email: string;
+  nickname: string;
+  enabled: boolean;
+  createdAt: string;
+};
+
+export type SalesUserListResult = {
+  users: SalesUser[];
+};
+
+export type CreateSalesInput = {
+  email: string;
+  nickname: string;
+  password: string;
+};
+
+export type ResetPasswordInput = {
+  password: string;
+};
+
+export type DisableResult = {
+  userId: number;
+  enabled: boolean;
+};
+
+export type SalesRankItem = {
+  nickname: string;
+  orderCount: number;
+};
+
+export type DashboardSummary = {
+  orderStatusCounts: Record<string, number>;
+  totalSalesAmount: number;
+  salesRanking: SalesRankItem[];
+};
+
 export type AdminOrderStatus = "PENDING_PAYMENT" | "PAID" | "SHIPPED" | "COMPLETED" | "CANCELLED" | "CLOSED";
 
 export type AdminOrderListItem = {

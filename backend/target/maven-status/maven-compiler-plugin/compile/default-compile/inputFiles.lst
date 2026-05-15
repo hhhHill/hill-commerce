@@ -7,7 +7,13 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\framework\security\Secur
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\framework\web\ApiExceptionHandler.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\framework\web\HealthController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\HillCommerceApplication.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\service\AdminDashboardService.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\service\AdminUserService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminAuthController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminDashboardController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminDashboardDtos.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminUserController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\admin\web\AdminUserDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\entity\CartEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\entity\CartItemEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\mapper\CartItemMapper.java

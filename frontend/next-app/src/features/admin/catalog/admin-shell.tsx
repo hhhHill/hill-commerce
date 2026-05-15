@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { LogoutButton } from "@/components/logout-button";
-import type { SessionUser } from "@/lib/auth/types";
+import type { SessionUser, SessionUserRole } from "@/lib/auth/types";
 
 type AdminShellProps = {
   title: string;
@@ -11,14 +11,24 @@ type AdminShellProps = {
   children: ReactNode;
 };
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  roles?: SessionUserRole[];
+};
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "后台总览" },
   { href: "/admin/categories", label: "分类管理" },
   { href: "/admin/products", label: "商品管理" },
-  { href: "/admin/orders", label: "订单管理" }
+  { href: "/admin/orders", label: "订单管理" },
+  { href: "/admin/users", label: "用户管理", roles: ["ADMIN"] },
+  { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] }
 ];
 
 export function AdminShell({ title, description, user, children }: AdminShellProps) {
+  const navItems = NAV_ITEMS.filter((item) => !item.roles || item.roles.some((role) => user.roles.includes(role)));
+
   return (
     <main className="min-h-screen px-6 py-10">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
@@ -46,7 +56,7 @@ export function AdminShell({ title, description, user, children }: AdminShellPro
             </div>
           </div>
           <nav className="mt-6 flex flex-wrap gap-3">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 className="rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium transition hover:border-[var(--accent)] hover:text-[var(--accent)]"

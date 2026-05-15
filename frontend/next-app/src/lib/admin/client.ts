@@ -5,10 +5,16 @@ import type {
   AutoCompleteResult,
   Category,
   CategoryStatus,
+  CreateSalesInput,
+  DashboardSummary,
+  DisableResult,
   ProductDetail,
   ProductPayload,
   ProductStatus,
   ProductSummary,
+  ResetPasswordInput,
+  SalesUser,
+  SalesUserListResult,
   ShipOrderResult
 } from "@/lib/admin/types";
 
@@ -75,6 +81,45 @@ export async function shipOrder(orderId: number, carrierName: string, trackingNo
 export async function triggerAutoComplete(): Promise<AutoCompleteResult> {
   return sendAdminRequest<AutoCompleteResult>("/api/admin/orders/auto-complete", {
     method: "POST"
+  });
+}
+
+export async function listSalesUsers(): Promise<SalesUser[]> {
+  const result = await sendAdminRequest<SalesUserListResult>("/api/admin/users", {
+    method: "GET"
+  });
+  return result.users;
+}
+
+export async function createSalesUser(input: CreateSalesInput): Promise<SalesUser> {
+  return sendAdminRequest<SalesUser>("/api/admin/users", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export async function disableSalesUser(userId: number): Promise<DisableResult> {
+  return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/disable`, {
+    method: "POST"
+  });
+}
+
+export async function enableSalesUser(userId: number): Promise<DisableResult> {
+  return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/enable`, {
+    method: "POST"
+  });
+}
+
+export async function resetSalesPassword(userId: number, input: ResetPasswordInput): Promise<DisableResult> {
+  return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/reset-password`, {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export async function getDashboardSummary(): Promise<DashboardSummary> {
+  return sendAdminRequest<DashboardSummary>("/api/admin/dashboard/summary", {
+    method: "GET"
   });
 }
 

@@ -1,7 +1,15 @@
 import { cookies } from "next/headers";
 
 import { getBackendBaseUrl } from "@/lib/config";
-import type { AdminOrderListResult, Category, ProductDetail, ProductListFilters, ProductSummary } from "@/lib/admin/types";
+import type {
+  AdminOrderListResult,
+  Category,
+  DashboardSummary,
+  ProductDetail,
+  ProductListFilters,
+  ProductSummary,
+  SalesUserListResult
+} from "@/lib/admin/types";
 import type { OrderDetail, OrderListStatus } from "@/lib/order/types";
 
 export async function getAdminCategories(): Promise<Category[]> {
@@ -45,6 +53,15 @@ export async function getAdminOrders(status?: OrderListStatus, page = 1, size = 
 
 export async function getAdminShipOrder(orderId: number): Promise<OrderDetail> {
   return fetchAdminJson<OrderDetail>(`/api/admin/orders/${orderId}/ship`);
+}
+
+export async function getServerSalesUsers() {
+  const result = await fetchAdminJson<SalesUserListResult>("/api/admin/users");
+  return result.users;
+}
+
+export async function getServerDashboardSummary(): Promise<DashboardSummary> {
+  return fetchAdminJson<DashboardSummary>("/api/admin/dashboard/summary");
 }
 
 async function fetchAdminJson<T>(pathname: string): Promise<T> {

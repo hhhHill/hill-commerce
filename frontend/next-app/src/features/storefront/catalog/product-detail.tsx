@@ -9,52 +9,60 @@ type ProductDetailPanelProps = {
 
 export function ProductDetailPanel({ product, isAuthenticated, loginHref }: ProductDetailPanelProps) {
   return (
-    <section className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-      <div className="flex flex-col gap-4">
-        <div className="surface-card overflow-hidden rounded-lg">
-          <div className="aspect-[4/5] bg-[var(--border-light)]">
-            {product.coverImageUrl ? (
-              <img alt={product.name} className="h-full w-full object-cover" src={product.coverImageUrl} />
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm font-medium text-[var(--text-hint)]">暂无商品图片</div>
-            )}
-          </div>
-        </div>
-        {product.detailImages.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2">
-            {product.detailImages.map((imageUrl) => (
-              <div key={imageUrl} className="overflow-hidden rounded-lg border border-[var(--border-normal)] bg-white">
-                <img alt={product.name} className="aspect-square w-full object-cover" src={imageUrl} />
-              </div>
-            ))}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="surface-card flex flex-col gap-4 rounded-lg px-4 py-4">
+    <section className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+      {/* 上半部分：左图右信息，桌面端左右分栏，手机端上下堆叠 */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* 左侧：商品图片 */}
         <div className="flex flex-col gap-3">
-          <div className="flex max-w-xl flex-col gap-2">
-            <span className="chip-badge w-fit">
-              {product.categoryName}
-            </span>
-            <h1 className="text-[28px] font-semibold tracking-tight">{product.name}</h1>
+          <div className="surface-card overflow-hidden rounded-lg">
+            <div className="aspect-[4/5] bg-[var(--border-light)]">
+              {product.coverImageUrl ? (
+                <img alt={product.name} className="h-full w-full object-cover" src={product.coverImageUrl} />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm font-medium text-[var(--text-hint)]">暂无商品图片</div>
+              )}
+            </div>
+          </div>
+          {product.detailImages.length > 0 ? (
+            <div className="grid grid-cols-3 gap-2">
+              {product.detailImages.map((imageUrl) => (
+                <div key={imageUrl} className="overflow-hidden rounded-lg border border-[var(--border-normal)] bg-white">
+                  <img alt={product.name} className="aspect-square w-full object-cover" src={imageUrl} />
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        {/* 右侧：价格与购买信息 */}
+        <div className="surface-card flex flex-col gap-5 rounded-lg px-5 py-5">
+          <div className="flex flex-col gap-3">
+            <span className="chip-badge w-fit">{product.categoryName}</span>
+            <h1 className="text-[26px] font-semibold tracking-tight">{product.name}</h1>
             {product.subtitle ? <p className="text-sm leading-6 text-[var(--text-secondary)]">{product.subtitle}</p> : null}
           </div>
+
           <div className="surface-subtle px-4 py-4">
             <p className="text-sm text-[var(--text-secondary)]">到手价</p>
-            <p className="mt-2 text-[32px] font-bold leading-none tracking-tight text-[var(--price)]" style={{ fontFamily: "var(--font-price)" }}>
+            <p
+              className="mt-2 text-[32px] font-bold leading-none tracking-tight text-[var(--price)]"
+              style={{ fontFamily: "var(--font-price)" }}
+            >
               {product.salePrice ? `¥${product.salePrice}` : "待定价"}
             </p>
           </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <InfoTile label="可售状态" value={renderSaleStatus(product.saleStatus)} />
+            <InfoTile label="SKU 数量" value={`${product.skus.length} 个可查看选项`} />
+          </div>
+
+          <AddToCartPanel isAuthenticated={isAuthenticated} loginHref={loginHref} product={product} />
         </div>
+      </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">
-          <InfoTile label="可售状态" value={renderSaleStatus(product.saleStatus)} />
-          <InfoTile label="SKU 数量" value={`${product.skus.length} 个可查看选项`} />
-        </div>
-
-        <AddToCartPanel isAuthenticated={isAuthenticated} loginHref={loginHref} product={product} />
-
+      {/* 下半部分：规格、SKU 明细、商品详情（后续商家补充内容也放这里） */}
+      <div className="surface-card flex flex-col gap-4 rounded-lg px-5 py-5">
         {product.salesAttributes.length > 0 ? (
           <section className="flex flex-col gap-3">
             <h2 className="text-sm font-semibold text-[var(--text-secondary)]">规格选项</h2>
@@ -64,7 +72,10 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
                   <p className="text-sm font-semibold">{attribute.name}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {attribute.values.map((value) => (
-                      <span key={value.id} className="rounded-md border border-[var(--border-normal)] bg-white px-3 py-2 text-sm text-[var(--text-secondary)]">
+                      <span
+                        key={value.id}
+                        className="rounded-md border border-[var(--border-normal)] bg-white px-3 py-2 text-sm text-[var(--text-secondary)]"
+                      >
                         {value.value}
                       </span>
                     ))}

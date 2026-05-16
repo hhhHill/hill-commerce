@@ -8,6 +8,7 @@ import com.hillcommerce.modules.logging.entity.ProductViewLogEntity;
 import com.hillcommerce.modules.logging.mapper.LoginLogMapper;
 import com.hillcommerce.modules.logging.mapper.OperationLogMapper;
 import com.hillcommerce.modules.logging.mapper.ProductViewLogMapper;
+import com.hillcommerce.modules.recommendation.GorseFeedbackService;
 
 @Service
 public class LoggingService {
@@ -15,15 +16,18 @@ public class LoggingService {
     private final LoginLogMapper loginLogMapper;
     private final OperationLogMapper operationLogMapper;
     private final ProductViewLogMapper productViewLogMapper;
+    private final GorseFeedbackService gorseFeedbackService;
 
     public LoggingService(
         LoginLogMapper loginLogMapper,
         OperationLogMapper operationLogMapper,
-        ProductViewLogMapper productViewLogMapper
+        ProductViewLogMapper productViewLogMapper,
+        GorseFeedbackService gorseFeedbackService
     ) {
         this.loginLogMapper = loginLogMapper;
         this.operationLogMapper = operationLogMapper;
         this.productViewLogMapper = productViewLogMapper;
+        this.gorseFeedbackService = gorseFeedbackService;
     }
 
     public void recordLogin(
@@ -79,5 +83,6 @@ public class LoggingService {
         entity.setProductId(productId);
         entity.setCategoryId(categoryId);
         productViewLogMapper.insert(entity);
+        gorseFeedbackService.fireAndForgetView(userId, anonymousId, productId);
     }
 }

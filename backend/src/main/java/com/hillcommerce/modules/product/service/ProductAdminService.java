@@ -48,6 +48,7 @@ import com.hillcommerce.modules.product.mapper.ProductMapper;
 import com.hillcommerce.modules.product.mapper.ProductSalesAttributeMapper;
 import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
+import com.hillcommerce.modules.recommendation.GorseCatalogSyncService;
 
 @Service
 public class ProductAdminService {
@@ -67,6 +68,7 @@ public class ProductAdminService {
     private final ProductSalesAttributeMapper productSalesAttributeMapper;
     private final ProductSalesAttributeValueMapper productSalesAttributeValueMapper;
     private final ProductSkuMapper productSkuMapper;
+    private final GorseCatalogSyncService gorseCatalogSyncService;
 
     public ProductAdminService(
         ProductCategoryMapper productCategoryMapper,
@@ -75,7 +77,8 @@ public class ProductAdminService {
         ProductAttributeValueMapper productAttributeValueMapper,
         ProductSalesAttributeMapper productSalesAttributeMapper,
         ProductSalesAttributeValueMapper productSalesAttributeValueMapper,
-        ProductSkuMapper productSkuMapper
+        ProductSkuMapper productSkuMapper,
+        GorseCatalogSyncService gorseCatalogSyncService
     ) {
         this.productCategoryMapper = productCategoryMapper;
         this.productMapper = productMapper;
@@ -84,6 +87,7 @@ public class ProductAdminService {
         this.productSalesAttributeMapper = productSalesAttributeMapper;
         this.productSalesAttributeValueMapper = productSalesAttributeValueMapper;
         this.productSkuMapper = productSkuMapper;
+        this.gorseCatalogSyncService = gorseCatalogSyncService;
     }
 
     public List<CategoryResponse> listCategories() {
@@ -204,13 +208,14 @@ public class ProductAdminService {
 
         product.setStatus(normalizedStatus);
         productMapper.updateById(product);
+        gorseCatalogSyncService.syncProduct(product);
 
         return buildProductResponse(product);
     }
 
     @Transactional
     public void deleteProduct(Long productId) {
-        requireActiveProduct(productId);
+        ProductEntity product = requireActiveProduct(productId);
         productMapper.update(
             null,
             new LambdaUpdateWrapper<ProductEntity>()
@@ -218,6 +223,10 @@ public class ProductAdminService {
                 .set(ProductEntity::getDeleted, true)
                 .set(ProductEntity::getDeletedAt, LocalDateTime.now())
                 .set(ProductEntity::getStatus, PRODUCT_STATUS_OFF_SHELF));
+        product.setDeleted(true);
+        product.setDeletedAt(LocalDateTime.now());
+        product.setStatus(PRODUCT_STATUS_OFF_SHELF);
+        gorseCatalogSyncService.syncProduct(product);
     }
 
     private ProductResponse saveProduct(Long productId, ProductRequest request) {
@@ -258,7 +267,9 @@ public class ProductAdminService {
         persistSalesAttributes(persistedProductId, request.salesAttributes());
         persistSkus(persistedProductId, skuRequests, resolvedSkuCodes);
 
-        return buildProductResponse(requireActiveProduct(persistedProductId));
+        ProductEntity persistedProduct = requireActiveProduct(persistedProductId);
+        gorseCatalogSyncService.syncProduct(persistedProduct);
+        return buildProductResponse(persistedProduct);
     }
 
     private void validateCategoryRequest(CategoryRequest request, Long currentCategoryId) {

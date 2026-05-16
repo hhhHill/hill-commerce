@@ -2,6 +2,11 @@ import { cookies } from "next/headers";
 
 import { getBackendBaseUrl } from "@/lib/config";
 import type {
+  AggregateProfileResponse,
+  ProductRankingResponse,
+  TrendResponse
+} from "@/lib/admin/analytics-types";
+import type {
   AdminOrderListResult,
   Category,
   DashboardSummary,
@@ -65,6 +70,37 @@ export async function getServerSalesUsers() {
 
 export async function getServerDashboardSummary(): Promise<DashboardSummary> {
   return fetchAdminJson<DashboardSummary>("/api/admin/dashboard/summary");
+}
+
+export async function getServerAnalyticsTrends(params: { granularity?: string; from?: string; to?: string } = {}): Promise<TrendResponse> {
+  const search = new URLSearchParams();
+  if (params.granularity) {
+    search.set("granularity", params.granularity);
+  }
+  if (params.from) {
+    search.set("from", params.from);
+  }
+  if (params.to) {
+    search.set("to", params.to);
+  }
+  const query = search.toString();
+  return fetchAdminJson<TrendResponse>(`/api/admin/analytics/trends${query ? `?${query}` : ""}`);
+}
+
+export async function getServerAnalyticsProductRankings(params: { range?: string; limit?: number } = {}): Promise<ProductRankingResponse> {
+  const search = new URLSearchParams();
+  if (params.range) {
+    search.set("range", params.range);
+  }
+  if (params.limit) {
+    search.set("limit", String(params.limit));
+  }
+  const query = search.toString();
+  return fetchAdminJson<ProductRankingResponse>(`/api/admin/analytics/rankings/products${query ? `?${query}` : ""}`);
+}
+
+export async function getServerAnalyticsAggregateProfiles(): Promise<AggregateProfileResponse> {
+  return fetchAdminJson<AggregateProfileResponse>("/api/admin/analytics/profiles/aggregate");
 }
 
 export async function getServerLoginLogs(params: { email?: string; result?: string } = {}): Promise<LoginLogListResult> {

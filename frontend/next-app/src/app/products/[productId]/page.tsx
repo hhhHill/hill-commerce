@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { HomeShortcut } from "@/features/storefront/catalog/home-shortcut";
 import { ProductDetailPanel } from "@/features/storefront/catalog/product-detail";
 import { ProductViewBeacon } from "@/features/storefront/catalog/product-view-beacon";
+import { RecommendationSection } from "@/features/storefront/catalog/recommendation-section";
 import { SearchForm } from "@/features/storefront/catalog/search-form";
 import { getSessionUser } from "@/lib/auth/server";
 import { StorefrontRequestError } from "@/lib/storefront/errors";
-import { getServerStorefrontProductDetail } from "@/lib/storefront/server";
+import { getServerStorefrontProductDetail, getServerStorefrontRecommendations } from "@/lib/storefront/server";
 
 type ProductDetailPageProps = {
   params: Promise<{
@@ -19,6 +20,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { productId } = await params;
   try {
     const [product, user] = await Promise.all([getServerStorefrontProductDetail(Number(productId)), getSessionUser()]);
+    const recommendations = await getServerStorefrontRecommendations({ type: "detail", productId: product.id, n: 6 });
 
     return (
       <main className="page-shell">
@@ -38,6 +40,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             loginHref={`/login?next=${encodeURIComponent(`/products/${product.id}`)}`}
             product={product}
           />
+          <RecommendationSection products={recommendations} />
         </div>
       </main>
     );

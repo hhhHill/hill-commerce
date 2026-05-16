@@ -3,15 +3,21 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
 import { CategoryDirectory } from "@/features/storefront/catalog/category-list";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
+import { RecommendationSection } from "@/features/storefront/catalog/recommendation-section";
 import { SearchForm } from "@/features/storefront/catalog/search-form";
 import { getSessionUser } from "@/lib/auth/server";
-import { getServerStorefrontCategories, getServerStorefrontProducts } from "@/lib/storefront/server";
+import {
+  getServerStorefrontCategories,
+  getServerStorefrontProducts,
+  getServerStorefrontRecommendations
+} from "@/lib/storefront/server";
 
 export default async function HomePage() {
   const user = await getSessionUser();
-  const [categories, products] = await Promise.all([
+  const [categories, products, recommendations] = await Promise.all([
     getServerStorefrontCategories(),
-    getServerStorefrontProducts({ pageSize: 12 })
+    getServerStorefrontProducts({ pageSize: 12 }),
+    getServerStorefrontRecommendations({ type: "home", n: 10 })
   ]);
 
   return (
@@ -55,10 +61,12 @@ export default async function HomePage() {
 
         <CategoryDirectory categories={categories.slice(0, 10)} />
 
+        <RecommendationSection products={recommendations} />
+
         <StorefrontProductList
           emptyDescription="当前还没有可展示的首页商品。"
           products={products.items}
-          title="猜你喜欢"
+          title="全部商品"
         />
       </div>
     </main>

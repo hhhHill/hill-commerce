@@ -24,7 +24,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/orders", label: "订单管理" },
   { href: "/admin/logs", label: "日志中心" },
   { href: "/admin/users", label: "用户管理", roles: ["ADMIN"] },
-  { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] }
+  { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] },
+  { href: "/admin/analytics/overview", label: "数据分析", roles: ["ADMIN", "SALES"] }
 ];
 
 export function AdminShell({ title, description, user, children }: AdminShellProps) {

@@ -33,6 +33,26 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  gorse:
+    image: zhenghaoz/gorse-in-one:latest
+    container_name: hc-gorse
+    ports:
+      - "8086:8086"
+      - "8088:8088"
+    command: >
+      -c /etc/gorse/config.toml
+      --log-path /var/log/gorse/master.log
+      --cache-path /var/lib/gorse/master_cache.data
+    volumes:
+      - ./ops/gorse/config.toml:/etc/gorse/config.toml:ro
+      - gorse-data:/var/lib/gorse
+      - gorse-log:/var/log/gorse
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
   backend:
     profiles: ["app"]
     build:
@@ -80,3 +100,5 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  gorse-data:
+  gorse-log:

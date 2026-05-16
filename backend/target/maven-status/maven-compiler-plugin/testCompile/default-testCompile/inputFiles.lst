@@ -1,4 +1,6 @@
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\admin\AdminAccountManagementIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\admin\AdminAnalyticsIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\admin\AdminAnalyticsServiceTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\auth\AuthFlowIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\cart\CartPreparationIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\fulfillment\FulfillmentIntegrationTest.java
@@ -12,3 +14,4 @@ D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\ProductAdminInte
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\ProductDiscoveryIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\StorefrontControllerWebMvcTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\StorefrontProductServiceTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\recommendation\RecommendationServiceTest.java

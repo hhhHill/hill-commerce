@@ -42,6 +42,7 @@ public class SecurityConfig {
                     "/api/products",
                     "/api/products/*",
                     "/api/search",
+                    "/api/storefront/recommendations",
                     "/api/storefront/view-log")
                 .permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SALES")

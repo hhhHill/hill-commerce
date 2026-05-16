@@ -1,5 +1,11 @@
+import { cookies } from "next/headers";
+
 import { getBackendBaseUrl } from "@/lib/config";
 import { StorefrontRequestError } from "@/lib/storefront/errors";
+import type {
+  StorefrontRecommendationParams,
+  StorefrontRecommendationResponse
+} from "@/lib/storefront/recommendation-types";
 import type {
   StorefrontCategory,
   StorefrontListParams,
@@ -47,9 +53,25 @@ export async function getServerStorefrontProductDetail(productId: number): Promi
   return fetchStorefrontJson<StorefrontProductDetail>(`/api/products/${productId}`);
 }
 
-async function fetchStorefrontJson<T>(pathname: string): Promise<T> {
+export async function getServerStorefrontRecommendations(
+  params: StorefrontRecommendationParams = {}
+): Promise<StorefrontProductCard[]> {
+  try {
+    const response = await fetchStorefrontJson<StorefrontRecommendationResponse>(
+      `/api/storefront/recommendations${buildRecommendationQuery(params)}`,
+      await getCookieHeader()
+    );
+
+    return response.items;
+  } catch {
+    return [];
+  }
+}
+
+async function fetchStorefrontJson<T>(pathname: string, cookieHeader?: string): Promise<T> {
   const response = await fetch(`${getBackendBaseUrl()}${pathname}`, {
     method: "GET",
+    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
     cache: "no-store",
     redirect: "manual"
   });
@@ -72,4 +94,29 @@ function buildListQuery(params: StorefrontListParams): string {
 
   const query = search.toString();
   return query ? `?${query}` : "";
+}
+
+function buildRecommendationQuery(params: StorefrontRecommendationParams): string {
+  const search = new URLSearchParams();
+  if (params.type) {
+    search.set("type", params.type);
+  }
+  if (params.productId) {
+    search.set("productId", String(params.productId));
+  }
+  if (params.n) {
+    search.set("n", String(params.n));
+  }
+
+  const query = search.toString();
+  return query ? `?${query}` : "";
+}
+
+async function getCookieHeader(): Promise<string> {
+  const cookieStore = await cookies();
+
+  return cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join("; ");
 }

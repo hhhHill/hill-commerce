@@ -1,0 +1,19 @@
+[database]
+cache_store = "redis://redis:6379"
+data_store = "mysql://hill:hill123@tcp(mysql:3306)/gorse?parseTime=true"
+
+[recommend]
+cache_size = 100
+fallback_recommend = ["popular", "latest"]
+
+[recommend.data_source]
+positive_feedback_types = ["view", "purchase"]
+read_feedback_types = ["view"]
+
+[recommend.collaborative]
+num_epochs = 100
+num_factors = 50
+learning_rate = 0.005
+
+[recommend.item_neighbors]
+neighbor_type = "items"

@@ -18,7 +18,12 @@
       "Bash(curl *)",
       "PowerShell(npm list *)",
       "Skill(superpowers:brainstorming)",
-      "Skill(frontend-design:frontend-design)"
+      "Skill(frontend-design:frontend-design)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gorse.io)",
+      "Skill(superpowers:requesting-code-review)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

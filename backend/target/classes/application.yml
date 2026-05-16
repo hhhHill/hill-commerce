@@ -45,6 +45,15 @@ hill:
   rocketmq:
     enabled: ${ROCKETMQ_ENABLED:false}
     name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
+  analytics:
+    hourly-snapshot-cron: "${ANALYTICS_HOURLY_SNAPSHOT_CRON:0 5 * * * *}"
+    daily-summary-cron: "${ANALYTICS_DAILY_SUMMARY_CRON:0 30 0 * * *}"
+    anomaly-check-cron: "${ANALYTICS_ANOMALY_CHECK_CRON:0 10 * * * *}"
+  recommendation:
+    gorse:
+      enabled: ${GORSE_ENABLED:false}
+      endpoint: ${GORSE_ENDPOINT:http://localhost:8088}
+      timeout: ${GORSE_TIMEOUT:2s}
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true

@@ -9,7 +9,7 @@
 **Files:**
 - Create: `backend/src/main/resources/db/migration/V7__analytics_aggregation.sql`
 
-- [ ] **Step 1: 编写建表 DDL**
+- [X] **Step 1: 编写建表 DDL**
 
 ```sql
 -- V7: analytics aggregation tables
@@ -74,7 +74,7 @@ git commit -m "feat: add analytics aggregation tables"
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/mapper/ProductSalesStatsMapper.java`
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/mapper/HourlySalesSnapshotMapper.java`
 
-- [ ] **Step 1: 写 DailySalesSummaryEntity**
+- [X] **Step 1: 写 DailySalesSummaryEntity**
 
 ```java
 package com.hillcommerce.modules.admin.entity;
@@ -118,7 +118,7 @@ public class DailySalesSummaryEntity {
 }
 ```
 
-- [ ] **Step 2: 写 ProductSalesStatsEntity**
+- [X] **Step 2: 写 ProductSalesStatsEntity**
 
 ```java
 package com.hillcommerce.modules.admin.entity;
@@ -161,7 +161,7 @@ public class ProductSalesStatsEntity {
 }
 ```
 
-- [ ] **Step 3: 写 HourlySalesSnapshotEntity**
+- [X] **Step 3: 写 HourlySalesSnapshotEntity**
 
 ```java
 package com.hillcommerce.modules.admin.entity;
@@ -194,7 +194,7 @@ public class HourlySalesSnapshotEntity {
 }
 ```
 
-- [ ] **Step 4: 写 3 个 Mapper**
+- [X] **Step 4: 写 3 个 Mapper**
 
 ```java
 package com.hillcommerce.modules.admin.mapper;
@@ -232,7 +232,7 @@ public interface HourlySalesSnapshotMapper extends BaseMapper<HourlySalesSnapsho
 }
 ```
 
-- [ ] **Step 5: 编译验证**
+- [X] **Step 5: 编译验证**
 
 ```powershell
 cd backend
@@ -255,7 +255,7 @@ git commit -m "feat: add analytics entity classes and mappers"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/web/AdminAnalyticsDtos.java`
 
-- [ ] **Step 1: 编写所有 DTO**
+- [X] **Step 1: 编写所有 DTO**
 
 ```java
 package com.hillcommerce.modules.admin.web;
@@ -368,7 +368,7 @@ public final class AdminAnalyticsDtos {
 }
 ```
 
-- [ ] **Step 2: 编译验证**
+- [X] **Step 2: 编译验证**
 
 ```powershell
 cd backend
@@ -389,7 +389,7 @@ git commit -m "feat: add analytics DTO records"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/AdminAnalyticsScheduler.java`
 
-- [ ] **Step 1: 检查 @EnableScheduling 并添加配置**
+- [X] **Step 1: 检查 @EnableScheduling 并添加配置**
 
 搜索 `@EnableScheduling`，如果不存在则添加到 `HillCommerceApplication.java`：
 
@@ -408,7 +408,7 @@ hill:
     anomaly-check-cron: "0 10 * * * *"
 ```
 
-- [ ] **Step 2: 编写 AdminAnalyticsScheduler**
+- [X] **Step 2: 编写 AdminAnalyticsScheduler**
 
 ```java
 package com.hillcommerce.modules.admin.service;
@@ -492,7 +492,7 @@ public class AdminAnalyticsScheduler {
 }
 ```
 
-- [ ] **Step 3: 编译验证**
+- [X] **Step 3: 编译验证**
 
 ```powershell
 cd backend
@@ -513,7 +513,7 @@ git commit -m "feat: add analytics aggregation scheduler"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/SalesTrendService.java`
 
-- [ ] **Step 1: 编写 SalesTrendService**
+- [X] **Step 1: 编写 SalesTrendService**
 
 ```java
 package com.hillcommerce.modules.admin.service;
@@ -633,7 +633,7 @@ public class SalesTrendService {
 }
 ```
 
-- [ ] **Step 2: 编译验证**
+- [X] **Step 2: 编译验证**
 
 ```powershell
 cd backend
@@ -654,7 +654,7 @@ git commit -m "feat: add sales trend service"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/AnomalyDetectionService.java`
 
-- [ ] **Step 1: 编写 AnomalyDetectionService**
+- [X] **Step 1: 编写 AnomalyDetectionService**
 
 ```java
 package com.hillcommerce.modules.admin.service;
@@ -762,7 +762,7 @@ public class AnomalyDetectionService {
 }
 ```
 
-- [ ] **Step 2: 编译验证**
+- [X] **Step 2: 编译验证**
 
 ```powershell
 cd backend
@@ -783,7 +783,7 @@ git commit -m "feat: add anomaly detection service"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/UserProfileService.java`
 
-- [ ] **Step 1: 编写 UserProfileService**
+- [X] **Step 1: 编写 UserProfileService**
 
 ```java
 package com.hillcommerce.modules.admin.service;
@@ -969,7 +969,7 @@ git commit -m "feat: add user profile service"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/ProductRankingService.java`
 
-- [ ] **Step 1: 编写 ProductRankingService**
+- [X] **Step 1: 编写 ProductRankingService**
 
 ```java
 package com.hillcommerce.modules.admin.service;
@@ -1073,7 +1073,7 @@ git commit -m "feat: add product ranking service"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/web/AdminAnalyticsController.java`
 
-- [ ] **Step 1: 编写 Controller**
+- [X] **Step 1: 编写 Controller**
 
 ```java
 package com.hillcommerce.modules.admin.web;
@@ -1202,7 +1202,7 @@ public class AdminAnalyticsController {
 }
 ```
 
-- [ ] **Step 2: 检查 AuthenticatedUserPrincipal 是否有 userId() 方法**
+- [X] **Step 2: 检查 AuthenticatedUserPrincipal 是否有 userId() 方法**
 
 在 `backend/src/main/java/com/hillcommerce/modules/user/security/AuthenticatedUserPrincipal.java` 确认存在 `userId()` 或 `getId()` 方法对应 `users.id`。如方法名为 `getId()`，将 controller 中 `principal.id()` 改为 `principal.getId()`。
 
@@ -1223,14 +1223,14 @@ git commit -m "feat: add analytics REST controller"
 - Modify: `frontend/next-app/package.json`
 - Create: `frontend/next-app/src/lib/admin/analytics-types.ts`
 
-- [ ] **Step 1: 安装 recharts**
+- [X] **Step 1: 安装 recharts**
 
 ```powershell
 cd frontend\next-app
 npm install recharts
 ```
 
-- [ ] **Step 2: 编写分析类型定义**
+- [X] **Step 2: 编写分析类型定义**
 
 ```typescript
 // src/lib/admin/analytics-types.ts
@@ -1329,7 +1329,7 @@ export type KpiData = {
 };
 ```
 
-- [ ] **Step 3: 类型检查**
+- [X] **Step 3: 类型检查**
 
 ```powershell
 cd frontend\next-app
@@ -1351,7 +1351,7 @@ git commit -m "feat: add recharts and analytics types"
 - Create: `frontend/next-app/src/lib/admin/analytics-client.ts`
 - Modify: `frontend/next-app/src/lib/admin/server.ts`
 
-- [ ] **Step 1: 编写 API 客户端**
+- [X] **Step 1: 编写 API 客户端**
 
 ```typescript
 // src/lib/admin/analytics-client.ts
@@ -1431,7 +1431,7 @@ export async function getUserProfile(userId: number): Promise<UserProfileDetail>
 }
 ```
 
-- [ ] **Step 2: 添加 server-side 数据获取函数到 server.ts**
+- [X] **Step 2: 添加 server-side 数据获取函数到 server.ts**
 
 在 `frontend/next-app/src/lib/admin/server.ts` 末尾追加：
 
@@ -1477,7 +1477,7 @@ git commit -m "feat: add analytics API client and server functions"
 - Create: `frontend/next-app/src/features/admin/analytics/analytics-shell.tsx`
 - Modify: `frontend/next-app/src/features/admin/catalog/admin-shell.tsx`
 
-- [ ] **Step 1: 编写 AnalyticsShell**
+- [X] **Step 1: 编写 AnalyticsShell**
 
 ```typescript
 "use client";
@@ -1525,7 +1525,7 @@ export function AnalyticsShell({ children }: AnalyticsShellProps) {
 }
 ```
 
-- [ ] **Step 2: 更新 AdminShell 导航**
+- [X] **Step 2: 更新 AdminShell 导航**
 
 在 `admin-shell.tsx` 的 `NAV_ITEMS` 数组中，在 `仪表盘` 之前插入：
 
@@ -1550,7 +1550,7 @@ git commit -m "feat: add analytics shell and navigation entry"
 - Create: `frontend/next-app/src/features/admin/analytics/overview/kpi-cards.tsx`
 - Create: `frontend/next-app/src/features/admin/analytics/overview/anomaly-banner.tsx`
 
-- [ ] **Step 1: 编写 KpiCards**
+- [X] **Step 1: 编写 KpiCards**
 
 ```typescript
 "use client";
@@ -1591,7 +1591,7 @@ export function KpiCards({ data }: KpiCardsProps) {
 }
 ```
 
-- [ ] **Step 2: 编写 AnomalyBanner**
+- [X] **Step 2: 编写 AnomalyBanner**
 
 ```typescript
 "use client";
@@ -1646,7 +1646,7 @@ git commit -m "feat: add KPI cards and anomaly banner"
 - Create: `frontend/next-app/src/features/admin/analytics/overview/sales-trend-chart.tsx`
 - Create: `frontend/next-app/src/features/admin/analytics/overview/overview-grid.tsx`
 
-- [ ] **Step 1: 编写 SalesTrendChart**
+- [X] **Step 1: 编写 SalesTrendChart**
 
 ```typescript
 "use client";
@@ -1719,7 +1719,7 @@ export function SalesTrendChart({ points: initialPoints }: SalesTrendChartProps)
 }
 ```
 
-- [ ] **Step 2: 编写 OverviewGrid**
+- [X] **Step 2: 编写 OverviewGrid**
 
 ```typescript
 "use client";
@@ -1780,7 +1780,7 @@ git commit -m "feat: add sales trend chart and overview grid"
 **Files:**
 - Create: `frontend/next-app/src/app/admin/analytics/overview/page.tsx`
 
-- [ ] **Step 1: 编写概览页**
+- [X] **Step 1: 编写概览页**
 
 ```typescript
 import { AdminShell } from "@/features/admin/catalog/admin-shell";
@@ -1820,7 +1820,7 @@ export default async function AnalyticsOverviewPage() {
 
 注意：`requireRole` / `getSessionUser` 来自 `src/lib/auth/server.ts`（项目已有）。
 
-- [ ] **Step 2: 类型检查 + 验证构建**
+- [X] **Step 2: 类型检查 + 验证构建**
 
 ```powershell
 cd frontend\next-app
@@ -1844,7 +1844,7 @@ git commit -m "feat: add analytics overview page"
 - Create: `frontend/next-app/src/features/admin/analytics/users/user-profile-detail.tsx`
 - Create: `frontend/next-app/src/app/admin/analytics/users/page.tsx`
 
-- [ ] **Step 1: 编写 AggregatePanels**
+- [X] **Step 1: 编写 AggregatePanels**
 
 ```typescript
 "use client";
@@ -1918,7 +1918,7 @@ export function AggregatePanels({ data }: AggregatePanelsProps) {
 }
 ```
 
-- [ ] **Step 2: 编写 UserSearchBar**
+- [X] **Step 2: 编写 UserSearchBar**
 
 ```typescript
 "use client";
@@ -1982,7 +1982,7 @@ export function UserSearchBar({ onSelect }: UserSearchBarProps) {
 }
 ```
 
-- [ ] **Step 3: 编写 UserProfileDetail**
+- [X] **Step 3: 编写 UserProfileDetail**
 
 ```typescript
 "use client";
@@ -2009,7 +2009,7 @@ export function UserProfileDetailPanel({ profile }: Props) {
 }
 ```
 
-- [ ] **Step 4: 编写 users page**
+- [X] **Step 4: 编写 users page**
 
 ```typescript
 import { AdminShell } from "@/features/admin/catalog/admin-shell";
@@ -2058,7 +2058,7 @@ git commit -m "feat: add user profile pages"
 - Create: `frontend/next-app/src/features/admin/analytics/products/client-product-analytics.tsx`
 - Create: `frontend/next-app/src/app/admin/analytics/products/page.tsx`
 
-- [ ] **Step 1: 编写 ProductRankingTable**
+- [X] **Step 1: 编写 ProductRankingTable**
 
 ```typescript
 "use client";
@@ -2104,7 +2104,7 @@ export function ProductRankingTable({ items }: Props) {
 }
 ```
 
-- [ ] **Step 2: 编写 CategoryPieChart**
+- [X] **Step 2: 编写 CategoryPieChart**
 
 ```typescript
 "use client";
@@ -2142,7 +2142,7 @@ export function CategoryPieChart({ items }: Props) {
 }
 ```
 
-- [ ] **Step 3: 编写 ClientProductAnalytics（含日/周/月切换）**
+- [X] **Step 3: 编写 ClientProductAnalytics（含日/周/月切换）**
 
 ```typescript
 "use client";
@@ -2195,7 +2195,7 @@ export function ClientProductAnalytics() {
 }
 ```
 
-- [ ] **Step 4: 编写 products server page**
+- [X] **Step 4: 编写 products server page**
 
 ```typescript
 import { AdminShell } from "@/features/admin/catalog/admin-shell";
@@ -2235,7 +2235,7 @@ git commit -m "feat: add product analytics page"
 **Files:**
 - Create: `backend/src/test/java/com/hillcommerce/admin/AdminAnalyticsIntegrationTest.java`
 
-- [ ] **Step 1: 编写集成测试**
+- [X] **Step 1: 编写集成测试**
 
 ```java
 package com.hillcommerce.admin;

@@ -14,12 +14,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hillcommerce.modules.order.entity.OrderEntity;
+import com.hillcommerce.modules.order.entity.OrderItemEntity;
 import com.hillcommerce.modules.order.entity.OrderStatusHistoryEntity;
+import com.hillcommerce.modules.order.mapper.OrderItemMapper;
 import com.hillcommerce.modules.order.mapper.OrderMapper;
 import com.hillcommerce.modules.order.mapper.OrderStatusHistoryMapper;
 import com.hillcommerce.modules.order.service.OrderStatus;
 import com.hillcommerce.modules.payment.entity.PaymentEntity;
 import com.hillcommerce.modules.payment.mapper.PaymentMapper;
+import com.hillcommerce.modules.recommendation.GorseFeedbackService;
 
 @Service
 public class PaymentService {
@@ -27,20 +30,26 @@ public class PaymentService {
     private static final String SIMULATED_METHOD = "SIMULATED";
 
     private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
     private final OrderStatusHistoryMapper orderStatusHistoryMapper;
     private final PaymentMapper paymentMapper;
     private final PaymentNumberGenerator paymentNumberGenerator;
+    private final GorseFeedbackService gorseFeedbackService;
 
     public PaymentService(
         OrderMapper orderMapper,
+        OrderItemMapper orderItemMapper,
         OrderStatusHistoryMapper orderStatusHistoryMapper,
         PaymentMapper paymentMapper,
-        PaymentNumberGenerator paymentNumberGenerator
+        PaymentNumberGenerator paymentNumberGenerator,
+        GorseFeedbackService gorseFeedbackService
     ) {
         this.orderMapper = orderMapper;
+        this.orderItemMapper = orderItemMapper;
         this.orderStatusHistoryMapper = orderStatusHistoryMapper;
         this.paymentMapper = paymentMapper;
         this.paymentNumberGenerator = paymentNumberGenerator;
+        this.gorseFeedbackService = gorseFeedbackService;
     }
 
     public PaymentOrderResponse getPaymentOrder(Long userId, Long orderId) {
@@ -123,6 +132,7 @@ public class PaymentService {
         history.setChangedBy(userId);
         history.setChangeReason("payment succeeded");
         orderStatusHistoryMapper.insert(history);
+        sendPurchaseFeedback(userId, order.getId());
 
         return toActionResponse(payment, order);
     }
@@ -176,6 +186,14 @@ public class PaymentService {
             .stream()
             .map(this::toAttemptResponse)
             .toList();
+    }
+
+    private void sendPurchaseFeedback(Long userId, Long orderId) {
+        List<OrderItemEntity> items = orderItemMapper.selectList(
+            new LambdaQueryWrapper<OrderItemEntity>().eq(OrderItemEntity::getOrderId, orderId));
+        for (OrderItemEntity item : items) {
+            gorseFeedbackService.fireAndForgetPurchase(userId, item.getProductId());
+        }
     }
 
     private PaymentAttemptResponse resolveCurrentAttempt(List<PaymentAttemptResponse> attempts) {

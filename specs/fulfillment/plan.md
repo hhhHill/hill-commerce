@@ -1,8 +1,7 @@
-# 履约模块实施计划
+﻿p# 履约模块实施计划
 
 **Feature**: `fulfillment`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## 总体思路
 

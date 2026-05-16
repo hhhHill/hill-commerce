@@ -1,8 +1,7 @@
-# Implementation Plan: cart-preparation
+﻿# Implementation Plan: cart-preparation
 
 **Feature**: `cart-preparation`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

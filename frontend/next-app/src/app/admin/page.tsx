@@ -31,6 +31,22 @@ export default async function AdminPage() {
             通过一个聚合编辑页维护 SPU、展示属性、销售属性、图片 URL、描述和 SKU。
           </p>
         </Link>
+        <Link
+          className="rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_16px_40px_rgba(29,20,13,0.06)] transition hover:-translate-y-0.5"
+          href="/admin/orders"
+        >
+          <p className="text-sm uppercase tracking-[0.18em] text-black/45">Order</p>
+          <h2 className="mt-3 text-2xl font-semibold">订单管理</h2>
+          <p className="mt-3 text-sm leading-6 text-black/65">查看后台订单、进入发货表单，并手动触发自动完成流程。</p>
+        </Link>
+        <Link
+          className="rounded-[28px] border border-black/10 bg-white/90 p-8 shadow-[0_16px_40px_rgba(29,20,13,0.06)] transition hover:-translate-y-0.5"
+          href="/admin/logs"
+        >
+          <p className="text-sm uppercase tracking-[0.18em] text-black/45">Observability</p>
+          <h2 className="mt-3 text-2xl font-semibold">日志中心</h2>
+          <p className="mt-3 text-sm leading-6 text-black/65">集中查询登录日志、操作日志和商品浏览日志，便于运营排查与审计。</p>
+        </Link>
       </section>
     </AdminShell>
   );

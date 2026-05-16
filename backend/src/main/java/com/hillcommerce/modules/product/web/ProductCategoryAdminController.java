@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 
 @RestController
@@ -37,17 +38,20 @@ public class ProductCategoryAdminController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @OperationLog(action = "CREATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#result.id")
     public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest request) {
         return productAdminService.createCategory(request);
     }
 
     @PutMapping("/{categoryId}")
+    @OperationLog(action = "UPDATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public CategoryResponse updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequest request) {
         return productAdminService.updateCategory(categoryId, request);
     }
 
     @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @OperationLog(action = "DELETE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public void deleteCategory(@PathVariable Long categoryId) {
         productAdminService.deleteCategory(categoryId);
     }

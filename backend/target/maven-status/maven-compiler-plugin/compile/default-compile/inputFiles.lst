@@ -22,6 +22,17 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\service\Car
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartSummaryController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\aop\OperationLog.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\aop\OperationLogAspect.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\entity\LoginLogEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\entity\OperationLogEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\entity\ProductViewLogEntity.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\mapper\LoginLogMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\mapper\OperationLogMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\mapper\ProductViewLogMapper.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\service\LoggingService.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\web\LoggingController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\web\LoggingDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\entity\OrderEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\entity\OrderItemEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\entity\OrderStatusHistoryEntity.java

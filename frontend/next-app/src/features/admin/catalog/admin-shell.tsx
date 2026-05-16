@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/categories", label: "分类管理" },
   { href: "/admin/products", label: "商品管理" },
   { href: "/admin/orders", label: "订单管理" },
+  { href: "/admin/logs", label: "日志中心" },
   { href: "/admin/users", label: "用户管理", roles: ["ADMIN"] },
   { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] }
 ];

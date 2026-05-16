@@ -35,11 +35,11 @@
 3. `specs/<feature>/plan.md`
 4. `specs/<feature>/tasks.md`
 
-当前商城 MVP 的 canonical baseline 位于：
+当前商城 MVP 的 canonical spec 按功能模块拆分，位于：
 
-- `specs/hill-commerce-mvp/spec.md`
-- `specs/hill-commerce-mvp/plan.md`
-- `specs/hill-commerce-mvp/tasks.md`
+- `specs/*/spec.md` — 各 feature 需求定义
+- `specs/*/plan.md` — 各 feature 实现计划
+- `specs/*/tasks.md` — 各 feature 任务清单
 
 第一轮已拆分或正在拆分的 feature 包括：
 

@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Get-ChildItem -Path \"D:\\\\hill-commerce\\\\specs\\\\hill-commerce-mvp\" -Recurse -Depth 3)",
       "Bash(Select-Object FullName)",
       "PowerShell(New-Item *)",
       "Bash(Get-ChildItem -Recurse \"D:\\\\hill-commerce\\\\specs\\\\cart-preparation\")",
@@ -18,7 +17,8 @@
       "Bash(docker exec hill-commerce-mysql *)",
       "Bash(curl *)",
       "PowerShell(npm list *)",
-      "Skill(superpowers:brainstorming)"
+      "Skill(superpowers:brainstorming)",
+      "Skill(frontend-design:frontend-design)"
     ]
   }
 }

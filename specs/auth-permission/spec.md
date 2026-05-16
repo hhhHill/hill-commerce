@@ -1,8 +1,7 @@
-# Feature Specification: auth-permission
+﻿# Feature Specification: auth-permission
 
 **Feature**: `auth-permission`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

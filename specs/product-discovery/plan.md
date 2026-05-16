@@ -1,8 +1,7 @@
-# Implementation Plan: product-discovery
+﻿# Implementation Plan: product-discovery
 
 **Feature**: `product-discovery`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

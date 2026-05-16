@@ -67,6 +67,9 @@ class OrderCheckoutFoundationIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-FOUNDATION-%'");
         jdbcTemplate.update("delete from products where spu_code like 'ORDER-FOUNDATION-%'");
         jdbcTemplate.update("delete from product_categories where name like 'Order Foundation-%'");
+        jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'order-foundation-%@example.com')");
+        jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'order-foundation-%@example.com')");
+        jdbcTemplate.update("delete from login_logs where email_snapshot like 'order-foundation-%@example.com'");
         jdbcTemplate.update(
             """
             delete ur from user_roles ur

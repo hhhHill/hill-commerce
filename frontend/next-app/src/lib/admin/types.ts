@@ -167,3 +167,49 @@ export type ShipOrderResult = {
 export type AutoCompleteResult = {
   completedCount: number;
 };
+
+export type SessionUserRole = "CUSTOMER" | "SALES" | "ADMIN";
+
+export type LoginLogEntry = {
+  id: number;
+  userId: number | null;
+  emailSnapshot: string;
+  roleSnapshot: string;
+  loginResult: string;
+  ipAddress: string;
+  userAgent: string | null;
+  loginAt: string;
+};
+
+export type LoginLogListResult = {
+  items: LoginLogEntry[];
+};
+
+export type OperationLogEntry = {
+  id: number;
+  operatorUserId: number;
+  operatorRole: string;
+  actionType: string;
+  targetType: string;
+  targetId: string;
+  actionDetail: string;
+  ipAddress: string;
+  createdAt: string;
+};
+
+export type OperationLogListResult = {
+  items: OperationLogEntry[];
+};
+
+export type ProductViewLogEntry = {
+  id: number;
+  userId: number | null;
+  anonymousId: string | null;
+  productId: number;
+  categoryId: number;
+  viewedAt: string;
+};
+
+export type ProductViewLogListResult = {
+  items: ProductViewLogEntry[];
+};

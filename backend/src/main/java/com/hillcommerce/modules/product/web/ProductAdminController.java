@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 
 @RestController
@@ -49,22 +50,26 @@ public class ProductAdminController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @OperationLog(action = "CREATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#result.id")
     public ProductResponse createProduct(@Valid @RequestBody ProductRequest request) {
         return productAdminService.createProduct(request);
     }
 
     @PutMapping("/{productId}")
+    @OperationLog(action = "UPDATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public ProductResponse updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest request) {
         return productAdminService.updateProduct(productId, request);
     }
 
     @PutMapping("/{productId}/status")
+    @OperationLog(action = "UPDATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public ProductResponse updateProductStatus(@PathVariable Long productId, @Valid @RequestBody ProductStatusRequest request) {
         return productAdminService.updateProductStatus(productId, request);
     }
 
     @DeleteMapping("/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @OperationLog(action = "DELETE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public void deleteProduct(@PathVariable Long productId) {
         productAdminService.deleteProduct(productId);
     }

@@ -9,7 +9,10 @@ import type {
   DashboardSummary,
   DisableResult,
   ProductDetail,
+  LoginLogListResult,
+  OperationLogListResult,
   ProductPayload,
+  ProductViewLogListResult,
   ProductStatus,
   ProductSummary,
   ResetPasswordInput,
@@ -119,6 +122,53 @@ export async function resetSalesPassword(userId: number, input: ResetPasswordInp
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
   return sendAdminRequest<DashboardSummary>("/api/admin/dashboard/summary", {
+    method: "GET"
+  });
+}
+
+export async function getLoginLogs(params: { email?: string; result?: string } = {}): Promise<LoginLogListResult> {
+  const search = new URLSearchParams();
+  if (params.email) {
+    search.set("email", params.email);
+  }
+  if (params.result) {
+    search.set("result", params.result);
+  }
+
+  const query = search.toString();
+  return sendAdminRequest<LoginLogListResult>(`/api/admin/login-logs${query ? `?${query}` : ""}`, {
+    method: "GET"
+  });
+}
+
+export async function getOperationLogs(
+  params: { operatorUserId?: number; actionType?: string } = {}
+): Promise<OperationLogListResult> {
+  const search = new URLSearchParams();
+  if (params.operatorUserId) {
+    search.set("operatorUserId", String(params.operatorUserId));
+  }
+  if (params.actionType) {
+    search.set("actionType", params.actionType);
+  }
+
+  const query = search.toString();
+  return sendAdminRequest<OperationLogListResult>(`/api/admin/operation-logs${query ? `?${query}` : ""}`, {
+    method: "GET"
+  });
+}
+
+export async function getViewLogs(params: { productId?: number; categoryId?: number } = {}): Promise<ProductViewLogListResult> {
+  const search = new URLSearchParams();
+  if (params.productId) {
+    search.set("productId", String(params.productId));
+  }
+  if (params.categoryId) {
+    search.set("categoryId", String(params.categoryId));
+  }
+
+  const query = search.toString();
+  return sendAdminRequest<ProductViewLogListResult>(`/api/admin/view-logs${query ? `?${query}` : ""}`, {
     method: "GET"
   });
 }

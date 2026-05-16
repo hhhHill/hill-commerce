@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.order.service.ShipmentService;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 
@@ -39,6 +40,7 @@ public class ShipmentController {
     }
 
     @PostMapping("/api/admin/orders/{orderId}/ship")
+    @OperationLog(action = "SHIP_ORDER", targetType = "ORDER", targetIdExpr = "#orderId")
     public ShipOrderResponse shipOrder(
         @PathVariable Long orderId,
         @RequestBody ShipOrderRequest request,

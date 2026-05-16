@@ -10,9 +10,12 @@ com\hillcommerce\cart\CartPreparationIntegrationTest.class
 com\hillcommerce\product\StorefrontControllerWebMvcTest.class
 com\hillcommerce\product\StorefrontProductServiceTest.class
 com\hillcommerce\auth\AuthFlowIntegrationTest.class
+com\hillcommerce\logging\LoggingIntegrationTest$1.class
+com\hillcommerce\logging\LoggingIntegrationTest.class
 com\hillcommerce\product\ProductAdminIntegrationTest.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest$4.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest.class
 com\hillcommerce\order\OrderCenterIntegrationTest.class
 com\hillcommerce\fulfillment\FulfillmentIntegrationTest.class
+com\hillcommerce\logging\LoggingIntegrationTest$2.class
 com\hillcommerce\payment\PaymentIntegrationTest.class

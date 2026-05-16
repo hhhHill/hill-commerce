@@ -60,6 +60,36 @@ class AuthFlowIntegrationTest {
             .build();
         jdbcTemplate.update(
             """
+            delete from product_view_logs
+            where user_id in (
+              select id from users
+              where email like 'customer%@example.com'
+                 or email like 'sales%@example.com'
+                 or email like 'bcrypt-admin%@example.com'
+                 or email like 'legacy-admin%@example.com'
+            )
+            """);
+        jdbcTemplate.update(
+            """
+            delete from operation_logs
+            where operator_user_id in (
+              select id from users
+              where email like 'customer%@example.com'
+                 or email like 'sales%@example.com'
+                 or email like 'bcrypt-admin%@example.com'
+                 or email like 'legacy-admin%@example.com'
+            )
+            """);
+        jdbcTemplate.update(
+            """
+            delete from login_logs
+            where email_snapshot like 'customer%@example.com'
+               or email_snapshot like 'sales%@example.com'
+               or email_snapshot like 'bcrypt-admin%@example.com'
+               or email_snapshot like 'legacy-admin%@example.com'
+            """);
+        jdbcTemplate.update(
+            """
             delete ur from user_roles ur
             join users u on u.id = ur.user_id
             where u.email like 'customer%@example.com'

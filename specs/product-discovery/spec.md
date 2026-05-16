@@ -1,8 +1,7 @@
-# Feature Specification: product-discovery
+﻿# Feature Specification: product-discovery
 
 **Feature**: `product-discovery`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

@@ -1,8 +1,7 @@
-# Implementation Plan: order-checkout
+﻿# Implementation Plan: order-checkout
 
 **Feature**: `order-checkout`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

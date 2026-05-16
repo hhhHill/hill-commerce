@@ -1,8 +1,7 @@
-# Feature Specification: admin-product-management
+﻿# Feature Specification: admin-product-management
 
 **Feature**: `admin-product-management`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

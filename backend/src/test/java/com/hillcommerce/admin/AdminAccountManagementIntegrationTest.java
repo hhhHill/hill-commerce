@@ -77,6 +77,19 @@ class AdminAccountManagementIntegrationTest {
         jdbcTemplate.update("delete from orders where order_no like ?", PREFIX + "%");
         jdbcTemplate.update(
             """
+            delete from product_view_logs
+            where user_id in (select id from users where email like ?)
+            """,
+            PREFIX + "%@example.com");
+        jdbcTemplate.update(
+            """
+            delete from operation_logs
+            where operator_user_id in (select id from users where email like ?)
+            """,
+            PREFIX + "%@example.com");
+        jdbcTemplate.update("delete from login_logs where email_snapshot like ?", PREFIX + "%@example.com");
+        jdbcTemplate.update(
+            """
             delete from user_roles
             where user_id in (select id from users where email like ?)
             """,

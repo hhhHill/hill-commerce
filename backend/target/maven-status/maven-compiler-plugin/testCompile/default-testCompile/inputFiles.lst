@@ -2,6 +2,7 @@ D:\hill-commerce\backend\src\test\java\com\hillcommerce\admin\AdminAccountManage
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\auth\AuthFlowIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\cart\CartPreparationIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\fulfillment\FulfillmentIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\logging\LoggingIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCenterIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutFoundationIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutIntegrationTest.java

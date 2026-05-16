@@ -1,8 +1,7 @@
-# Feature Specification: fulfillment
+﻿# Feature Specification: fulfillment
 
 **Feature**: `fulfillment`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

@@ -1,8 +1,7 @@
-# Feature Specification: order-center
+﻿# Feature Specification: order-center
 
 **Feature**: `order-center`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

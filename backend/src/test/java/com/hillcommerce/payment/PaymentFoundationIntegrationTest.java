@@ -63,6 +63,9 @@ class PaymentFoundationIntegrationTest {
         jdbcTemplate.update("delete from payments where payment_no like 'PAY-FOUNDATION-%'");
         jdbcTemplate.update("delete from orders where order_no like 'ORD-FOUNDATION-%'");
         jdbcTemplate.update("delete from user_addresses where user_id in (select id from users where email like 'payment-foundation-%@example.com')");
+        jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'payment-foundation-%@example.com')");
+        jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'payment-foundation-%@example.com')");
+        jdbcTemplate.update("delete from login_logs where email_snapshot like 'payment-foundation-%@example.com'");
         jdbcTemplate.update("delete from user_roles where user_id in (select id from users where email like 'payment-foundation-%@example.com')");
         jdbcTemplate.update("delete from users where email like 'payment-foundation-%@example.com'");
     }

@@ -1,8 +1,7 @@
-# Implementation Plan: shopping-journey
+﻿# Implementation Plan: shopping-journey
 
 **Feature**: `shopping-journey`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

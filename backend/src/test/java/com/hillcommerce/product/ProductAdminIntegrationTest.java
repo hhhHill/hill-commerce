@@ -83,6 +83,9 @@ class ProductAdminIntegrationTest {
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'TASK4-%')");
         jdbcTemplate.update("delete from products where spu_code like 'TASK4-%'");
         jdbcTemplate.update("delete from product_categories where name like 'Task4-%'");
+        jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'task4-%@example.com')");
+        jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'task4-%@example.com')");
+        jdbcTemplate.update("delete from login_logs where email_snapshot like 'task4-%@example.com'");
         jdbcTemplate.update(
             """
             delete ur from user_roles ur

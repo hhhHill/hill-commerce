@@ -1,8 +1,7 @@
-# Feature Specification: payment
+﻿# Feature Specification: payment
 
 **Feature**: `payment`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

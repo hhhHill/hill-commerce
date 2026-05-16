@@ -1,8 +1,7 @@
-# Feature Specification: cart-preparation
+﻿# Feature Specification: cart-preparation
 
 **Feature**: `cart-preparation`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

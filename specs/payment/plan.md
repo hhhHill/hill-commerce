@@ -1,8 +1,7 @@
-# Implementation Plan: payment
+﻿# Implementation Plan: payment
 
 **Feature**: `payment`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

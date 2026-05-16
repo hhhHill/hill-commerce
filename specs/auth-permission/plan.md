@@ -1,8 +1,7 @@
-# Implementation Plan: auth-permission
+﻿# Implementation Plan: auth-permission
 
 **Feature**: `auth-permission`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

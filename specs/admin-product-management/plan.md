@@ -1,8 +1,7 @@
-# Implementation Plan: admin-product-management
+﻿# Implementation Plan: admin-product-management
 
 **Feature**: `admin-product-management`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

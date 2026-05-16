@@ -1,4 +1,4 @@
-# Specs Guide
+﻿# Specs Guide
 
 ## Purpose
 
@@ -35,9 +35,6 @@
 
 当前 canonical baseline 为：
 
-- `specs/hill-commerce-mvp/spec.md`
-- `specs/hill-commerce-mvp/plan.md`
-- `specs/hill-commerce-mvp/tasks.md`
 
 这个 baseline 承载当前商城 MVP 的项目目标、范围、角色、全局非目标、核心模块总览和跨模块约束。
 

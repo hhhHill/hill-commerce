@@ -1,8 +1,7 @@
-# 后台账户管理与仪表盘实施计划
+﻿# 后台账户管理与仪表盘实施计划
 
 **Feature**: `admin-account-management`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## 总体思路
 

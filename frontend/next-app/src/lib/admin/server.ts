@@ -5,9 +5,12 @@ import type {
   AdminOrderListResult,
   Category,
   DashboardSummary,
+  LoginLogListResult,
+  OperationLogListResult,
   ProductDetail,
   ProductListFilters,
   ProductSummary,
+  ProductViewLogListResult,
   SalesUserListResult
 } from "@/lib/admin/types";
 import type { OrderDetail, OrderListStatus } from "@/lib/order/types";
@@ -62,6 +65,44 @@ export async function getServerSalesUsers() {
 
 export async function getServerDashboardSummary(): Promise<DashboardSummary> {
   return fetchAdminJson<DashboardSummary>("/api/admin/dashboard/summary");
+}
+
+export async function getServerLoginLogs(params: { email?: string; result?: string } = {}): Promise<LoginLogListResult> {
+  const search = new URLSearchParams();
+  if (params.email) {
+    search.set("email", params.email);
+  }
+  if (params.result) {
+    search.set("result", params.result);
+  }
+  const query = search.toString();
+  return fetchAdminJson<LoginLogListResult>(`/api/admin/login-logs${query ? `?${query}` : ""}`);
+}
+
+export async function getServerOperationLogs(
+  params: { operatorUserId?: number; actionType?: string } = {}
+): Promise<OperationLogListResult> {
+  const search = new URLSearchParams();
+  if (params.operatorUserId) {
+    search.set("operatorUserId", String(params.operatorUserId));
+  }
+  if (params.actionType) {
+    search.set("actionType", params.actionType);
+  }
+  const query = search.toString();
+  return fetchAdminJson<OperationLogListResult>(`/api/admin/operation-logs${query ? `?${query}` : ""}`);
+}
+
+export async function getServerViewLogs(params: { productId?: number; categoryId?: number } = {}): Promise<ProductViewLogListResult> {
+  const search = new URLSearchParams();
+  if (params.productId) {
+    search.set("productId", String(params.productId));
+  }
+  if (params.categoryId) {
+    search.set("categoryId", String(params.categoryId));
+  }
+  const query = search.toString();
+  return fetchAdminJson<ProductViewLogListResult>(`/api/admin/view-logs${query ? `?${query}` : ""}`);
 }
 
 async function fetchAdminJson<T>(pathname: string): Promise<T> {

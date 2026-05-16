@@ -1,8 +1,7 @@
-# Implementation Plan: order-center
+﻿# Implementation Plan: order-center
 
 **Feature**: `order-center`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/plan.md`
 
 ## Summary
 

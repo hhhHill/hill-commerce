@@ -1,8 +1,7 @@
-# Feature Specification: shopping-journey
+﻿# Feature Specification: shopping-journey
 
 **Feature**: `shopping-journey`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

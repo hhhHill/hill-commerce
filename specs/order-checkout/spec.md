@@ -1,8 +1,7 @@
-# Feature Specification: order-checkout
+﻿# Feature Specification: order-checkout
 
 **Feature**: `order-checkout`  
 **Status**: active  
-**Parent Baseline**: `specs/hill-commerce-mvp/spec.md`
 
 ## Purpose
 

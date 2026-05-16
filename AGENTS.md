@@ -2,12 +2,10 @@
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read:
 
-- `specs/hill-commerce-mvp/plan.md` for the current canonical implementation plan
-- `specs/hill-commerce-mvp/spec.md` for the current canonical product baseline
-- `.specify/memory/constitution.md` for project-level rules
-
-If future feature-specific specs exist, prefer the most specific `specs/<feature>/spec.md`
-and `specs/<feature>/plan.md` over the MVP baseline for that scope.
+- `specs/<feature>/spec.md` for feature-level requirements (prefer the most specific)
+- `specs/<feature>/plan.md` for feature-level implementation plan
+- `specs/<feature>/tasks.md` for feature-level task breakdown
+- `.specify/memory/constitution.md` for project-level rules (if present)
 
 ## Spec Kit / Constitution Workflow
 

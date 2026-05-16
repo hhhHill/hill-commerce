@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillcommerce.modules.user.model.AuthUser;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
+import com.hillcommerce.modules.logging.service.LoggingService;
 import com.hillcommerce.modules.user.service.UserAccountService;
 
 /**
@@ -50,15 +51,18 @@ public class AuthController {
     private final UserAccountService userAccountService;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
+    private final LoggingService loggingService;
 
     public AuthController(
         UserAccountService userAccountService,
         AuthenticationManager authenticationManager,
-        SecurityContextRepository securityContextRepository
+        SecurityContextRepository securityContextRepository,
+        LoggingService loggingService
     ) {
         this.userAccountService = userAccountService;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
+        this.loggingService = loggingService;
     }
 
     /** 注册成功后返回 201 + 用户信息，前端自行跳转至登录页完成首次登录 */
@@ -85,6 +89,13 @@ public class AuthController {
                 UsernamePasswordAuthenticationToken.unauthenticated(request.email(), request.password()));
         }
         catch (AuthenticationException exception) {
+            recordLoginSafely(
+                null,
+                request.email(),
+                "UNKNOWN",
+                "FAILURE",
+                resolveRemoteAddr(httpServletRequest),
+                httpServletRequest.getHeader("User-Agent"));
             log.warn(
                 "Login failed: email={}, remoteAddr={}, reason={}",
                 request.email(),
@@ -108,6 +119,13 @@ public class AuthController {
             principal.id(),
             principal.roles(),
             resolveRemoteAddr(httpServletRequest));
+        recordLoginSafely(
+            principal.id(),
+            principal.email(),
+            String.join(",", principal.roles()),
+            "SUCCESS",
+            resolveRemoteAddr(httpServletRequest),
+            httpServletRequest.getHeader("User-Agent"));
 
         return toResponse(principal);
     }
@@ -169,5 +187,20 @@ public class AuthController {
             return "authentication-service-error";
         }
         return exception.getClass().getSimpleName();
+    }
+
+    private void recordLoginSafely(
+        Long userId,
+        String email,
+        String roleSnapshot,
+        String loginResult,
+        String ipAddress,
+        String userAgent
+    ) {
+        try {
+            loggingService.recordLogin(userId, email, roleSnapshot, loginResult, ipAddress, userAgent);
+        } catch (Exception exception) {
+            log.error("Failed to persist login log: email={}, result={}", email, loginResult, exception);
+        }
     }
 }

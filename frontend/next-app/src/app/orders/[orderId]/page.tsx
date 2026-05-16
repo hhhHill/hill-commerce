@@ -22,16 +22,16 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     const order = await getServerOrder(Number(orderId));
 
     return (
-      <main className="min-h-screen px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8">
+      <main className="page-shell">
+        <div className="page-stack">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-3">
               <HomeShortcut />
-              <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href={`/orders/${orderId}/result`}>
+              <Link className="btn-secondary px-4 py-2" href={`/orders/${orderId}/result`}>
                 返回提交结果页
               </Link>
             </div>
-            <SearchForm className="w-full max-w-md" />
+            <SearchForm />
           </div>
 
           <OrderDetailPanel order={order} />

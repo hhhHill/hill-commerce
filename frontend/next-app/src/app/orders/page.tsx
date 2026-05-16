@@ -30,16 +30,16 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   const result = await getServerOrders(query);
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <main className="page-shell">
+      <div className="page-stack">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-3">
             <HomeShortcut />
-            <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/account">
+            <Link className="btn-secondary px-4 py-2" href="/account">
               返回账户页
             </Link>
           </div>
-          <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
+          <Link className="btn-secondary px-4 py-2" href="/cart">
             前往购物车
           </Link>
         </div>

@@ -13,35 +13,29 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
   }
 
   return (
-    <section className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.22em] text-black/45">Category Directory</span>
-        <h1 className="text-4xl font-semibold tracking-tight">按分类开始浏览</h1>
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">品类入口</h1>
+        <p className="text-sm text-[var(--text-secondary)]">左右滑动，快速进入你想逛的分类。</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categories.map((category, index) => (
+      <div className="-mx-3 overflow-x-auto px-3 [scrollbar-width:none]">
+        <div className="flex min-w-max gap-2">
+          {categories.map((category) => (
           <BrowseEventLink
             key={category.id}
-            className="group flex min-h-40 flex-col justify-between rounded-[28px] border border-black/10 px-6 py-6 shadow-[0_16px_40px_rgba(74,42,18,0.08)]"
+            className="surface-card group flex min-h-20 min-w-[92px] shrink-0 flex-col justify-between rounded-lg px-3 py-3"
             eventName={STOREFRONT_BROWSE_EVENTS.categoryEnter}
             eventPayload={{ categoryId: category.id, source: "category-directory" }}
             href={`/categories/${category.id}`}
-            style={{
-              background:
-                index % 3 === 0
-                  ? "linear-gradient(160deg, #fff7ef 0%, #f0dbc1 100%)"
-                  : index % 3 === 1
-                    ? "linear-gradient(160deg, #f6efe4 0%, #dfcbb4 100%)"
-                    : "linear-gradient(160deg, #fef3dc 0%, #efcf9a 100%)"
-            }}
           >
-            <span className="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">Category</span>
-            <div className="flex items-end justify-between gap-4">
-              <h2 className="text-2xl font-semibold tracking-tight">{category.name}</h2>
-              <span className="text-sm font-medium text-black/50 transition-transform duration-200 group-hover:translate-x-1">进入</span>
+            <span className="text-xs font-semibold text-[var(--brand-primary)]">分类</span>
+            <div className="flex items-end justify-between gap-3">
+              <h2 className="line-clamp-2 text-sm font-semibold text-[var(--text-primary)]">{category.name}</h2>
+              <span className="text-xs font-medium text-[var(--text-hint)] transition-transform duration-200 group-hover:translate-x-0.5">逛</span>
             </div>
           </BrowseEventLink>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

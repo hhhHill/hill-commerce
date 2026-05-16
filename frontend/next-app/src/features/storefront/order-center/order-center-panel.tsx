@@ -15,11 +15,11 @@ export function OrderCenterPanel({ result, status, orderNo }: OrderCenterPanelPr
     <section className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-black/45">My Orders</span>
-          <h1 className="text-4xl font-semibold tracking-tight">订单查询中心</h1>
-          <p className="max-w-3xl text-sm leading-7 text-black/65">这里负责回访已创建订单、按状态查看和按订单号快速定位，不重新定义订单详情和支付规则。</p>
+          <span className="chip-badge w-fit">我的订单</span>
+          <h1 className="text-3xl font-semibold tracking-tight">订单查询中心</h1>
+          <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">这里负责回访已创建订单、按状态查看和按订单号快速定位，不重新定义订单详情和支付规则。</p>
         </div>
-        <div className="rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm text-black/60">共 {result.total} 笔订单</div>
+        <div className="chip-badge">共 {result.total} 笔订单</div>
       </div>
 
       <OrderCenterToolbar currentOrderNo={orderNo} currentStatus={status} />

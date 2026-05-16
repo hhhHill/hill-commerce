@@ -17,7 +17,7 @@ export function SearchForm({ defaultKeyword = "", className }: SearchFormProps) 
 
   return (
     <form
-      className={className}
+      className={`w-full ${className ?? ""}`}
       onSubmit={(event) => {
         event.preventDefault();
         const normalizedKeyword = keyword.trim();
@@ -32,16 +32,16 @@ export function SearchForm({ defaultKeyword = "", className }: SearchFormProps) 
         });
       }}
     >
-      <label className="flex items-center gap-3 rounded-full border border-black/10 bg-white/80 px-4 py-3 shadow-[0_10px_30px_rgba(74,42,18,0.08)]">
-        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/45">Search</span>
+      <label className="flex w-full items-center gap-3 rounded-full border border-[var(--border-normal)] bg-white px-3 py-2 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <span className="chip-badge shrink-0">搜索</span>
         <input
-          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-black/35"
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-hint)]"
           onChange={(event) => setKeyword(event.target.value)}
-          placeholder="按商品名称搜索"
+          placeholder="搜你想要的..."
           value={keyword}
         />
         <button
-          className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className={`btn-primary shrink-0 px-4 py-2 ${isPending ? "opacity-70" : ""}`}
           disabled={isPending}
           type="submit"
         >

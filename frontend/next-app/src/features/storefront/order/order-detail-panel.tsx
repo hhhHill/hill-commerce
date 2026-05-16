@@ -20,39 +20,37 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
   const canConfirmReceipt = order.orderStatus === "SHIPPED";
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
       <div className="flex flex-col gap-4">
-        <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+        <article className="surface-card rounded-lg p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
-                Order Detail
-              </span>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight">{order.orderNo}</h1>
+              <span className="chip-badge">订单详情</span>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight">{order.orderNo}</h1>
             </div>
-            <span className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold">{renderStatus(order.orderStatus)}</span>
+            <span className="chip-badge">{renderStatus(order.orderStatus)}</span>
           </div>
 
-          <dl className="mt-6 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+          <dl className="surface-subtle mt-6 grid gap-4 p-4">
             <Metric label="订单金额" value={formatPrice(order.totalAmount)} />
             <Metric label="应付金额" value={formatPrice(order.payableAmount)} />
             <Metric label="支付截止" value={formatDateTime(order.paymentDeadlineAt)} />
           </dl>
         </article>
 
-        <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+        <article className="surface-card rounded-lg p-5">
           <h2 className="text-2xl font-semibold tracking-tight">商品快照</h2>
           <div className="mt-5 flex flex-col gap-4">
             {order.items.map((item) => (
-              <div key={item.id} className="grid gap-4 rounded-[24px] border border-black/10 bg-[var(--surface)] p-4 md:grid-cols-[120px_1fr]">
+              <div key={item.id} className="surface-subtle grid gap-4 p-4 md:grid-cols-[120px_1fr]">
                 <Link
-                  className="overflow-hidden rounded-[20px] border border-black/10 bg-[linear-gradient(160deg,#f4e7d2_0%,#e7d1ba_100%)]"
+                  className="overflow-hidden rounded-lg border border-[var(--border-normal)] bg-[var(--border-light)]"
                   href={`/products/${item.productId}`}
                 >
                   {item.productImageUrl ? (
                     <img alt={item.productName} className="aspect-square h-full w-full object-cover" src={item.productImageUrl} />
                   ) : (
-                    <div className="flex aspect-square items-center justify-center text-sm font-medium text-black/40">暂无图片</div>
+                    <div className="flex aspect-square items-center justify-center text-sm font-medium text-[var(--text-hint)]">暂无图片</div>
                   )}
                 </Link>
                 <div className="flex flex-col gap-3">
@@ -61,15 +59,17 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
                       <Link className="text-xl font-semibold" href={`/products/${item.productId}`}>
                         {item.productName}
                       </Link>
-                      <p className="mt-2 text-sm text-black/55">{item.skuSpecText}</p>
-                      <p className="mt-1 text-sm text-black/45">{item.skuCode}</p>
+                      <p className="mt-2 text-sm text-[var(--text-secondary)]">{item.skuSpecText}</p>
+                      <p className="mt-1 text-sm text-[var(--text-hint)]">{item.skuCode}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-black/50">小计</p>
-                      <p className="text-2xl font-semibold text-[var(--accent-strong)]">{formatPrice(item.subtotalAmount)}</p>
+                      <p className="text-sm text-[var(--text-secondary)]">小计</p>
+                      <p className="text-2xl font-bold text-[var(--price)]" style={{ fontFamily: "var(--font-price)" }}>
+                        {formatPrice(item.subtotalAmount)}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-6 text-sm text-black/65">
+                  <div className="flex flex-wrap gap-6 text-sm text-[var(--text-secondary)]">
                     <span>单价：{formatPrice(item.unitPrice)}</span>
                     <span>数量：{item.quantity}</span>
                   </div>
@@ -80,16 +80,16 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
         </article>
 
         {(order.orderStatus === "SHIPPED" || order.orderStatus === "COMPLETED") && order.shipment ? (
-          <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+          <article className="surface-card rounded-lg p-5">
             <h2 className="text-2xl font-semibold tracking-tight">物流信息</h2>
-            <div className="mt-5 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+            <div className="surface-subtle mt-5 grid gap-4 p-4">
               <Metric label="快递公司" value={order.shipment.carrierName} />
               <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3">
-                <dt className="text-sm text-black/50">运单号</dt>
+                <dt className="text-sm text-[var(--text-secondary)]">运单号</dt>
                 <dd className="flex items-center gap-3 text-right">
                   <span className="text-lg font-semibold">{order.shipment.trackingNo}</span>
                   <button
-                    className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold"
+                    className="btn-secondary px-3 py-1 text-xs"
                     type="button"
                     onClick={async () => {
                       try {
@@ -109,19 +109,19 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
           </article>
         ) : null}
 
-        <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+        <article className="surface-card rounded-lg p-5">
           <h2 className="text-2xl font-semibold tracking-tight">状态历史</h2>
           <div className="mt-5 flex flex-col gap-3">
             {order.statusHistory.map((history) => (
-              <div key={history.id} className="rounded-[22px] border border-black/10 bg-[var(--surface)] px-4 py-4">
+              <div key={history.id} className="surface-subtle px-4 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm font-semibold">
                     {history.fromStatus ? `${renderStatus(history.fromStatus)} → ` : ""}
                     {renderStatus(history.toStatus)}
                   </p>
-                  <p className="text-sm text-black/50">{formatDateTime(history.createdAt)}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">{formatDateTime(history.createdAt)}</p>
                 </div>
-                {history.changeReason ? <p className="mt-2 text-sm text-black/65">{history.changeReason}</p> : null}
+                {history.changeReason ? <p className="mt-2 text-sm text-[var(--text-secondary)]">{history.changeReason}</p> : null}
               </div>
             ))}
           </div>
@@ -129,11 +129,11 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
       </div>
 
       <aside className="flex flex-col gap-4">
-        <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+        <article className="surface-card rounded-lg p-5">
           <h2 className="text-2xl font-semibold tracking-tight">收货地址快照</h2>
           <p className="mt-4 text-lg font-semibold">{order.address.receiverName}</p>
-          <p className="mt-1 text-sm text-black/60">{order.address.receiverPhone}</p>
-          <p className="mt-4 text-sm leading-7 text-black/65">
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">{order.address.receiverPhone}</p>
+          <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
             {order.address.province}
             {order.address.city}
             {order.address.district}
@@ -142,19 +142,19 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
           </p>
         </article>
 
-        <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+        <article className="surface-card rounded-lg p-5">
           <h2 className="text-2xl font-semibold tracking-tight">订单动作</h2>
           <div className="mt-5 flex flex-col gap-3">
             {canPay ? (
-              <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-center text-sm font-semibold text-white" href={`/pay/${order.id}`}>
+              <Link className="btn-primary w-full px-5 py-3" href={`/pay/${order.id}`}>
                 去支付
               </Link>
             ) : (
-              <div className="rounded-[22px] bg-black/5 px-4 py-4 text-sm font-medium text-black/60">{renderPaymentHint(order.orderStatus)}</div>
+              <div className="rounded-lg bg-black/5 px-4 py-4 text-sm font-medium text-[var(--text-secondary)]">{renderPaymentHint(order.orderStatus)}</div>
             )}
             {canCancel ? (
               <button
-                className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700"
+                className="btn-secondary border-red-200 px-5 py-3 text-red-700"
                 disabled={isPending}
                 type="button"
                 onClick={() => {
@@ -172,11 +172,11 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
                 {isPending ? "取消中..." : "取消未支付订单"}
               </button>
             ) : (
-              <div className="rounded-[22px] bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再支持未支付取消。</div>
+              <div className="rounded-lg bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再支持未支付取消。</div>
             )}
             {canConfirmReceipt ? (
               <button
-                className="rounded-full bg-[var(--accent-strong)] px-5 py-3 text-sm font-semibold text-white"
+                className="btn-primary px-5 py-3"
                 disabled={isPending}
                 type="button"
                 onClick={() => {
@@ -197,10 +197,10 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
                 {isPending ? "提交中..." : "确认收货"}
               </button>
             ) : null}
-            <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/cart">
+            <Link className="btn-secondary w-full px-5 py-3" href="/cart">
               返回购物车
             </Link>
-            <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/orders">
+            <Link className="btn-secondary w-full px-5 py-3" href="/orders">
               返回我的订单
             </Link>
             {message ? <p className="text-sm text-red-700">{message}</p> : null}
@@ -214,7 +214,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3 last:border-b-0 last:pb-0">
-      <dt className="text-sm text-black/50">{label}</dt>
+      <dt className="text-sm text-[var(--text-secondary)]">{label}</dt>
       <dd className="text-right text-lg font-semibold">{value}</dd>
     </div>
   );

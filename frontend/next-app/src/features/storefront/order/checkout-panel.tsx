@@ -25,20 +25,18 @@ export function CheckoutPanel({ checkout }: CheckoutPanelProps) {
   }
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
       <div className="flex flex-col gap-4">
         <CheckoutAddressCard address={checkout.defaultAddress} />
         <CheckoutItemList items={checkout.items} />
       </div>
 
-      <aside className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
-        <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
-          Final Checkout
-        </span>
+      <aside className="surface-card rounded-lg p-5">
+        <span className="chip-badge">Final Checkout</span>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight">真正创建订单前的最终确认</h2>
-        <p className="mt-2 text-sm leading-7 text-black/65">这里不再承担重新勾选和地址编辑，只消费当前勾选条目与默认地址，并在提交时由服务端再次做最终校验。</p>
+        <p className="mt-2 text-sm leading-7 text-[var(--text-secondary)]">这里不再承担重新勾选和地址编辑，只消费当前勾选条目与默认地址，并在提交时由服务端再次做最终校验。</p>
 
-        <dl className="mt-6 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+        <dl className="surface-subtle mt-6 grid gap-4 p-4">
           <Metric label="勾选条目" value={`${checkout.summary.selectedItemCount} 件`} />
           <Metric label="勾选数量" value={`${checkout.summary.selectedQuantity} 件`} />
           <Metric label="合计金额" value={formatPrice(checkout.summary.totalAmount)} />
@@ -66,7 +64,7 @@ export function CheckoutPanel({ checkout }: CheckoutPanelProps) {
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/checkout-summary">
+          <Link className="btn-secondary w-full px-5 py-3" href="/checkout-summary">
             返回结算前汇总
           </Link>
           <OrderSubmitForm canSubmit={checkout.summary.canSubmit} />
@@ -79,7 +77,7 @@ export function CheckoutPanel({ checkout }: CheckoutPanelProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3 last:border-b-0 last:pb-0">
-      <dt className="text-sm text-black/50">{label}</dt>
+      <dt className="text-sm text-[var(--text-secondary)]">{label}</dt>
       <dd className="text-lg font-semibold">{value}</dd>
     </div>
   );

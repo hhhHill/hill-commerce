@@ -28,9 +28,7 @@ Sync Impact Report
 1. 本文件 `.specify/memory/constitution.md`
 2. `specs/<feature>/spec.md`
 3. `specs/<feature>/plan.md`
-4. `specs/<feature>/tasks.md`
-5. `specs/README.md`
-6. `specs/migration-map.md`
+4. `specs/<feature>/tas
 
 `docs/superpowers/` 下的 prompts、workflows、commands、checklists 属于执行辅助文档，不定义产品事实。
 

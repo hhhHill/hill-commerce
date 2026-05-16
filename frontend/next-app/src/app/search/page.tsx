@@ -21,11 +21,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     : { items: [], page: 1, pageSize: 12, total: 0 };
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <main className="page-shell">
+      <div className="page-stack">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <HomeShortcut />
-          <SearchForm className="w-full max-w-md" defaultKeyword={keyword} />
+          <SearchForm defaultKeyword={keyword} />
         </div>
         <StorefrontProductList
           buildPageHref={(nextPage) => `/search?keyword=${encodeURIComponent(keyword)}&page=${nextPage}`}

@@ -1,20 +1,121 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f1e8;
-  --foreground: #1d140d;
-  --surface: #fffaf2;
-  --accent: #8a4b22;
-  --accent-strong: #5f2f11;
+  --bg-page: #f5f5f5;
+  --bg-surface: #ffffff;
+  --bg-warm: #fefaf5;
+  --bg-admin: #ffffff;
+  --brand-primary: #ff4d1e;
+  --brand-gradient: linear-gradient(135deg, #ff6b35 0%, #ff3d00 100%);
+  --brand-deep: #d6380e;
+  --price: #ff3d00;
+  --price-strike: #999999;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-hint: #999999;
+  --text-inverse: #ffffff;
+  --border-light: #f0f0f0;
+  --border-normal: #e8e8e8;
+  --font-body: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  --font-price: "DIN Alternate", "PingFang SC", sans-serif;
+  --background: var(--bg-page);
+  --foreground: var(--text-primary);
+  --surface: var(--bg-warm);
+  --accent: var(--brand-primary);
+  --accent-strong: var(--price);
 }
 
 html,
 body {
-  background: linear-gradient(180deg, #f6f1e8 0%, #efe1cf 100%);
+  background: var(--bg-page);
   color: var(--foreground);
   min-height: 100%;
 }
 
 body {
-  font-family: "Segoe UI", sans-serif;
+  font-family: var(--font-body);
+}
+
+button,
+a {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+@layer components {
+  .page-shell {
+    @apply min-h-screen px-3 py-4 md:px-4 md:py-5;
+  }
+
+  .page-stack {
+    @apply mx-auto flex max-w-[1200px] flex-col gap-4;
+  }
+
+  .surface-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-normal);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .surface-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .surface-subtle {
+    background: var(--bg-warm);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+  }
+
+  .chip-badge {
+    @apply inline-flex items-center rounded-[4px] px-2 py-1 text-xs font-semibold;
+    background: #fff2ec;
+    color: var(--brand-deep);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold;
+    border-radius: 24px;
+  }
+
+  .btn-primary {
+    background: var(--brand-gradient);
+    color: var(--text-inverse);
+    box-shadow: 0 8px 18px rgba(255, 77, 30, 0.18);
+  }
+
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-ghost:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 10px 24px rgba(255, 77, 30, 0.24);
+  }
+
+  .btn-secondary {
+    background: var(--bg-surface);
+    border: 1px solid rgba(255, 77, 30, 0.28);
+    color: var(--brand-primary);
+  }
+
+  .btn-ghost {
+    color: var(--text-secondary);
+  }
+
+  .btn-disabled {
+    @apply cursor-not-allowed;
+    background: #d9d9d9;
+    color: #ffffff;
+    box-shadow: none;
+  }
 }

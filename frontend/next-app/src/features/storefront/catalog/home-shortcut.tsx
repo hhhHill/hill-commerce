@@ -6,7 +6,7 @@ type HomeShortcutProps = {
 
 export function HomeShortcut({ label = "返回首页" }: HomeShortcutProps) {
   return (
-    <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/">
+    <Link className="btn-ghost px-0 py-0 text-sm" href="/">
       {label}
     </Link>
   );

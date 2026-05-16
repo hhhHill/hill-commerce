@@ -20,21 +20,21 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
   }
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+    <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flex flex-col gap-4">
         {summary.defaultAddress ? (
-          <article className="rounded-[28px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_50px_rgba(74,42,18,0.06)]">
+          <article className="surface-card rounded-lg p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm uppercase tracking-[0.18em] text-black/45">Default Address</p>
+                <p className="text-sm uppercase tracking-[0.18em] text-[var(--text-secondary)]">Default Address</p>
                 <h2 className="mt-2 text-2xl font-semibold">{summary.defaultAddress.receiverName}</h2>
-                <p className="mt-1 text-sm text-black/60">{summary.defaultAddress.receiverPhone}</p>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">{summary.defaultAddress.receiverPhone}</p>
               </div>
-              <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/account/addresses">
+              <Link className="btn-secondary px-4 py-2" href="/account/addresses">
                 管理地址
               </Link>
             </div>
-            <p className="mt-4 text-sm leading-7 text-black/65">
+            <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
               {summary.defaultAddress.province}
               {summary.defaultAddress.city}
               {summary.defaultAddress.district}
@@ -46,7 +46,7 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
           <article className="rounded-[28px] border border-dashed border-red-200 bg-red-50/80 p-5 text-red-800">
             <h2 className="text-xl font-semibold">还没有默认地址</h2>
             <p className="mt-2 text-sm leading-7">当前无法进入真正下单流程。先补充地址，系统会自动维护默认地址。</p>
-            <Link className="mt-4 inline-flex rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" href="/account/addresses">
+            <Link className="btn-primary mt-4 inline-flex px-4 py-2" href="/account/addresses">
               去新增地址
             </Link>
           </article>
@@ -54,20 +54,22 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
 
         <div className="flex flex-col gap-4">
           {summary.items.map((item) => (
-            <article key={item.id} className="rounded-[28px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_50px_rgba(74,42,18,0.06)]">
+            <article key={item.id} className="surface-card rounded-lg p-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold">{item.productName}</h3>
-                  <p className="text-sm text-black/55">{item.skuSpecText}</p>
-                  <p className="text-sm text-black/45">{item.skuCode}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">{item.skuSpecText}</p>
+                  <p className="text-sm text-[var(--text-hint)]">{item.skuCode}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-black/50">小计</p>
-                  <p className="text-2xl font-semibold text-[var(--accent-strong)]">{formatPrice(item.subtotalAmount)}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">小计</p>
+                  <p className="text-2xl font-bold text-[var(--price)]" style={{ fontFamily: "var(--font-price)" }}>
+                    {formatPrice(item.subtotalAmount)}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-4 text-sm text-black/65">
+              <div className="mt-4 flex flex-wrap gap-4 text-sm text-[var(--text-secondary)]">
                 <span>单价：{formatPrice(item.unitPrice)}</span>
                 <span>数量：{item.quantity}</span>
               </div>
@@ -84,13 +86,11 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
         </div>
       </div>
 
-      <aside className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
-        <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
-          Summary Gate
-        </span>
+      <aside className="surface-card rounded-lg p-5">
+        <span className="chip-badge">Summary Gate</span>
         <h2 className="mt-3 text-2xl font-semibold tracking-tight">进入下单前的最后检查</h2>
 
-        <dl className="mt-6 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+        <dl className="surface-subtle mt-6 grid gap-4 p-4">
           <Metric label="勾选条目" value={`${summary.summary.selectedItemCount} 件`} />
           <Metric label="勾选数量" value={`${summary.summary.selectedQuantity} 件`} />
           <Metric label="勾选金额" value={formatPrice(summary.summary.selectedAmount)} />
@@ -120,14 +120,12 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href="/cart">
+          <Link className="btn-secondary w-full px-5 py-3" href="/cart">
             返回购物车调整
           </Link>
           <Link
             aria-disabled={!summary.summary.canProceed}
-            className={`rounded-full px-5 py-3 text-center text-sm font-semibold text-white ${
-              summary.summary.canProceed ? "bg-[var(--accent)]" : "cursor-not-allowed bg-black/30"
-            }`}
+            className={`btn-primary w-full px-5 py-3 ${summary.summary.canProceed ? "" : "btn-disabled"}`}
             href={summary.summary.canProceed ? "/checkout" : "/checkout-summary"}
           >
             {summary.summary.canProceed ? "继续进入最终下单确认" : "当前不可继续"}
@@ -141,7 +139,7 @@ export function CheckoutSummaryPanel({ summary }: CheckoutSummaryPanelProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3 last:border-b-0 last:pb-0">
-      <dt className="text-sm text-black/50">{label}</dt>
+      <dt className="text-sm text-[var(--text-secondary)]">{label}</dt>
       <dd className="text-lg font-semibold">{value}</dd>
     </div>
   );

@@ -19,7 +19,7 @@ const STATUS_OPTIONS: Array<{ label: string; value?: OrderListStatus }> = [
 
 export function OrderCenterToolbar({ currentStatus, currentOrderNo }: OrderCenterToolbarProps) {
   return (
-    <section className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+    <section className="surface-card rounded-lg p-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-3">
           {STATUS_OPTIONS.map((option) => {
@@ -29,8 +29,8 @@ export function OrderCenterToolbar({ currentStatus, currentOrderNo }: OrderCente
                 key={option.label}
                 className={
                   isActive
-                    ? "rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-black/70"
+                    ? "btn-primary px-4 py-2"
+                    : "btn-secondary px-4 py-2"
                 }
                 href={`/orders${buildQueryString({ status: option.value, orderNo: currentOrderNo })}`}
               >
@@ -43,21 +43,21 @@ export function OrderCenterToolbar({ currentStatus, currentOrderNo }: OrderCente
         <form action="/orders" className="flex flex-col gap-3 md:flex-row md:items-center">
           {currentStatus ? <input name="status" type="hidden" value={currentStatus} /> : null}
           <input
-            className="w-full rounded-full border border-black/10 bg-[var(--surface)] px-5 py-3 text-sm outline-none transition focus:border-black/20"
+            className="w-full rounded-full border border-[var(--border-normal)] bg-white px-5 py-3 text-sm outline-none transition focus:border-[var(--brand-primary)]"
             defaultValue={currentOrderNo ?? ""}
             name="orderNo"
             placeholder="输入订单号前缀搜索"
             type="search"
           />
-          <button className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white" type="submit">
+          <button className="btn-primary px-5 py-3" type="submit">
             搜索订单
           </button>
-          <Link className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium" href="/orders">
+          <Link className="btn-secondary px-5 py-3" href="/orders">
             清空条件
           </Link>
         </form>
 
-        <p className="text-sm text-black/50">订单号搜索采用前缀匹配，输入不足 4 位时会回到默认列表。</p>
+        <p className="text-sm text-[var(--text-secondary)]">订单号搜索采用前缀匹配，输入不足 4 位时会回到默认列表。</p>
       </div>
     </section>
   );

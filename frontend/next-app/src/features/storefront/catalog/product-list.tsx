@@ -28,13 +28,12 @@ export function StorefrontProductList({
   const canGoNext = page < totalPages;
 
   return (
-    <section className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-black/45">Storefront Listing</span>
-          <h1 className="text-4xl font-semibold tracking-tight">{title}</h1>
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         </div>
-        <div className="rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm text-black/60">
+        <div className="chip-badge">
           共 {total} 件商品
         </div>
       </div>
@@ -43,24 +42,24 @@ export function StorefrontProductList({
         <EmptyState description={emptyDescription} title="暂时没有可展示商品" />
       ) : (
         <>
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
           {buildPageHref ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-black/10 bg-white/70 px-5 py-4">
-              <p className="text-sm text-black/55">
+            <div className="surface-card flex flex-wrap items-center justify-between gap-3 rounded-lg px-4 py-3">
+              <p className="text-sm text-[var(--text-secondary)]">
                 第 {page} / {totalPages} 页
               </p>
               <div className="flex gap-3">
                 {canGoPrevious ? (
-                  <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href={buildPageHref(page - 1)}>
+                  <Link className="btn-secondary px-4 py-2" href={buildPageHref(page - 1)}>
                     上一页
                   </Link>
                 ) : null}
                 {canGoNext ? (
-                  <Link className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" href={buildPageHref(page + 1)}>
+                  <Link className="btn-primary px-4 py-2" href={buildPageHref(page + 1)}>
                     下一页
                   </Link>
                 ) : null}

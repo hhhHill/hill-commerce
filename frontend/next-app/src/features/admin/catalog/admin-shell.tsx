@@ -31,28 +31,28 @@ export function AdminShell({ title, description, user, children }: AdminShellPro
   const navItems = NAV_ITEMS.filter((item) => !item.roles || item.roles.some((role) => user.roles.includes(role)));
 
   return (
-    <main className="min-h-screen px-6 py-10">
+    <main className="min-h-screen bg-[var(--bg-admin)] px-4 py-4 md:px-6 md:py-6">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
-        <div className="rounded-[32px] border border-black/10 bg-[var(--surface)] p-8 shadow-[0_20px_60px_rgba(74,42,18,0.08)]">
+        <div className="rounded-lg border border-[var(--border-normal)] bg-[var(--bg-admin)] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-4">
-              <span className="w-fit rounded-full bg-[var(--accent-strong)] px-4 py-1 text-sm font-semibold text-white">
+              <span className="chip-badge w-fit">
                 Sales Console
               </span>
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
-                <p className="max-w-3xl text-base leading-7 text-black/70">{description}</p>
+                <p className="max-w-3xl text-base leading-7 text-[var(--text-secondary)]">{description}</p>
               </div>
             </div>
-            <div className="rounded-[24px] bg-white/85 p-5 text-sm shadow-[0_12px_30px_rgba(29,20,13,0.06)]">
-              <p className="text-black/55">当前后台账号</p>
+            <div className="rounded-lg border border-[var(--border-normal)] bg-white p-4 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <p className="text-[var(--text-secondary)]">当前后台账号</p>
               <p className="mt-1 font-semibold">{user.nickname}</p>
-              <p className="mt-1 text-black/65">{user.roles.join(", ")}</p>
+              <p className="mt-1 text-[var(--text-secondary)]">{user.roles.join(", ")}</p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <Link className="rounded-full border border-black/10 px-4 py-2 font-medium" href="/">
+                <Link className="btn-secondary px-4 py-2" href="/">
                   返回首页
                 </Link>
-                <LogoutButton className="rounded-full bg-[var(--accent)] px-4 py-2 font-semibold text-white" />
+                <LogoutButton className="btn-primary px-4 py-2" />
               </div>
             </div>
           </div>
@@ -60,7 +60,7 @@ export function AdminShell({ title, description, user, children }: AdminShellPro
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                className="rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-medium transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                className="rounded-full border border-[var(--border-normal)] bg-white px-4 py-2 text-sm font-medium transition hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
                 href={item.href}
               >
                 {item.label}

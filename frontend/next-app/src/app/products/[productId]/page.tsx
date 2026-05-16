@@ -21,17 +21,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     const [product, user] = await Promise.all([getServerStorefrontProductDetail(Number(productId)), getSessionUser()]);
 
     return (
-      <main className="min-h-screen px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8">
+      <main className="page-shell">
+        <div className="page-stack">
           <ProductViewBeacon categoryId={product.categoryId} productId={product.id} />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-3">
               <HomeShortcut />
-              <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/categories">
+              <Link className="btn-secondary px-4 py-2" href="/categories">
                 返回分类
               </Link>
             </div>
-            <SearchForm className="w-full max-w-md" />
+            <SearchForm />
           </div>
           <ProductDetailPanel
             isAuthenticated={Boolean(user)}

@@ -389,13 +389,23 @@ git commit -m "feat: add analytics DTO records"
 **Files:**
 - Create: `backend/src/main/java/com/hillcommerce/modules/admin/service/AdminAnalyticsScheduler.java`
 
-- [ ] **Step 1: 检查 @EnableScheduling**
+- [ ] **Step 1: 检查 @EnableScheduling 并添加配置**
 
-在 `backend/src/main/java/com/hillcommerce/` 下搜索 `@EnableScheduling`，如果不存在则添加到 `HillCommerceApplication.java`：
+搜索 `@EnableScheduling`，如果不存在则添加到 `HillCommerceApplication.java`：
 
 ```java
 // 在 @SpringBootApplication 类上添加:
 @EnableScheduling
+```
+
+在 `application.yml` 追加：
+
+```yaml
+hill:
+  analytics:
+    hourly-snapshot-cron: "0 5 * * * *"
+    daily-summary-cron: "0 30 0 * * *"
+    anomaly-check-cron: "0 10 * * * *"
 ```
 
 - [ ] **Step 2: 编写 AdminAnalyticsScheduler**
@@ -1641,15 +1651,33 @@ git commit -m "feat: add KPI cards and anomaly banner"
 ```typescript
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { TrendPoint } from "@/lib/admin/analytics-types";
+import type { TrendPoint, TrendResponse } from "@/lib/admin/analytics-types";
+import { getTrends } from "@/lib/admin/analytics-client";
 
 type SalesTrendChartProps = {
   points: TrendPoint[];
 };
 
-export function SalesTrendChart({ points }: SalesTrendChartProps) {
+const GRANULARITY_TABS = [
+  { key: "day", label: "日" },
+  { key: "week", label: "周" },
+  { key: "month", label: "月" }
+] as const;
+
+export function SalesTrendChart({ points: initialPoints }: SalesTrendChartProps) {
+  const [granularity, setGranularity] = useState<string>("day");
+  const [points, setPoints] = useState(initialPoints);
+
+  const handleSwitch = useCallback(async (g: string) => {
+    setGranularity(g);
+    try {
+      const resp = await getTrends({ granularity: g });
+      setPoints(resp.points);
+    } catch { /* keep current data */ }
+  }, []);
+
   const data = points.map((p) => ({
     date: p.date,
     销售额: p.amount,
@@ -1658,7 +1686,24 @@ export function SalesTrendChart({ points }: SalesTrendChartProps) {
 
   return (
     <div className="rounded-[28px] border border-black/10 bg-white/90 p-5 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
-      <h3 className="text-lg font-semibold mb-4">销售趋势</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">销售趋势</h3>
+        <nav className="flex gap-1">
+          {GRANULARITY_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => handleSwitch(tab.key)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                granularity === tab.key
+                  ? "bg-[var(--brand-primary)] text-white"
+                  : "border border-[var(--border-normal)] bg-white hover:border-[var(--brand-primary)]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#00000015" />
@@ -2010,6 +2055,7 @@ git commit -m "feat: add user profile pages"
 **Files:**
 - Create: `frontend/next-app/src/features/admin/analytics/products/product-ranking-table.tsx`
 - Create: `frontend/next-app/src/features/admin/analytics/products/category-pie-chart.tsx`
+- Create: `frontend/next-app/src/features/admin/analytics/products/client-product-analytics.tsx`
 - Create: `frontend/next-app/src/app/admin/analytics/products/page.tsx`
 
 - [ ] **Step 1: 编写 ProductRankingTable**
@@ -2096,37 +2142,82 @@ export function CategoryPieChart({ items }: Props) {
 }
 ```
 
-- [ ] **Step 3: 编写 products page**
+- [ ] **Step 3: 编写 ClientProductAnalytics（含日/周/月切换）**
+
+```typescript
+"use client";
+
+import { useState, useEffect } from "react";
+import { ProductRankingTable } from "./product-ranking-table";
+import { CategoryPieChart } from "./category-pie-chart";
+import { getProductRankings } from "@/lib/admin/analytics-client";
+import type { ProductRankItem } from "@/lib/admin/analytics-types";
+
+const RANGE_TABS = [
+  { key: "today", label: "今日" },
+  { key: "week", label: "本周" },
+  { key: "month", label: "本月" }
+] as const;
+
+export function ClientProductAnalytics() {
+  const [range, setRange] = useState<string>("today");
+  const [items, setItems] = useState<ProductRankItem[]>([]);
+
+  useEffect(() => {
+    getProductRankings({ range, limit: 50 }).then(r => setItems(r.items)).catch(() => {});
+  }, [range]);
+
+  return (
+    <div>
+      <nav className="flex gap-2 mb-6">
+        {RANGE_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setRange(tab.key)}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              range === tab.key
+                ? "bg-[var(--brand-primary)] text-white"
+                : "border border-[var(--border-normal)] bg-white hover:border-[var(--brand-primary)]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ProductRankingTable items={items} />
+        </div>
+        <CategoryPieChart items={items} />
+      </div>
+    </div>
+  );
+}
+```
+
+- [ ] **Step 4: 编写 products server page**
 
 ```typescript
 import { AdminShell } from "@/features/admin/catalog/admin-shell";
 import { AnalyticsShell } from "@/features/admin/analytics/analytics-shell";
-import { ProductRankingTable } from "@/features/admin/analytics/products/product-ranking-table";
-import { CategoryPieChart } from "@/features/admin/analytics/products/category-pie-chart";
-import { getServerAnalyticsProductRankings } from "@/lib/admin/server";
+import { ClientProductAnalytics } from "@/features/admin/analytics/products/client-product-analytics";
 import { requireRole } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 
 export default async function AnalyticsProductsPage() {
   const user = await requireRole(["ADMIN", "SALES"], "/admin/analytics/products");
 
-  const rankings = await getServerAnalyticsProductRankings({ range: "today", limit: 50 }).catch(() => null);
-  const items = rankings?.items ?? [];
-
   return (
     <AdminShell title="商品分析" description="商品销量排行与品类分析" user={user}>
       <AnalyticsShell>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <ProductRankingTable items={items} />
-          </div>
-          <CategoryPieChart items={items} />
-        </div>
+        <ClientProductAnalytics />
       </AnalyticsShell>
     </AdminShell>
   );
 }
 ```
+
+- [ ] **Step 5: 类型检查 + 提交**
 
 - [ ] **Step 4: 类型检查 + 提交**
 

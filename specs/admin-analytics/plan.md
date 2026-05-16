@@ -129,6 +129,7 @@ GET /api/admin/analytics/profiles/users/{userId}
 | `src/features/admin/analytics/users/user-profile-detail.tsx` | 个体画像详情 |
 | `src/features/admin/analytics/products/product-ranking-table.tsx` | 商品排行表格 |
 | `src/features/admin/analytics/products/category-pie-chart.tsx` | 品类占比饼图 |
+| `src/features/admin/analytics/products/client-product-analytics.tsx` | 商品分析页客户端组件（含日/周/月 Tab） |
 | `src/app/admin/analytics/overview/page.tsx` | 概览页 (server) |
 | `src/app/admin/analytics/users/page.tsx` | 用户画像页 (server) |
 | `src/app/admin/analytics/products/page.tsx` | 商品分析页 (server) |
@@ -138,8 +139,7 @@ GET /api/admin/analytics/profiles/users/{userId}
 | 文件 | 变更内容 |
 |------|---------|
 | `src/features/admin/catalog/admin-shell.tsx` | `NAV_ITEMS` 新增"数据分析" |
-| `src/lib/admin/types.ts` | 新增分析相关类型 |
-| `src/lib/admin/client.ts` | 新增分析 API 函数 |
+| `src/lib/admin/server.ts` | 新增 3 个 analytics server-side 获取函数 |
 | `package.json` | 新增 `recharts` 依赖 |
 
 ### 组件树

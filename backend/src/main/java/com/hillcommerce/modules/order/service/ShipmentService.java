@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -171,11 +170,6 @@ public class ShipmentService {
                 latestShipment == null ? ShipmentStatus.DELIVERED.name() : latestShipment.getShipmentStatus());
         }
         return new ConfirmReceiptResponse(orderId, OrderStatus.COMPLETED.name(), ShipmentStatus.DELIVERED.name());
-    }
-
-    @Scheduled(fixedDelayString = "${hill.fulfillment.auto-complete.fixed-delay-ms:300000}")
-    public void scheduledAutoComplete() {
-        autoComplete();
     }
 
     @Transactional

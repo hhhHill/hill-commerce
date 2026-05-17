@@ -1,4 +1,4 @@
-package com.hillcommerce.modules.admin.service;
+package com.hillcommerce.modules.admin.scheduler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hillcommerce.modules.admin.service.AnomalyDetectionService;
 
 @Service
 public class AdminAnalyticsScheduler {

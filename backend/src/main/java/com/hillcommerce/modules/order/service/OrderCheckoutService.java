@@ -144,8 +144,7 @@ public class OrderCheckoutService {
         for (CartDtos.CheckoutItemResponse item : checkoutSummary.items()) {
             UpdateWrapper<ProductSkuEntity> updateWrapper = new UpdateWrapper<>();
             updateWrapper.eq("id",  item.skuId())
-                    .ge("stock", item.quantity())
-                    .setSql("stock = stock - " + item.quantity());
+                    .setDecrBy(true, "stock", item.quantity());
             int updated = productSkuMapper.update(null, updateWrapper);
             if (updated == 0) {
                 throw new IllegalArgumentException("Insufficient stock for SKU: " + item.skuId());

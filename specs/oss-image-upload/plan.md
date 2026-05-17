@@ -809,10 +809,8 @@ export async function uploadToOss(
     bucket: token.bucket,
   });
 
-  const objectKey = `${token.uploadDir}${Date.now()}_${fileName}`;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  const randomSuffix = Math.random().toString(36).substring(2, 8);
+  const objectKey = `${token.uploadDir}${Date.now()}_${randomSuffix}_${fileName}`;
 
   try {
     const result = await client.put(objectKey, new File([blob], fileName), {
@@ -824,9 +822,6 @@ export async function uploadToOss(
     throw new Error(
       `上传失败，请重试: ${err instanceof Error ? err.message : "未知错误"}`
     );
-  } finally {
-    clearTimeout(timeoutId);
-  }
 }
 ```
 
@@ -1028,16 +1023,78 @@ export function ImageUploader({
 }
 ```
 
-- [ ] **Step 2: 运行 TypeScript 类型检查**
+- [ ] **Step 2: 编写 ImageUploader 组件测试**
+
+创建 `frontend/next-app/src/features/admin/catalog/image-uploader.test.tsx`：
+
+```tsx
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { ImageUploader } from "./image-uploader";
+
+// Mock upload utilities so tests don't make real network calls
+vi.mock("@/lib/upload/image-compress", () => ({
+  compressImage: vi.fn().mockResolvedValue(new Blob(["test"], { type: "image/jpeg" })),
+}));
+vi.mock("@/lib/upload/oss-client", () => ({
+  requestStsToken: vi.fn().mockResolvedValue({
+    accessKey: "ak", secretKey: "sk", securityToken: "st",
+    region: "r", bucket: "b", endpoint: "e", uploadDir: "p/",
+  }),
+  uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg"),
+}));
+
+describe("ImageUploader", () => {
+  it("renders empty state with upload prompt", () => {
+    render(<ImageUploader value="" onChange={() => {}} />);
+    expect(screen.getByText("上传封面图")).toBeDefined();
+    expect(screen.getByText("建议 800×800")).toBeDefined();
+  });
+
+  it("renders thumbnail when value is provided", () => {
+    render(
+      <ImageUploader
+        value="https://example.com/img.jpg"
+        onChange={() => {}}
+      />
+    );
+    const img = screen.getByAltText("封面图");
+    expect(img).toBeDefined();
+    expect(img.getAttribute("src")).toContain("x-oss-process=image/resize");
+  });
+
+  it("calls onChange with empty string on remove", () => {
+    const onChange = vi.fn();
+    render(
+      <ImageUploader
+        value="https://example.com/img.jpg"
+        onChange={onChange}
+      />
+    );
+    fireEvent.click(screen.getByText("×"));
+    expect(onChange).toHaveBeenCalledWith("");
+  });
+});
+```
+
+运行测试确认通过：
+
+```bash
+cd frontend/next-app && npx vitest run --reporter=verbose src/features/admin/catalog/image-uploader.test.tsx
+```
+
+预期：3 tests passed。
+
+- [ ] **Step 3: 运行 TypeScript 类型检查**
 
 ```bash
 cd frontend/next-app && npx tsc --noEmit
 ```
 
-- [ ] **Step 3: 提交**
+- [ ] **Step 4: 提交**
 
 ```bash
-git add frontend/next-app/src/features/admin/catalog/image-uploader.tsx
+git add frontend/next-app/src/features/admin/catalog/image-uploader.tsx frontend/next-app/src/features/admin/catalog/image-uploader.test.tsx
 git commit -m "feat: add ImageUploader component for single image upload
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
@@ -1082,20 +1139,18 @@ export function ImagesUploader({
     const filesToUpload = Array.from(files).slice(0, remaining);
     setUploadingCount((c) => c + filesToUpload.length);
 
+    const uploaded: ImageUploadMeta[] = [];
     for (const file of filesToUpload) {
       try {
         const compressed = await compressImage(file);
         const token = await requestStsToken();
         const url = await uploadToOss(compressed, file.name, token);
-        onChange([
-          ...value,
-          { url, sortOrder: value.length },
-        ]);
+        uploaded.push({ url, sortOrder: 0 }); // sortOrder fixed after loop
       } catch (err) {
         setErrors((prev) => {
           const next = new Map(prev);
           next.set(
-            value.length,
+            value.length + uploaded.length,
             err instanceof Error ? err.message : "上传失败"
           );
           return next;
@@ -1103,6 +1158,14 @@ export function ImagesUploader({
       } finally {
         setUploadingCount((c) => c - 1);
       }
+    }
+
+    if (uploaded.length > 0) {
+      const base = value.length;
+      onChange([
+        ...value,
+        ...uploaded.map((img, i) => ({ url: img.url, sortOrder: base + i })),
+      ]);
     }
 
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -1203,16 +1266,77 @@ export function ImagesUploader({
 }
 ```
 
-- [ ] **Step 2: 运行 TypeScript 类型检查**
+- [ ] **Step 2: 编写 ImagesUploader 组件测试**
+
+创建 `frontend/next-app/src/features/admin/catalog/images-uploader.test.tsx`：
+
+```tsx
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { ImagesUploader } from "./images-uploader";
+
+vi.mock("@/lib/upload/image-compress", () => ({
+  compressImage: vi.fn().mockResolvedValue(new Blob(["test"], { type: "image/jpeg" })),
+}));
+vi.mock("@/lib/upload/oss-client", () => ({
+  requestStsToken: vi.fn().mockResolvedValue({
+    accessKey: "ak", secretKey: "sk", securityToken: "st",
+    region: "r", bucket: "b", endpoint: "e", uploadDir: "p/",
+  }),
+  uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg"),
+}));
+
+describe("ImagesUploader", () => {
+  it("renders add button when empty", () => {
+    render(<ImagesUploader value={[]} onChange={() => {}} />);
+    expect(screen.getByText("共 0 张")).toBeDefined();
+  });
+
+  it("renders thumbnails for provided images", () => {
+    const images = [
+      { url: "https://example.com/a.jpg", sortOrder: 0 },
+      { url: "https://example.com/b.jpg", sortOrder: 1 },
+    ];
+    render(<ImagesUploader value={images} onChange={() => {}} />);
+    expect(screen.getByText("共 2 张")).toBeDefined();
+    expect(screen.getByText("拖拽调整顺序")).toBeDefined();
+    expect(screen.getAllByAltText(/详情图/)).toHaveLength(2);
+  });
+
+  it("calls onChange without removed image on delete", () => {
+    const onChange = vi.fn();
+    const images = [
+      { url: "https://example.com/a.jpg", sortOrder: 0 },
+      { url: "https://example.com/b.jpg", sortOrder: 1 },
+    ];
+    render(<ImagesUploader value={images} onChange={onChange} />);
+    const deleteButtons = screen.getAllByText("×");
+    fireEvent.click(deleteButtons[0]);
+    expect(onChange).toHaveBeenCalledWith([
+      { url: "https://example.com/b.jpg", sortOrder: 0 },
+    ]);
+  });
+});
+```
+
+运行测试确认通过：
+
+```bash
+cd frontend/next-app && npx vitest run --reporter=verbose src/features/admin/catalog/images-uploader.test.tsx
+```
+
+预期：3 tests passed。
+
+- [ ] **Step 3: 运行 TypeScript 类型检查**
 
 ```bash
 cd frontend/next-app && npx tsc --noEmit
 ```
 
-- [ ] **Step 3: 提交**
+- [ ] **Step 4: 提交**
 
 ```bash
-git add frontend/next-app/src/features/admin/catalog/images-uploader.tsx
+git add frontend/next-app/src/features/admin/catalog/images-uploader.tsx frontend/next-app/src/features/admin/catalog/images-uploader.test.tsx
 git commit -m "feat: add ImagesUploader component for multi-image upload with drag sort
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```

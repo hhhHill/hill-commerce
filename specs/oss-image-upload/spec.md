@@ -11,7 +11,7 @@
 浏览器（商家后台）
   │
   ├─ 1. GET /api/admin/oss/sts  ──→  后端 OssController
-  │    返回 {accessKey, secretKey, securityToken, region, bucket, endpoint}
+  │    返回 {accessKey, secretKey, securityToken, region, bucket, endpoint, uploadDir}
   │
   ├─ 2. Canvas 压缩（最大 1920px, 质量 0.8）→ OSS JS SDK 直传
   │
@@ -63,7 +63,8 @@ GET /api/admin/oss/sts
     securityToken: "xxx",
     region: "oss-cn-hangzhou",
     bucket: "hill-commerce",
-    endpoint: "oss-cn-hangzhou.aliyuncs.com"
+    endpoint: "oss-cn-hangzhou.aliyuncs.com",
+    uploadDir: "products/"
   }
 ```
 
@@ -97,7 +98,7 @@ GET /api/admin/oss/sts
 compressImage(file: File, options?: {
   maxWidth?: number   // 默认 1920
   quality?: number    // 默认 0.8
-  format?: string     // 默认原格式（jpg/png/webp）
+  maxSize?: number    // 默认 10（MB，压缩前文件大小上限）
 }): Promise<Blob>
 ```
 
@@ -110,8 +111,8 @@ requestStsToken(): Promise<OssStsToken>
 uploadToOss(file: Blob, fileName: string, token: OssStsToken): Promise<string>
 ```
 
-- `requestStsToken`：调 `/api/admin/oss/sts`，失败有重试（1 次）
-- `uploadToOss`：用 aliyun-oss SDK 直传，带 30 秒超时
+- `requestStsToken`：调 `/api/admin/oss/sts`
+- `uploadToOss`：用 aliyun-oss SDK 直传，object key 加随机后缀防冲突，带 30 秒超时
 
 ### 组件
 
@@ -196,7 +197,7 @@ Props:
 | 层级 | 内容 | 工具 |
 |------|------|------|
 | `image-compress.ts` | 压缩后尺寸/质量/格式验证 | Vitest + jsdom Canvas |
-| `oss-client.ts` | STS 请求 + 上传流程 | Vitest + MSW |
+| `oss-client.ts` | STS 请求 + 上传流程 | Vitest + mock fetch |
 | `OssService.java` | STS 签发正确性 | JUnit 5 + Mockito |
 | `OssController.java` | API 返回结构、权限 | MockMvc `@WebMvcTest` |
 | `ImageUploader` | 各状态渲染、用户交互 | Vitest + Testing Library |

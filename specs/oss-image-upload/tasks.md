@@ -13,7 +13,7 @@
 - [ ] 在 `backend/pom.xml` 添加 `aliyun-sdk-oss` (3.18.1) 和 `aliyun-sdk-sts` (3.1.2) 依赖
 - [ ] 验证 `mvn dependency:resolve` 通过
 - [ ] 新增 `backend/src/main/java/com/hillcommerce/modules/oss/config/OssProperties.java`，`@ConfigurationProperties("oss")` 配置类
-- [ ] 在 `backend/src/main/resources/application.yml` `hill:` 块下新增 `oss:` 配置（endpoint, bucket, region, access-key-id, access-key-secret, role-arn, upload-dir），均通过环境变量注入
+- [ ] 在 `backend/src/main/resources/application.yml` `hill:` 块下新增 `oss:` 配置（endpoint, bucket, region, access-key-id, access-key-secret, role-arn, upload-dir），均通过环境变量注入，其中 upload-dir 默认 `products/`
 - [ ] 新增 `backend/src/main/java/com/hillcommerce/modules/oss/dto/OssStsToken.java` record
 - [ ] 新增 `backend/src/main/java/com/hillcommerce/modules/oss/service/OssService.java`：
   - `generateStsToken()` 通过 `DefaultAcsClient` + `AssumeRoleRequest` 获取 STS 临时凭证
@@ -52,9 +52,11 @@
   - Props: `value: ImageUploadMeta[]`, `onChange`, `maxCount`（默认 10）
   - 80×80 缩略图网格，左上角序号，右上角 × 删除
   - 支持批量选择文件
-  - HTML5 drag-and-drop 排序
+  - HTML5 drag-and-drop 排序，批量上传完成后统一更新 sortOrder
   - 末尾 + 按钮添加，上传中时 disabled
   - 底部显示总数 + 上传进度提示
+- [ ] 编写 `image-uploader.test.tsx`（覆盖：空态渲染、已有图片缩略图、删除操作）
+- [ ] 编写 `images-uploader.test.tsx`（覆盖：空态、多图渲染数量、删除回调）
 - [ ] `tsc --noEmit` 通过
 
 ### Phase 4: Product Editor Integration

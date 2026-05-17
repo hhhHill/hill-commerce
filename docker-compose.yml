@@ -11,6 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./ops/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot123"]
       interval: 10s
@@ -42,7 +43,7 @@ services:
     command: >
       -c /etc/gorse/config.toml
       --log-path /var/log/gorse/master.log
-      --cache-path /var/lib/gorse/master_cache.data
+      --cache-path /var/lib/gorse/master
     volumes:
       - ./ops/gorse/config.toml:/etc/gorse/config.toml:ro
       - gorse-data:/var/lib/gorse
@@ -72,6 +73,16 @@ services:
       DB_PASSWORD: hill123
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      OSS_ENDPOINT: ${OSS_ENDPOINT:-}
+      OSS_BUCKET: ${OSS_BUCKET:-}
+      OSS_REGION: ${OSS_REGION:-}
+      OSS_STS_REGION: ${OSS_STS_REGION:-}
+      OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID:-}
+      OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET:-}
+      OSS_STS_ROLE_ARN: ${OSS_STS_ROLE_ARN:-}
+      OSS_UPLOAD_DIR: ${OSS_UPLOAD_DIR:-products/}
     ports:
       - "8080:8080"
 

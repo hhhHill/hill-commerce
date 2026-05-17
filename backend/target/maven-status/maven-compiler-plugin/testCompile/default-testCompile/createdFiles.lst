@@ -10,9 +10,12 @@ com\hillcommerce\admin\AdminAccountManagementIntegrationTest$4.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest.class
 com\hillcommerce\fulfillment\FulfillmentIntegrationTest.class
 com\hillcommerce\payment\PaymentIntegrationTest.class
+com\hillcommerce\oss\OssServiceTest$CapturingStsClient.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest$3.class
 com\hillcommerce\order\OrderCheckoutFoundationIntegrationTest.class
+com\hillcommerce\oss\OssControllerWebMvcTest.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest$1.class
+com\hillcommerce\oss\OssServiceTest.class
 com\hillcommerce\order\OrderCheckoutIntegrationTest.class
 com\hillcommerce\admin\AdminAccountManagementIntegrationTest$5.class
 com\hillcommerce\cart\CartPreparationIntegrationTest.class

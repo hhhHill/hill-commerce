@@ -86,12 +86,14 @@ com\hillcommerce\modules\cart\web\CartSummaryController.class
 com\hillcommerce\modules\order\mapper\ShipmentMapper.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductAttributeResponse.class
 com\hillcommerce\modules\product\web\ProductAdminDtos$ProductSummaryResponse.class
+com\hillcommerce\modules\oss\service\OssService$AliyunStsClient.class
 com\hillcommerce\modules\logging\service\LoggingService.class
 com\hillcommerce\modules\user\security\AppUserDetailsService.class
 com\hillcommerce\modules\logging\web\LoggingDtos$LoginLogListResult.class
 com\hillcommerce\modules\user\web\AuthDtos$AuthUserResponse.class
 com\hillcommerce\HillCommerceApplication.class
 com\hillcommerce\modules\cart\web\CartDtos$CartSummaryResponse.class
+com\hillcommerce\modules\oss\service\OssService$StsClient.class
 com\hillcommerce\modules\cart\entity\CartItemEntity.class
 com\hillcommerce\modules\admin\web\AdminAuthController.class
 com\hillcommerce\modules\order\web\OrderDtos$OrderStatusHistoryResponse.class
@@ -101,6 +103,7 @@ com\hillcommerce\modules\recommendation\GorseClient$ItemPayload.class
 com\hillcommerce\modules\user\security\AuthenticatedUserPrincipal.class
 com\hillcommerce\modules\admin\service\AnomalyDetectionService$HourlySnapshot.class
 com\hillcommerce\modules\product\web\ProductCategoryAdminController.class
+com\hillcommerce\modules\oss\dto\OssStsToken.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$SalesAttributeValueResponse.class
 com\hillcommerce\modules\admin\web\AdminAnalyticsDtos$AggregateProfileResponse.class
 com\hillcommerce\modules\product\mapper\ProductCategoryMapper.class
@@ -122,7 +125,9 @@ com\hillcommerce\modules\product\entity\ProductImageEntity.class
 com\hillcommerce\modules\admin\service\ProductRankingService.class
 com\hillcommerce\modules\product\entity\ProductCategoryEntity.class
 com\hillcommerce\modules\payment\web\PaymentController.class
+com\hillcommerce\modules\common\infrastructure\NumberPrefix.class
 com\hillcommerce\modules\cart\mapper\CartItemMapper.class
+com\hillcommerce\modules\oss\web\OssController.class
 com\hillcommerce\framework\events\LocalDomainEventPublisher.class
 com\hillcommerce\modules\user\security\AppAuthenticationProvider.class
 com\hillcommerce\modules\logging\aop\OperationLog.class
@@ -144,6 +149,7 @@ com\hillcommerce\modules\cart\web\CartDtos$CheckoutSummaryMetaResponse.class
 com\hillcommerce\modules\recommendation\GorseCatalogSyncService.class
 com\hillcommerce\modules\order\entity\ShipmentEntity.class
 com\hillcommerce\modules\user\entity\RoleEntity.class
+com\hillcommerce\modules\oss\config\OssProperties.class
 com\hillcommerce\modules\recommendation\RecommendationService$RecommendationResponse.class
 com\hillcommerce\modules\product\entity\ProductSalesAttributeValueEntity.class
 com\hillcommerce\modules\product\mapper\ProductMapper.class
@@ -154,6 +160,7 @@ com\hillcommerce\modules\admin\mapper\HourlySalesSnapshotMapper.class
 com\hillcommerce\modules\admin\web\AdminAnalyticsDtos$ProductRankingResponse.class
 com\hillcommerce\modules\admin\web\AdminAnalyticsDtos$RegionDistribution.class
 com\hillcommerce\modules\logging\entity\ProductViewLogEntity.class
+com\hillcommerce\modules\oss\service\OssService.class
 com\hillcommerce\modules\user\web\AuthDtos$RegisterRequest.class
 com\hillcommerce\modules\payment\web\PaymentDtos$PaymentActionResponse.class
 com\hillcommerce\modules\order\entity\OrderStatusHistoryEntity.class
@@ -168,10 +175,10 @@ com\hillcommerce\modules\admin\entity\HourlySalesSnapshotEntity.class
 com\hillcommerce\modules\admin\mapper\ProductSalesStatsMapper.class
 com\hillcommerce\modules\admin\service\UserProfileService.class
 com\hillcommerce\modules\order\web\OrderCenterDtos$OrderListQuery.class
-com\hillcommerce\modules\payment\service\PaymentNumberGenerator.class
 com\hillcommerce\modules\product\mapper\ProductSkuMapper.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$ProductSkuResponse.class
 com\hillcommerce\modules\product\web\StorefrontProductDtos$PagedResponse.class
+com\hillcommerce\modules\common\infrastructure\BusinessIdGenerator.class
 com\hillcommerce\modules\logging\entity\LoginLogEntity.class
 com\hillcommerce\modules\user\web\AuthController.class
 com\hillcommerce\modules\admin\web\AdminAnalyticsDtos$TrendResponse.class
@@ -216,6 +223,5 @@ com\hillcommerce\modules\cart\service\CartService$CartItemView.class
 com\hillcommerce\modules\cart\web\CartDtos$CheckoutSummaryResponse.class
 com\hillcommerce\modules\order\mapper\OrderStatusHistoryMapper.class
 com\hillcommerce\modules\cart\mapper\CartMapper.class
-com\hillcommerce\modules\order\service\OrderNumberGenerator.class
 com\hillcommerce\modules\admin\service\SalesTrendService.class
 com\hillcommerce\modules\logging\web\LoggingDtos.class

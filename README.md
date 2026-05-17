@@ -1,205 +1,113 @@
 # hill-commerce
 
-`hill-commerce` 是一个面向实体商品销售的商城 MVP 项目，采用 `Spec-driven + Agent-assisted + Test-verified + Human-reviewed` 的工程模式推进开发。
+面向实体商品销售的现代化商城，覆盖前台交易与后台管理两条核心闭环，开箱即用。
 
-项目目标不是一次性堆满所有电商能力，而是先稳定打通两条核心闭环：
+## 项目亮点
 
-- 前台交易闭环：注册登录、商品浏览、购物车、下单、模拟支付、查单、收货
-- 后台管理闭环：分类管理、商品管理、库存维护、订单发货、日志与基础统计
-
-## 项目定位
-
-这是一个前后端分离的商城仓库：
-
-- Backend：Java 21 + Spring Boot 4 的模块化单体
-- Frontend：Next.js 15 + React 19 的 Web 应用
-- Data：MySQL 为主库，Flyway 管理迁移
-- Infra Reserve：Redis 与 RocketMQ 仅作为扩展预留，不是 MVP 主链路前提
-
-当前仓库已经具备一部分可运行能力，而不只是空白脚手架：
-
-- 后端已落地认证、角色边界、商品管理、基础健康检查与 Flyway 基线
-- 前端已落地登录注册、前台商品浏览、购物车页骨架、后台分类与商品管理页面
-- 测试已覆盖认证、商品后台、商品浏览与购物车准备等关键切片
-
-## 工程方法
-
-### 1. Spec-driven
-
-本项目把 `specs/*` 作为规范事实源，先定义产品行为、边界和验收标准，再推进实现。
-
-规范阅读顺序：
-
-1. `.specify/memory/constitution.md`
-2. `specs/<feature>/spec.md`
-3. `specs/<feature>/plan.md`
-4. `specs/<feature>/tasks.md`
-
-当前商城 MVP 的 canonical spec 按功能模块拆分，位于：
-
-- `specs/*/spec.md` — 各 feature 需求定义
-- `specs/*/plan.md` — 各 feature 实现计划
-- `specs/*/tasks.md` — 各 feature 任务清单
-
-第一轮已拆分或正在拆分的 feature 包括：
-
-- `auth-permission`
-- `admin-product-management`
-- `cart-preparation`
-- `order-checkout`
-- `payment`
-- `fulfillment`
-- `operations-observability`
-- `product-discovery`
-
-### 2. Agent-assisted
-
-本仓库内置了面向 agent 协作的工作约束与 Spec Kit 流程，agent 不是替代规范和评审，而是加速规范执行、代码实现、测试补齐和文档维护。
-
-仓库中的 agent 工作遵循这些原则：
-
-- 先读 constitution、spec、plan、tasks，再实施中高复杂度工作
-- README 负责开发入口说明，不负责重新定义业务真相
-- 高风险改动必须能追溯到规范，而不是只依据即时对话或代码猜测
-- 规范、实现、验证结果发生冲突时，先记录并由人工决策，不制造双真相
-
-### 3. Test-verified
-
-本项目要求关键实现通过可执行验证，而不是只依赖描述性说明。
-
-当前验证手段包括：
-
-- Backend：JUnit 5、Spring Boot Test、Spring Security Test、Testcontainers
-- Frontend：TypeScript typecheck
-- Manual verification：部分 feature 在 `specs/<feature>/manual-verification.md` 中补充人工验证步骤
-
-这意味着本项目强调：
-
-- 功能变更需要测试或等价验证证据
-- 文档声称完成的能力，需要能被命令或手工流程复核
-- 在宣称“已完成”前，应先跑完对应验证
-
-### 4. Human-reviewed
-
-agent 可以生成方案、修改代码、补测试、更新文档，但最终项目质量门槛仍由人来把关。
-
-这里的 `Human-reviewed` 不是口号，而是交付原则：
-
-- 规范冲突由人工裁决
-- 高风险业务变更不能只凭 agent 直接定稿
-- 重要实现应经过人工审阅代码、行为和验证结果
-- README、规范和代码需要保持一致，避免 agent 自行扩写出第二套事实
+- **完整电商双闭环** — 15 个 feature spec 覆盖全链路：注册登录 → 商品浏览 → 购物车 → 下单 → 支付 → 收货 → 售后，后台分类 → 商品管理 → 库存 → 发货 → 数据统计
+- **现代化全栈技术** — Java 21 + Spring Boot 4 后端，Next.js 15.5 + React 19 + TypeScript 5.8 + Tailwind CSS 4 前端，MySQL 9.7 主库
+- **智能推荐引擎** — 内置 Gorse 协同过滤推荐，首页个性化推荐 + 商品详情页相似推荐，用户浏览/购买行为实时反馈
+- **OSS 图片直传** — 阿里云 OSS + STS 临时凭证，浏览器端 Canvas 压缩后直传，缩略图按需生成
+- **一键全栈部署** — Docker Compose 编排 MySQL + Redis + Gorse + Backend + Frontend + Nginx，一条命令启动
+- **类型安全全链路** — 后端 Java + 前端 TypeScript strict + 后端集成测试覆盖关键路径
+- **默认管理员开箱即用** — 内置种子账号，启动即可登录后台
 
 ## 技术栈
 
-- Backend: Java 21, Spring Boot 4, Spring Security 7, MyBatis-Plus, Flyway
-- Frontend: Next.js 15, React 19, TypeScript, Tailwind CSS 4
-- Database: MySQL 9.7 LTS
-- Cache: Redis 8
-- Messaging: RocketMQ
-- Deployment: Docker Compose, Nginx
+| 层级 | 技术 |
+|------|------|
+| 后端 | Java 21, Spring Boot 4, Spring Security 7, MyBatis-Plus, Flyway |
+| 前端 | Next.js 15.5, React 19, TypeScript 5.8, Tailwind CSS 4, Recharts |
+| 数据库 | MySQL 9.7 |
+| 缓存 | Redis 8 |
+| 消息队列 | RocketMQ（预留，非 MVP 主链路前提） |
+| 推荐引擎 | Gorse |
+| 对象存储 | 阿里云 OSS |
+| 部署 | Docker Compose, Nginx |
 
-## 仓库结构
+## 快速部署
 
-```text
-backend/             Spring Boot 后端
-frontend/next-app/   Next.js 前端
-ops/                 Nginx 与部署配置
-specs/               Canonical specs、plans、tasks
-.specify/            Spec Kit 工作流与项目治理记忆
-docs/                历史和辅助文档
-```
+### 前置条件
 
-## 本地准备
+只需要 **Docker Desktop**。
 
-建议环境：
-
-- JDK 21
-- Maven 3.9+
-- Node.js 20+
-- Docker Desktop
-
-## 环境变量
-
-复制 `.env.example` 并按本地环境调整。
-
-重点变量：
-
-- `APP_PROFILE`
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
-- `DB_USERNAME`
-- `DB_PASSWORD`
-- `REDIS_HOST`
-- `REDIS_PORT`
-- `CACHE_ENABLED`
-- `ROCKETMQ_ENABLED`
-- `MAIL_HOST`
-- `MAIL_PORT`
-
-## 本地启动
-
-仅启动基础依赖：
+### 30 秒全栈启动
 
 ```powershell
-docker compose up -d mysql redis mailhog
+git clone <repo-url> hill-commerce
+cd hill-commerce
+cp .env.example .env
+docker compose --profile app up -d
 ```
 
-启动后端：
+### 访问入口
+
+| 服务 | 地址 |
+|------|------|
+| 前台 / 后台 | http://localhost |
+| 后端 API | http://localhost:8080 |
+| Mailhog（开发邮件） | http://localhost:8025 |
+
+### 默认管理员
+
+- 邮箱：`admin@hill-commerce.local`
+- 密码：`Admin@123456`
+
+### 开发模式（仅启基础依赖）
 
 ```powershell
+# 启动 MySQL + Redis + Mailhog + Gorse
+docker compose up -d
+
+# 启动后端（另开终端）
 mvn -pl backend spring-boot:run
-```
 
-启动前端：
-
-```powershell
+# 启动前端（另开终端）
 cd frontend/next-app
 npm install
 npm run dev
 ```
 
-如需要用 Compose 启动完整应用栈：
+开发模式下前端运行在 http://localhost:3000，后端在 http://localhost:8080。
+
+### 环境变量
+
+复制 `.env.example` 并按需调整。常用变量：
+
+`APP_PROFILE` `DB_HOST` `DB_PORT` `DB_NAME` `DB_USERNAME` `DB_PASSWORD` `REDIS_HOST` `REDIS_PORT` `MAIL_HOST` `MAIL_PORT` `OSS_ACCESS_KEY_ID` `OSS_ACCESS_KEY_SECRET` `OSS_ROLE_ARN` `OSS_REGION` `OSS_BUCKET` `CACHE_ENABLED` `ROCKETMQ_ENABLED`
+
+## 验证
 
 ```powershell
-docker compose --profile app up -d --build
-```
-
-## 验证命令
-
-后端测试：
-
-```powershell
+# 后端测试
 mvn -pl backend test
-```
 
-前端类型检查：
-
-```powershell
+# 前端类型检查
 cd frontend/next-app
 npm run typecheck
 ```
 
+## 仓库结构
+
+```text
+backend/               Spring Boot 后端（模块化单体）
+frontend/next-app/     Next.js 前端
+ops/                   Nginx 配置、Gorse 配置、MySQL 初始化脚本
+specs/                 各 feature 的规范/计划/任务文档
+.specify/              Spec Kit 工作流与项目治理
+```
+
+## 工程方法
+
+本项目采用 **Spec-driven + Agent-assisted + Test-verified + Human-reviewed** 模式，规范定义在 `specs/<feature>/` 中，治理原则见 `.specify/memory/constitution.md`。
+
+开发流程：阅读 spec → 实现 → 测试验证 → 人工审阅。agent 用于加速执行，不替代规范和评审。
+
 ## 数据库基线
 
-当前已提供的 Flyway 迁移包括：
+Flyway 迁移（`backend/src/main/resources/db/migration/`）：
 
-- `V1__init_schema.sql`：MVP 首版核心表结构
-- `V2__seed_roles.sql`：`CUSTOMER`、`SALES`、`ADMIN` 角色种子
-- `V3__seed_admin_account.sql`：默认管理员种子账号
-- `V4__migrate_admin_seed_password_to_bcrypt.sql`：管理员密码哈希迁移
-
-默认管理员种子信息：
-
-- Email: `admin@hill-commerce.local`
-- Bootstrap Password Source: `Admin@123456`
-
-## 当前开发共识
-
-如果你要继续在这个仓库里开发，默认遵循以下共识：
-
-- 先看 spec，再改代码
-- 先有验证，再宣称完成
-- 先经人工审阅，再视为稳定结果
-- agent 用来加速交付，不用来绕过规范和评审
+- `V1__init_schema.sql` — MVP 核心表结构
+- `V2__seed_roles.sql` — CUSTOMER / SALES / ADMIN 角色种子
+- `V3__seed_admin_account.sql` — 默认管理员账号
+- `V4__migrate_admin_seed_password_to_bcrypt.sql` — 密码哈希迁移

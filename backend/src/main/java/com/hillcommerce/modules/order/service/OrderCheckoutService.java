@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,8 @@ import com.hillcommerce.modules.cart.entity.CartItemEntity;
 import com.hillcommerce.modules.cart.mapper.CartItemMapper;
 import com.hillcommerce.modules.cart.service.CartService;
 import com.hillcommerce.modules.cart.web.CartDtos;
+import com.hillcommerce.modules.common.infrastructure.BusinessIdGenerator;
+import com.hillcommerce.modules.common.infrastructure.NumberPrefix;
 import com.hillcommerce.modules.order.entity.OrderEntity;
 import com.hillcommerce.modules.order.entity.OrderItemEntity;
 import com.hillcommerce.modules.order.entity.OrderStatusHistoryEntity;
@@ -27,6 +30,13 @@ import com.hillcommerce.modules.order.mapper.OrderStatusHistoryMapper;
 import com.hillcommerce.modules.product.entity.ProductSkuEntity;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 
+/**
+ * 订单结账服务。
+ *
+ * 负责从购物车到订单的完整流程：结账预览（只读校验）与订单创建（事务性写入）。
+ * 创建订单时将商品快照、地址快照写入订单，保证订单数据的不可变性——
+ * 后续即使商品信息或用户地址变更，已生成订单不受影响。
+ */
 @Service
 public class OrderCheckoutService {
 
@@ -36,7 +46,7 @@ public class OrderCheckoutService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderStatusHistoryMapper orderStatusHistoryMapper;
-    private final OrderNumberGenerator orderNumberGenerator;
+    private final BusinessIdGenerator businessIdGenerator;
 
     public OrderCheckoutService(
         CartService cartService,
@@ -45,7 +55,7 @@ public class OrderCheckoutService {
         OrderMapper orderMapper,
         OrderItemMapper orderItemMapper,
         OrderStatusHistoryMapper orderStatusHistoryMapper,
-        OrderNumberGenerator orderNumberGenerator
+        BusinessIdGenerator businessIdGenerator
     ) {
         this.cartService = cartService;
         this.cartItemMapper = cartItemMapper;
@@ -53,9 +63,12 @@ public class OrderCheckoutService {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.orderStatusHistoryMapper = orderStatusHistoryMapper;
-        this.orderNumberGenerator = orderNumberGenerator;
+        this.businessIdGenerator = businessIdGenerator;
     }
 
+    /**
+     * 结账预览（只读），不做任何数据变更，仅展示当前购物车选中项、默认地址和可下单状态。
+     */
     public CheckoutResponse getCheckout(Long userId) {
         CartDtos.CheckoutSummaryResponse checkoutSummary = cartService.getCheckoutSummary(userId);
         return new CheckoutResponse(
@@ -111,6 +124,13 @@ public class OrderCheckoutService {
             summary.blockingReasons());
     }
 
+    /**
+     * 创建订单（事务性写入）。
+     *
+     * 流程：再次校验购物车 → 插入订单 → 扣减库存 → 写入订单明细 → 清空已购购物车项 → 记录状态历史。
+     * 注意：库存扣减采用 read-modify-write，高并发下存在超卖风险，
+     * 应改为 SQL 原子更新（SET stock = stock - quantity WHERE stock >= quantity）。
+     */
     @Transactional
     public CreateOrderResponse createOrder(Long userId) {
         CartDtos.CheckoutSummaryResponse checkoutSummary = cartService.getCheckoutSummary(userId);
@@ -122,12 +142,14 @@ public class OrderCheckoutService {
         orderMapper.insert(order);
 
         for (CartDtos.CheckoutItemResponse item : checkoutSummary.items()) {
-            ProductSkuEntity sku = productSkuMapper.selectById(item.skuId());
-            if (sku == null) {
-                throw new IllegalArgumentException("Selected cart items are not ready for checkout");
+            UpdateWrapper<ProductSkuEntity> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id",  item.skuId())
+                    .ge("stock", item.quantity())
+                    .setSql("stock = stock - " + item.quantity());
+            int updated = productSkuMapper.update(null, updateWrapper);
+            if (updated == 0) {
+                throw new IllegalArgumentException("Insufficient stock for SKU: " + item.skuId());
             }
-            sku.setStock(sku.getStock() - item.quantity());
-            productSkuMapper.updateById(sku);
 
             OrderItemEntity orderItem = new OrderItemEntity();
             orderItem.setOrderId(order.getId());
@@ -156,12 +178,15 @@ public class OrderCheckoutService {
         return new CreateOrderResponse(order.getId(), order.getOrderNo(), order.getOrderStatus(), order.getPayableAmount());
     }
 
+    /**
+     * 构建订单实体，将地址信息快照到订单中，使订单成为独立的不可变记录。
+     */
     private OrderEntity buildOrder(Long userId, CartDtos.CheckoutSummaryResponse checkoutSummary) {
         CartDtos.CheckoutAddressResponse address = checkoutSummary.defaultAddress();
         CartDtos.CheckoutSummaryMetaResponse summary = checkoutSummary.summary();
 
         OrderEntity order = new OrderEntity();
-        order.setOrderNo(orderNumberGenerator.nextOrderNo());
+        order.setOrderNo(businessIdGenerator.next(NumberPrefix.ORDER));
         order.setUserId(userId);
         order.setOrderStatus(OrderStatus.PENDING_PAYMENT.name());
         order.setTotalAmount(summary.validSelectedAmount());

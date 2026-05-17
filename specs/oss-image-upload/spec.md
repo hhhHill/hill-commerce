@@ -1,5 +1,7 @@
 # OSS 图片上传服务
 
+**Status**: active
+
 ## 概述
 
 为商家后台商品编辑器接入阿里云 OSS，替换当前纯文本 URL 输入，实现真正的图片上传功能。
@@ -11,11 +13,11 @@
 浏览器（商家后台）
   │
   ├─ 1. GET /api/admin/oss/sts  ──→  后端 OssController
-  │    返回 {accessKey, secretKey, securityToken, region, bucket, endpoint, uploadDir}
+  │    返回 {accessKey, secretKey, securityToken, ossRegion, bucket, endpoint, uploadDir}
   │
   ├─ 2. Canvas 压缩（最大 1920px, 质量 0.8）→ OSS JS SDK 直传
   │
-  └─ 3. 保存商品时，OSS key → URL 存入数据库
+  └─ 3. 保存商品时，将 OSS object key 转成完整 HTTPS URL 后存入数据库
         缩略图通过 URL 参数按需生成：
         ?x-oss-process=image/resize,w_200,h_200
 ```
@@ -26,7 +28,7 @@
 
 `backend/pom.xml` 新增：
 - `aliyun-sdk-oss` — OSS Java SDK
-- `aliyun-sdk-sts` — STS 临时凭证 SDK
+- `aliyun-java-sdk-sts` — STS 临时凭证 SDK
 
 ### 配置
 
@@ -36,7 +38,8 @@
 oss:
   endpoint: ${OSS_ENDPOINT}
   bucket: ${OSS_BUCKET}
-  region: ${OSS_REGION}
+  oss-region: ${OSS_REGION}
+  sts-region: ${OSS_STS_REGION}
   access-key-id: ${OSS_ACCESS_KEY_ID}
   access-key-secret: ${OSS_ACCESS_KEY_SECRET}
   role-arn: ${OSS_STS_ROLE_ARN}
@@ -61,7 +64,7 @@ GET /api/admin/oss/sts
     accessKey: "STS.xxx",
     secretKey: "xxx",
     securityToken: "xxx",
-    region: "oss-cn-hangzhou",
+    ossRegion: "oss-cn-hangzhou",
     bucket: "hill-commerce",
     endpoint: "oss-cn-hangzhou.aliyuncs.com",
     uploadDir: "products/"
@@ -71,12 +74,16 @@ GET /api/admin/oss/sts
 - 仅 ADMIN/SALES 角色可访问
 - STS 凭证有效期 1 小时
 - 上传目录限制在 `products/*`
+- `ossRegion` 用于前端 ali-oss SDK，例如 `oss-cn-hangzhou`
+- `stsRegion` 只在后端配置中使用，用于 STS AssumeRole，例如 `cn-hangzhou`，不返回给前端
 
 ### 安全
 
 - STS Policy 限制只能 PutObject 到指定 bucket 的 `products/` 前缀下
 - 临时凭证有效期 1 小时，过期后前端自动续期
 - 后端不处理文件流，不暴露主账号 AK
+- 部署前必须在 OSS 控制台配置允许商家后台域名的 CORS 规则，至少允许 `PUT`、所需请求头和凭证上传
+- 图片展示依赖 bucket 读策略或 CDN/自定义域名策略；本功能只负责保存可访问的 HTTPS 图片 URL
 
 ## 前端
 
@@ -112,7 +119,7 @@ uploadToOss(file: Blob, fileName: string, token: OssStsToken): Promise<string>
 ```
 
 - `requestStsToken`：调 `/api/admin/oss/sts`
-- `uploadToOss`：用 aliyun-oss SDK 直传，object key 加随机后缀防冲突，带 30 秒超时
+- `uploadToOss`：用 aliyun-oss SDK 直传，object key 加随机后缀防冲突，带 30 秒超时，返回完整 HTTPS 图片 URL
 
 ### 组件
 
@@ -122,6 +129,7 @@ uploadToOss(file: Blob, fileName: string, token: OssStsToken): Promise<string>
 Props:
   value: string        // 当前 OSS URL（空表示未上传）
   onChange: (url: string) => void
+  onUploadingChange?: (uploadingCount: number) => void
   placeholder?: string // 默认 "上传封面图"
   suggestSize?: string // 默认 "建议 800×800"
   maxSize?: number     // 默认 10MB（压缩前）
@@ -141,6 +149,7 @@ Props:
 Props:
   value: {url: string, sortOrder: number}[]
   onChange: (images: {url: string, sortOrder: number}[]) => void
+  onUploadingChange?: (uploadingCount: number) => void
   maxCount?: number  // 默认 10
 ```
 
@@ -151,7 +160,7 @@ Props:
 - 已上传图片左上角显示序号，右上角 × 删除
 - HTML5 drag-and-drop 排序（每次拖拽后更新 sortOrder）
 - 末尾始终有 + 按钮添加图片
-- 提交前有图片在上传中时按钮置灰 + 提示
+- 通过 `onUploadingChange` 将上传中数量同步给 `product-editor.tsx`；提交前有图片在上传中时保存按钮置灰 + 显示“还有 N 张图片正在上传中”
 
 ### 改造文件
 
@@ -199,7 +208,7 @@ Props:
 | `image-compress.ts` | 压缩后尺寸/质量/格式验证 | Vitest + jsdom Canvas |
 | `oss-client.ts` | STS 请求 + 上传流程 | Vitest + mock fetch |
 | `OssService.java` | STS 签发正确性 | JUnit 5 + Mockito |
-| `OssController.java` | API 返回结构、权限 | MockMvc `@WebMvcTest` |
+| `OssController.java` | API 返回结构、ADMIN/SALES 权限、未认证/非授权拒绝 | MockMvc `@WebMvcTest` |
 | `ImageUploader` | 各状态渲染、用户交互 | Vitest + Testing Library |
 | `ImagesUploader` | 多图上传、排序、删除 | Vitest + Testing Library |
 

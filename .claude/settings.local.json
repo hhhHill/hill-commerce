@@ -23,7 +23,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gorse.io)",
       "Skill(superpowers:requesting-code-review)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Skill(superpowers:systematic-debugging)",
+      "Skill(superpowers:writing-plans)"
     ]
   }
 }

@@ -1,0 +1,11 @@
+.git/
+.dockerignore
+Dockerfile*
+**/node_modules/
+**/.next/
+**/target/
+**/coverage/
+*.log
+.env
+.env.*
+!.env.example

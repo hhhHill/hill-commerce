@@ -8,6 +8,8 @@ D:\hill-commerce\backend\src\test\java\com\hillcommerce\logging\LoggingIntegrati
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCenterIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutFoundationIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\order\OrderCheckoutIntegrationTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\oss\OssControllerWebMvcTest.java
+D:\hill-commerce\backend\src\test\java\com\hillcommerce\oss\OssServiceTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\payment\PaymentFoundationIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\payment\PaymentIntegrationTest.java
 D:\hill-commerce\backend\src\test\java\com\hillcommerce\product\ProductAdminIntegrationTest.java

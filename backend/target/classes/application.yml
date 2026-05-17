@@ -57,3 +57,12 @@ hill:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+oss:
+  endpoint: ${OSS_ENDPOINT:}
+  bucket: ${OSS_BUCKET:}
+  oss-region: ${OSS_REGION:}
+  sts-region: ${OSS_STS_REGION:}
+  access-key-id: ${OSS_ACCESS_KEY_ID:}
+  access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+  role-arn: ${OSS_STS_ROLE_ARN:}
+  upload-dir: ${OSS_UPLOAD_DIR:products/}

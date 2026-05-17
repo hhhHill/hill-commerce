@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hillcommerce.modules.common.infrastructure.BusinessIdGenerator;
+import com.hillcommerce.modules.common.infrastructure.NumberPrefix;
 import com.hillcommerce.modules.order.entity.OrderEntity;
 import com.hillcommerce.modules.order.entity.OrderItemEntity;
 import com.hillcommerce.modules.order.entity.OrderStatusHistoryEntity;
@@ -33,7 +35,7 @@ public class PaymentService {
     private final OrderItemMapper orderItemMapper;
     private final OrderStatusHistoryMapper orderStatusHistoryMapper;
     private final PaymentMapper paymentMapper;
-    private final PaymentNumberGenerator paymentNumberGenerator;
+    private final BusinessIdGenerator businessIdGenerator;
     private final GorseFeedbackService gorseFeedbackService;
 
     public PaymentService(
@@ -41,14 +43,14 @@ public class PaymentService {
         OrderItemMapper orderItemMapper,
         OrderStatusHistoryMapper orderStatusHistoryMapper,
         PaymentMapper paymentMapper,
-        PaymentNumberGenerator paymentNumberGenerator,
+        BusinessIdGenerator businessIdGenerator,
         GorseFeedbackService gorseFeedbackService
     ) {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.orderStatusHistoryMapper = orderStatusHistoryMapper;
         this.paymentMapper = paymentMapper;
-        this.paymentNumberGenerator = paymentNumberGenerator;
+        this.businessIdGenerator = businessIdGenerator;
         this.gorseFeedbackService = gorseFeedbackService;
     }
 
@@ -87,7 +89,7 @@ public class PaymentService {
         PaymentEntity payment = new PaymentEntity();
         payment.setOrderId(order.getId());
         payment.setUserId(userId);
-        payment.setPaymentNo(paymentNumberGenerator.nextPaymentNo());
+        payment.setPaymentNo(businessIdGenerator.next(NumberPrefix.PAYMENT));
         payment.setPaymentMethod(SIMULATED_METHOD);
         payment.setPaymentStatus(PaymentStatus.INITIATED.name());
         payment.setAmount(order.getPayableAmount());

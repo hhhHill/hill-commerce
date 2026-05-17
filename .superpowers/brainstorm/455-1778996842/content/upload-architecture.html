@@ -1,0 +1,89 @@
+<h2>图片上传到阿里云 OSS，选哪种架构？</h2>
+<p class="subtitle">这是最核心的决策，决定了后端复杂度、安全模型和用户体验</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 A：服务端中转上传</div>
+    <div class="mockup-body">
+      <div style="text-align:center;padding:16px">
+        <div style="background:#f0f4ff;border:2px solid #3b82f6;border-radius:8px;padding:10px;margin-bottom:8px">
+          <strong>浏览器</strong>
+          <div style="font-size:12px;color:#666">选文件 → FormData</div>
+        </div>
+        <div style="font-size:24px;margin:4px 0">⬇️</div>
+        <div style="background:#fff7ed;border:2px solid #f97316;border-radius:8px;padding:10px;margin-bottom:8px">
+          <strong>后端 Controller</strong>
+          <div style="font-size:12px;color:#666">MultipartFile 接收 → 校验 → 调用 OSS SDK</div>
+        </div>
+        <div style="font-size:24px;margin:4px 0">⬇️</div>
+        <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:10px">
+          <strong>阿里云 OSS</strong>
+          <div style="font-size:12px;color:#666">PutObject → 返回 URL</div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>优点</h4>
+          <ul>
+            <li>实现简单，传统模式</li>
+            <li>后端完全控制文件校验</li>
+            <li>不暴露 OSS 凭证</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>缺点</h4>
+          <ul>
+            <li>后端带宽压力大</li>
+            <li>大文件占用内存/磁盘</li>
+            <li>上传慢（两次传输）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">方案 B：客户端直传 OSS（STS 临时凭证）</div>
+    <div class="mockup-body">
+      <div style="text-align:center;padding:16px">
+        <div style="background:#f0f4ff;border:2px solid #3b82f6;border-radius:8px;padding:10px;margin-bottom:8px">
+          <strong>浏览器</strong>
+          <div style="font-size:12px;color:#666">1. 请求 STS 令牌</div>
+        </div>
+        <div style="font-size:24px;margin:4px 0">⬆️⬇️</div>
+        <div style="background:#fff7ed;border:2px solid #f97316;border-radius:8px;padding:10px;margin-bottom:8px">
+          <strong>后端 STS 接口</strong>
+          <div style="font-size:12px;color:#666">返回临时 AccessKey + Policy</div>
+        </div>
+        <div style="font-size:24px;margin:4px 0">⬇️</div>
+        <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:10px;margin-bottom:8px">
+          <strong>浏览器直接上传</strong>
+          <div style="font-size:12px;color:#666">2. OSS SDK JS → multipart 直传</div>
+        </div>
+        <div style="font-size:24px;margin:4px 0">⬇️</div>
+        <div style="background:#dbeafe;border:2px solid #6366f1;border-radius:8px;padding:10px">
+          <strong>OSS 回调后端</strong>
+          <div style="font-size:12px;color:#666">3. 通知上传完成 + 校验</div>
+        </div>
+      </div>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>优点</h4>
+          <ul>
+            <li>速度快，不占后端带宽</li>
+            <li>支持分片/断点续传</li>
+            <li>后端无压力</li>
+          </ul>
+        </div>
+        <div class="cons"><h4>缺点</h4>
+          <ul>
+            <li>需要 STS 服务</li>
+            <li>前端稍复杂</li>
+            <li>需配置 CORS/回调</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <h3>推荐：方案 B — 客户端直传 + STS</h3>
+  <p>对电商场景（多图、大图），客户端直传是业界标准做法。后端只负责签发临时凭证和接收回调，不参与文件流传输，性能最优。</p>
+</div>

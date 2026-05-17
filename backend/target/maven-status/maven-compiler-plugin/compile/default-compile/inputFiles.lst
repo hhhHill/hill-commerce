@@ -35,6 +35,8 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\service\Car
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\cart\web\CartSummaryController.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\common\infrastructure\BusinessIdGenerator.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\common\infrastructure\NumberPrefix.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\aop\OperationLog.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\aop\OperationLogAspect.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\logging\entity\LoginLogEntity.java
@@ -56,7 +58,6 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\mapper\Ord
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\mapper\ShipmentMapper.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\OrderCenterService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\OrderCheckoutService.java
-D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\OrderNumberGenerator.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\OrderService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\OrderStatus.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\service\ShipmentService.java
@@ -68,10 +69,13 @@ D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\web\OrderC
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\web\OrderDtos.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\web\ShipmentController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\order\web\ShipmentDtos.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\oss\config\OssProperties.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\oss\dto\OssStsToken.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\oss\service\OssService.java
+D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\oss\web\OssController.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\entity\PaymentEntity.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\mapper\PaymentMapper.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\service\PaymentCloseService.java
-D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\service\PaymentNumberGenerator.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\service\PaymentService.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\service\PaymentStatus.java
 D:\hill-commerce\backend\src\main\java\com\hillcommerce\modules\payment\web\PaymentController.java

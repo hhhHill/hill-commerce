@@ -18,6 +18,8 @@ import type {
 
 import { FieldLabel } from "./field-label";
 import { FieldHelpRowHeadings } from "./field-help-row-headings";
+import { ImageUploader } from "./image-uploader";
+import { ImagesUploader } from "./images-uploader";
 import { SkuGridLayout, SKU_GRID_CLASS } from "./sku-grid-layout";
 
 type ProductEditorProps = {
@@ -51,11 +53,20 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [coverUploadingCount, setCoverUploadingCount] = useState(0);
+  const [detailUploadingCount, setDetailUploadingCount] = useState(0);
   const [form, setForm] = useState<ProductFormState>(() => buildInitialState(categories, product));
+  const imageUploadingCount = coverUploadingCount + detailUploadingCount;
+  const imageUploading = imageUploadingCount > 0;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    if (imageUploading) {
+      setError(`还有 ${imageUploadingCount} 张图片正在上传中`);
+      return;
+    }
 
     startTransition(async () => {
       try {
@@ -161,15 +172,17 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
       <section className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold">图片与描述</h2>
-          <p className="text-sm text-black/65">封面图和详情图都使用 URL，描述先存富文本源字符串。</p>
+          <p className="text-sm text-black/65">支持点击/拖拽上传，自动压缩后存入 OSS，缩略图按需生成。</p>
         </div>
         <div className="mt-5 grid gap-4">
           <label className="flex flex-col gap-2 text-sm font-medium">
-            <FieldLabel field="coverImageUrl" page="productEditor">封面图 URL</FieldLabel>
-            <input
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+            <FieldLabel field="coverImageUrl" page="productEditor">封面图</FieldLabel>
+            <ImageUploader
               value={form.coverImageUrl}
-              onChange={(event) => setForm((current) => ({ ...current, coverImageUrl: event.target.value }))}
+              onChange={(url) => setForm((current) => ({ ...current, coverImageUrl: url }))}
+              onUploadingChange={setCoverUploadingCount}
+              placeholder="上传封面图"
+              suggestSize="建议 800x800"
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium">
@@ -181,78 +194,22 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
             />
           </label>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">详情图 URL 列表</h3>
-              <button
-                className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium"
-                onClick={() =>
-                  setForm((current) => ({
-                    ...current,
-                    detailImages: [
-                      ...current.detailImages,
-                      { imageUrl: "", sortOrder: current.detailImages.length }
-                    ]
+            <h3 className="text-lg font-semibold">详情图</h3>
+            <ImagesUploader
+              value={form.detailImages
+                .filter((image) => image.imageUrl)
+                .map((image, index) => ({ url: image.imageUrl, sortOrder: index }))}
+              onChange={(images) =>
+                setForm((current) => ({
+                  ...current,
+                  detailImages: images.map((image) => ({
+                    imageUrl: image.url,
+                    sortOrder: image.sortOrder
                   }))
-                }
-                type="button"
-              >
-                添加详情图
-              </button>
-            </div>
-            <div className="space-y-3">
-              <FieldHelpRowHeadings
-                items={[
-                  { field: "detailImageUrl", label: "详情图 URL" },
-                  { field: "detailImageSortOrder", label: "详情图排序" }
-                ]}
-                page="productEditor"
-              />
-              {form.detailImages.map((image, index) => (
-                <div key={`detail-image-${index}`} className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
-                  <input
-                    className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    aria-label="详情图 URL"
-                    placeholder="详情图 URL，例如 https://example.com/detail.jpg"
-                    value={image.imageUrl}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        detailImages: current.detailImages.map((item, itemIndex) =>
-                          itemIndex === index ? { ...item, imageUrl: event.target.value } : item
-                        )
-                      }))
-                    }
-                  />
-                  <input
-                    className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
-                    aria-label="详情图排序"
-                    min="0"
-                    type="number"
-                    value={image.sortOrder}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        detailImages: current.detailImages.map((item, itemIndex) =>
-                          itemIndex === index ? { ...item, sortOrder: Number(event.target.value) } : item
-                        )
-                      }))
-                    }
-                  />
-                  <button
-                    className="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-700"
-                    onClick={() =>
-                      setForm((current) => ({
-                        ...current,
-                        detailImages: current.detailImages.filter((_, itemIndex) => itemIndex !== index)
-                      }))
-                    }
-                    type="button"
-                  >
-                    删除
-                  </button>
-                </div>
-              ))}
-            </div>
+                }))
+              }
+              onUploadingChange={setDetailUploadingCount}
+            />
           </div>
         </div>
       </section>
@@ -542,12 +499,17 @@ export function ProductEditor({ categories, product }: ProductEditorProps) {
         </div>
       </section>
 
+      {imageUploading ? (
+        <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          还有 {imageUploadingCount} 张图片正在上传中
+        </p>
+      ) : null}
       {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
       <div className="flex flex-wrap gap-3">
         <button
           className="rounded-2xl bg-[var(--accent)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:opacity-60"
-          disabled={isPending}
+          disabled={isPending || imageUploading}
           type="submit"
         >
           {isPending ? "保存中..." : product ? "更新商品" : "创建商品"}

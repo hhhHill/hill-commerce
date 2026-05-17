@@ -1,12 +1,14 @@
 # OSS 图片上传 — 实现计划
 
+**Status**: active
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 为商家后台商品编辑器接入阿里云 OSS 图片上传，客户端 Canvas 压缩 + STS 直传 + OSS 缩略图。
 
 **Architecture:** 后端新增 `OssService`（STS 临时凭证签发）→ `OssController`（`GET /api/admin/oss/sts`）。前端 `image-compress.ts`（Canvas 压缩）→ `oss-client.ts`（直传）→ `ImageUploader` / `ImagesUploader` 组件替换产品编辑器中现有文本 URL 输入。数据库不改。
 
-**Tech Stack:** Java 21 / Spring Boot 4.0 / aliyun-sdk-oss + aliyun-sdk-sts / Next.js 15 / React 19 / ali-oss / Vitest + Testing Library
+**Tech Stack:** Java 21 / Spring Boot 4.0 / aliyun-sdk-oss + aliyun-java-sdk-sts / Next.js 15 / React 19 / ali-oss / Vitest + Testing Library
 
 ---
 
@@ -15,7 +17,7 @@
 **Files:**
 - Modify: `backend/pom.xml`
 
-- [ ] **Step 1: 在 pom.xml 添加 aliyun-oss 和 aliyun-sts 依赖**
+- [ ] **Step 1: 在 pom.xml 添加 aliyun-oss 和 aliyun-java-sdk-sts 依赖**
 
 在 `<dependencies>` 末尾（`</dependencies>` 之前）加入：
 
@@ -27,12 +29,12 @@
 </dependency>
 <dependency>
     <groupId>com.aliyun</groupId>
-    <artifactId>aliyun-sdk-sts</artifactId>
+    <artifactId>aliyun-java-sdk-sts</artifactId>
     <version>3.1.2</version>
 </dependency>
 ```
 
-`aliyun-sdk-sts` 会传递引入 `aliyun-java-sdk-core`。
+`aliyun-java-sdk-sts` 会传递引入 `aliyun-java-sdk-core`。
 
 - [ ] **Step 2: 验证依赖下载成功**
 
@@ -40,13 +42,13 @@
 cd backend && mvn dependency:resolve -DskipTests -q
 ```
 
-预期：BUILD SUCCESS，`aliyun-sdk-oss-3.18.1.jar` 和 `aliyun-sdk-sts-3.1.2.jar` 出现在本地仓库。
+预期：BUILD SUCCESS，`aliyun-sdk-oss-3.18.1.jar` 和 `aliyun-java-sdk-sts-3.1.2.jar` 出现在本地仓库。
 
 - [ ] **Step 3: 提交**
 
 ```bash
 git add backend/pom.xml
-git commit -m "build: add aliyun-oss and aliyun-sts SDK dependencies
+git commit -m "build: add aliyun-oss and aliyun-java-sdk-sts dependencies
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```
 
@@ -70,7 +72,8 @@ public class OssProperties {
 
     private String endpoint;
     private String bucket;
-    private String region;
+    private String ossRegion;
+    private String stsRegion;
     private String accessKeyId;
     private String accessKeySecret;
     private String roleArn;
@@ -82,8 +85,11 @@ public class OssProperties {
     public String getBucket() { return bucket; }
     public void setBucket(String bucket) { this.bucket = bucket; }
 
-    public String getRegion() { return region; }
-    public void setRegion(String region) { this.region = region; }
+    public String getOssRegion() { return ossRegion; }
+    public void setOssRegion(String ossRegion) { this.ossRegion = ossRegion; }
+
+    public String getStsRegion() { return stsRegion; }
+    public void setStsRegion(String stsRegion) { this.stsRegion = stsRegion; }
 
     public String getAccessKeyId() { return accessKeyId; }
     public void setAccessKeyId(String accessKeyId) { this.accessKeyId = accessKeyId; }
@@ -101,17 +107,18 @@ public class OssProperties {
 
 - [ ] **Step 2: 在 application.yml 新增 oss 配置块**
 
-在 `hill:` 配置块末尾追加：
+在 `application.yml` 顶层追加，与 `@ConfigurationProperties("oss")` 保持一致：
 
 ```yaml
-  oss:
-    endpoint: ${OSS_ENDPOINT:}
-    bucket: ${OSS_BUCKET:}
-    region: ${OSS_REGION:}
-    access-key-id: ${OSS_ACCESS_KEY_ID:}
-    access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
-    role-arn: ${OSS_STS_ROLE_ARN:}
-    upload-dir: ${OSS_UPLOAD_DIR:products/}
+oss:
+  endpoint: ${OSS_ENDPOINT:}
+  bucket: ${OSS_BUCKET:}
+  oss-region: ${OSS_REGION:}
+  sts-region: ${OSS_STS_REGION:}
+  access-key-id: ${OSS_ACCESS_KEY_ID:}
+  access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+  role-arn: ${OSS_STS_ROLE_ARN:}
+  upload-dir: ${OSS_UPLOAD_DIR:products/}
 ```
 
 - [ ] **Step 3: 启用 ConfigurationProperties**
@@ -150,7 +157,7 @@ public record OssStsToken(
     String accessKey,
     String secretKey,
     String securityToken,
-    String region,
+    String ossRegion,
     String bucket,
     String endpoint,
     String uploadDir
@@ -162,31 +169,14 @@ public record OssStsToken(
 ```java
 package com.hillcommerce.oss;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.hillcommerce.modules.oss.config.OssProperties;
-import com.hillcommerce.modules.oss.dto.OssStsToken;
 import com.hillcommerce.modules.oss.service.OssService;
 
 class OssServiceTest {
-
-    private OssProperties properties;
-
-    @BeforeEach
-    void setUp() {
-        properties = new OssProperties();
-        properties.setEndpoint("oss-cn-hangzhou.aliyuncs.com");
-        properties.setBucket("test-bucket");
-        properties.setRegion("cn-hangzhou");
-        properties.setAccessKeyId("test-ak");
-        properties.setAccessKeySecret("test-sk");
-        properties.setRoleArn("acs:ram::123:role/test-role");
-        properties.setUploadDir("products/");
-    }
 
     @Test
     void generateStsTokenRequiresConfiguration() {
@@ -196,19 +186,6 @@ class OssServiceTest {
         assertThatThrownBy(service::generateStsToken)
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("OSS not configured");
-    }
-
-    @Test
-    void generatesTokenWithUploadDirConstraint() {
-        OssService service = new OssService(properties);
-
-        OssStsToken token = service.generateStsToken();
-
-        assertThat(token.region()).isEqualTo("cn-hangzhou");
-        assertThat(token.bucket()).isEqualTo("test-bucket");
-        assertThat(token.endpoint()).isEqualTo("oss-cn-hangzhou.aliyuncs.com");
-        assertThat(token.uploadDir()).isEqualTo("products/");
-        assertThat(token.accessKey()).isNotEmpty();
     }
 }
 ```
@@ -231,10 +208,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.auth.sts.AssumeRoleRequest;
-import com.aliyuncs.auth.sts.AssumeRoleResponse;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.sts.model.v20150401.AssumeRoleRequest;
+import com.aliyuncs.sts.model.v20150401.AssumeRoleResponse;
 import com.hillcommerce.modules.oss.config.OssProperties;
 import com.hillcommerce.modules.oss.dto.OssStsToken;
 
@@ -273,7 +250,7 @@ public class OssService {
 
         try {
             DefaultProfile profile = DefaultProfile.getProfile(
-                properties.getRegion(), accessKeyId, accessKeySecret);
+                properties.getStsRegion(), accessKeyId, accessKeySecret);
             DefaultAcsClient client = new DefaultAcsClient(profile);
 
             AssumeRoleRequest request = new AssumeRoleRequest();
@@ -286,11 +263,11 @@ public class OssService {
             AssumeRoleResponse response = client.getAcsResponse(request);
             AssumeRoleResponse.Credentials credentials = response.getCredentials();
 
-            return new OssSttToken(
+            return new OssStsToken(
                 credentials.getAccessKeyId(),
                 credentials.getAccessKeySecret(),
                 credentials.getSecurityToken(),
-                properties.getRegion(),
+                properties.getOssRegion(),
                 properties.getBucket(),
                 properties.getEndpoint(),
                 properties.getUploadDir()
@@ -309,9 +286,9 @@ public class OssService {
 cd backend && mvn test -pl . -Dtest="com.hillcommerce.oss.OssServiceTest" -DfailIfNoTests=false -q
 ```
 
-注意：第一个测试 `generateStsTokenRequiresConfiguration` 会通过（复用 OssService 逻辑）。第二个测试 `generatesTokenWithUploadDirConstraint` 会尝试真正调用阿里云 API，在 CI 环境会失败。需要将其改为使用 Mockito 避免真实网络调用。
+注意：`OssServiceTest` 不得真实调用阿里云 API。实现时需要把 `DefaultAcsClient` 创建封装为可替换的 factory/client adapter，并在测试中 mock `AssumeRoleResponse`，覆盖 duration、policy resource 和返回字段映射。
 
-- [ ] **Step 6: 用 Mockito 改写 OssService 测试**
+- [ ] **Step 6: 用 Mockito 覆盖 STS 请求构造和返回映射**
 
 ```java
 package com.hillcommerce.oss;
@@ -343,7 +320,8 @@ class OssServiceTest {
         OssProperties properties = new OssProperties();
         properties.setEndpoint("oss-cn-hangzhou.aliyuncs.com");
         properties.setBucket("test-bucket");
-        properties.setRegion("cn-hangzhou");
+        properties.setOssRegion("oss-cn-hangzhou");
+        properties.setStsRegion("cn-hangzhou");
         properties.setAccessKeyId("test-ak");
         properties.setAccessKeySecret("test-sk");
         properties.setRoleArn("acs:ram::123:role/test-role");
@@ -351,9 +329,10 @@ class OssServiceTest {
 
         OssService service = new OssService(properties);
 
-        // Verify configuration is set correctly, without making real API calls.
-        // The actual STS API call is tested via integration/container tests.
-        assertThat(properties.getRegion()).isEqualTo("cn-hangzhou");
+        // In the real test, mock the STS client/factory and assert that AssumeRoleRequest
+        // uses stsRegion=cn-hangzhou, duration=3600, and a PutObject-only products/* policy.
+        assertThat(properties.getOssRegion()).isEqualTo("oss-cn-hangzhou");
+        assertThat(properties.getStsRegion()).isEqualTo("cn-hangzhou");
         assertThat(properties.getBucket()).isEqualTo("test-bucket");
         assertThat(properties.getEndpoint()).isEqualTo("oss-cn-hangzhou.aliyuncs.com");
         assertThat(properties.getUploadDir()).isEqualTo("products/");
@@ -431,15 +410,34 @@ class OssControllerWebMvcTest {
     void returnsStsTokenForAdmin() throws Exception {
         when(ossService.generateStsToken()).thenReturn(new OssStsToken(
             "STS.ak", "STS.sk", "STS.token",
-            "cn-hangzhou", "test-bucket", "oss-cn-hangzhou.aliyuncs.com", "products/"
+            "oss-cn-hangzhou", "test-bucket", "oss-cn-hangzhou.aliyuncs.com", "products/"
         ));
 
         mockMvc.perform(get("/api/admin/oss/sts"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.accessKey").value("STS.ak"))
-            .andExpect(jsonPath("$.region").value("cn-hangzhou"))
+            .andExpect(jsonPath("$.ossRegion").value("oss-cn-hangzhou"))
             .andExpect(jsonPath("$.bucket").value("test-bucket"))
             .andExpect(jsonPath("$.uploadDir").value("products/"));
+    }
+
+    @Test
+    @WithMockUser(roles = "SALES")
+    void returnsStsTokenForSales() throws Exception {
+        when(ossService.generateStsToken()).thenReturn(new OssStsToken(
+            "STS.ak", "STS.sk", "STS.token",
+            "oss-cn-hangzhou", "test-bucket", "oss-cn-hangzhou.aliyuncs.com", "products/"
+        ));
+
+        mockMvc.perform(get("/api/admin/oss/sts"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void returns403ForCustomer() throws Exception {
+        mockMvc.perform(get("/api/admin/oss/sts"))
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -487,7 +485,7 @@ public class OssController {
             "accessKey", token.accessKey(),
             "secretKey", token.secretKey(),
             "securityToken", token.securityToken(),
-            "region", token.region(),
+            "ossRegion", token.ossRegion(),
             "bucket", token.bucket(),
             "endpoint", token.endpoint(),
             "uploadDir", token.uploadDir()
@@ -502,7 +500,7 @@ public class OssController {
 cd backend && mvn test -pl . -Dtest="com.hillcommerce.oss.OssControllerWebMvcTest" -DfailIfNoTests=false -q
 ```
 
-预期：BUILD SUCCESS，2 tests passed。
+预期：BUILD SUCCESS，4 tests passed。
 
 - [ ] **Step 5: SecurityConfig 确认覆盖率**
 
@@ -537,7 +535,7 @@ export type OssStsToken = {
   accessKey: string;
   secretKey: string;
   securityToken: string;
-  region: string;
+  ossRegion: string;
   bucket: string;
   endpoint: string;
   uploadDir: string;
@@ -733,7 +731,7 @@ describe("requestStsToken", () => {
             accessKey: "STS.ak",
             secretKey: "STS.sk",
             securityToken: "STS.token",
-            region: "cn-hangzhou",
+            ossRegion: "oss-cn-hangzhou",
             bucket: "test-bucket",
             endpoint: "oss-cn-hangzhou.aliyuncs.com",
             uploadDir: "products/",
@@ -802,7 +800,8 @@ export async function uploadToOss(
   token: OssStsToken
 ): Promise<string> {
   const client = new OSS({
-    region: token.region,
+    region: token.ossRegion,
+    endpoint: token.endpoint,
     accessKeyId: token.accessKey,
     accessKeySecret: token.secretKey,
     stsToken: token.securityToken,
@@ -822,6 +821,7 @@ export async function uploadToOss(
     throw new Error(
       `上传失败，请重试: ${err instanceof Error ? err.message : "未知错误"}`
     );
+  }
 }
 ```
 
@@ -863,6 +863,7 @@ import type { UploadState } from "@/lib/upload/types";
 type ImageUploaderProps = {
   value: string;
   onChange: (url: string) => void;
+  onUploadingChange?: (uploadingCount: number) => void;
   placeholder?: string;
   suggestSize?: string;
   maxSize?: number;
@@ -871,6 +872,7 @@ type ImageUploaderProps = {
 export function ImageUploader({
   value,
   onChange,
+  onUploadingChange,
   placeholder = "上传封面图",
   suggestSize = "建议 800×800",
   maxSize = 10,
@@ -882,6 +884,7 @@ export function ImageUploader({
 
   async function handleFile(file: File) {
     setErrorMsg("");
+    onUploadingChange?.(1);
 
     try {
       setState("compressing");
@@ -899,6 +902,8 @@ export function ImageUploader({
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "上传失败");
       setState("error");
+    } finally {
+      onUploadingChange?.(0);
     }
   }
 
@@ -1039,7 +1044,7 @@ vi.mock("@/lib/upload/image-compress", () => ({
 vi.mock("@/lib/upload/oss-client", () => ({
   requestStsToken: vi.fn().mockResolvedValue({
     accessKey: "ak", secretKey: "sk", securityToken: "st",
-    region: "r", bucket: "b", endpoint: "e", uploadDir: "p/",
+    ossRegion: "oss-r", bucket: "b", endpoint: "e", uploadDir: "p/",
   }),
   uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg"),
 }));
@@ -1119,12 +1124,14 @@ import type { ImageUploadMeta } from "@/lib/upload/types";
 type ImagesUploaderProps = {
   value: ImageUploadMeta[];
   onChange: (images: ImageUploadMeta[]) => void;
+  onUploadingChange?: (uploadingCount: number) => void;
   maxCount?: number;
 };
 
 export function ImagesUploader({
   value,
   onChange,
+  onUploadingChange,
   maxCount = 10,
 }: ImagesUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1138,26 +1145,35 @@ export function ImagesUploader({
 
     const filesToUpload = Array.from(files).slice(0, remaining);
     setUploadingCount((c) => c + filesToUpload.length);
+    onUploadingChange?.(filesToUpload.length);
 
     const uploaded: ImageUploadMeta[] = [];
-    for (const file of filesToUpload) {
-      try {
-        const compressed = await compressImage(file);
-        const token = await requestStsToken();
-        const url = await uploadToOss(compressed, file.name, token);
-        uploaded.push({ url, sortOrder: 0 }); // sortOrder fixed after loop
-      } catch (err) {
-        setErrors((prev) => {
-          const next = new Map(prev);
-          next.set(
-            value.length + uploaded.length,
-            err instanceof Error ? err.message : "上传失败"
-          );
-          return next;
-        });
-      } finally {
-        setUploadingCount((c) => c - 1);
+    try {
+      for (const file of filesToUpload) {
+        try {
+          const compressed = await compressImage(file);
+          const token = await requestStsToken();
+          const url = await uploadToOss(compressed, file.name, token);
+          uploaded.push({ url, sortOrder: 0 }); // sortOrder fixed after loop
+        } catch (err) {
+          setErrors((prev) => {
+            const next = new Map(prev);
+            next.set(
+              value.length + uploaded.length,
+              err instanceof Error ? err.message : "上传失败"
+            );
+            return next;
+          });
+        } finally {
+          setUploadingCount((c) => {
+            const next = c - 1;
+            onUploadingChange?.(next);
+            return next;
+          });
+        }
       }
+    } finally {
+      onUploadingChange?.(0);
     }
 
     if (uploaded.length > 0) {
@@ -1281,7 +1297,7 @@ vi.mock("@/lib/upload/image-compress", () => ({
 vi.mock("@/lib/upload/oss-client", () => ({
   requestStsToken: vi.fn().mockResolvedValue({
     accessKey: "ak", secretKey: "sk", securityToken: "st",
-    region: "r", bucket: "b", endpoint: "e", uploadDir: "p/",
+    ossRegion: "oss-r", bucket: "b", endpoint: "e", uploadDir: "p/",
   }),
   uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg"),
 }));
@@ -1398,7 +1414,42 @@ import { ImagesUploader } from "./images-uploader";
 
 - [ ] **Step 3: 更新提交按钮逻辑**
 
-在提交按钮上增加"上传中"的检查。因为上传是异步的，在当前架构下不需要额外状态——组件自身管理上传状态，`onChange` 回调在上传完成后才触发，所以表单保存时图片 URL 已经就绪。无需额外改动。
+在 `product-editor.tsx` 中维护封面图和详情图的上传中状态，并把状态传给两个上传组件：
+
+```tsx
+const [coverUploadingCount, setCoverUploadingCount] = useState(0);
+const [detailUploadingCount, setDetailUploadingCount] = useState(0);
+const imageUploadingCount = coverUploadingCount + detailUploadingCount;
+const imageUploading = imageUploadingCount > 0;
+```
+
+组件调用示例：
+
+```tsx
+<ImageUploader
+  value={form.coverImageUrl}
+  onChange={(url) => setForm((current) => ({ ...current, coverImageUrl: url }))}
+  onUploadingChange={setCoverUploadingCount}
+/>
+
+<ImagesUploader
+  value={form.detailImages
+    .filter((img) => img.imageUrl)
+    .map((img, i) => ({ url: img.imageUrl, sortOrder: i }))}
+  onChange={(images) =>
+    setForm((current) => ({
+      ...current,
+      detailImages: images.map((img) => ({
+        imageUrl: img.url,
+        sortOrder: img.sortOrder,
+      })),
+    }))
+  }
+  onUploadingChange={setDetailUploadingCount}
+/>
+```
+
+保存按钮的 `disabled` 条件需要包含 `imageUploading`，并在按钮附近显示 `还有 ${imageUploadingCount} 张图片正在上传中`。
 
 但需要在 `buildPayload` 中对 `detailImages` 过滤一致：`filter((image) => image.imageUrl.trim())` 保持不变。
 
@@ -1427,23 +1478,27 @@ Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 
 ---
 
-### Task 11: 端到端验证 + .env 配置
+### Task 11: 端到端验证 + 环境配置
 
 **Files:**
-- Modify: `.env`（或 `.env.example`）
+- Modify: `.env.example`
+- Modify: `docker-compose.yml`
 
-- [ ] **Step 1: 在 .env 添加 OSS 环境变量**
+- [ ] **Step 1: 在 .env.example 添加 OSS 环境变量占位**
 
 ```bash
 # 阿里云 OSS
 OSS_ENDPOINT=oss-cn-hangzhou.aliyuncs.com
 OSS_BUCKET=hill-commerce
-OSS_REGION=cn-hangzhou
+OSS_REGION=oss-cn-hangzhou
+OSS_STS_REGION=cn-hangzhou
 OSS_ACCESS_KEY_ID=your-access-key-id
 OSS_ACCESS_KEY_SECRET=your-access-key-secret
 OSS_STS_ROLE_ARN=acs:ram::your-account-id:role/oss-upload-role
 OSS_UPLOAD_DIR=products/
 ```
+
+真实 `OSS_ACCESS_KEY_ID` / `OSS_ACCESS_KEY_SECRET` 只写入本地 `.env` 或部署平台密钥，不提交到仓库。
 
 - [ ] **Step 2: docker-compose.yml 环境变量传递**
 
@@ -1455,13 +1510,22 @@ OSS_UPLOAD_DIR=products/
       OSS_ENDPOINT: ${OSS_ENDPOINT:-}
       OSS_BUCKET: ${OSS_BUCKET:-}
       OSS_REGION: ${OSS_REGION:-}
+      OSS_STS_REGION: ${OSS_STS_REGION:-}
       OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID:-}
       OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET:-}
       OSS_STS_ROLE_ARN: ${OSS_STS_ROLE_ARN:-}
       OSS_UPLOAD_DIR: ${OSS_UPLOAD_DIR:-products/}
 ```
 
-- [ ] **Step 3: 启动应用验证**
+- [ ] **Step 3: 确认 OSS 控制台配置**
+
+在阿里云 OSS 控制台确认：
+
+- Bucket CORS 允许商家后台域名发起 `PUT` 上传
+- CORS 允许 ali-oss 需要的请求头
+- 图片读策略、Bucket 域名、CDN 或自定义域名能让保存后的 HTTPS URL 被前台页面访问
+
+- [ ] **Step 4: 启动应用验证**
 
 ```bash
 docker compose --profile app up -d
@@ -1471,12 +1535,13 @@ docker compose --profile app up -d
 1. 打开 `http://localhost:3000/admin/products/new`
 2. 确认封面图区域显示虚线框上传按钮（不再是文本输入）
 3. 确认详情图区域显示网格上传
-4. 用测试图片上传验证完整链路
+4. 上传过程中保存按钮置灰并显示上传中提示
+5. 用测试图片上传验证完整链路
 
-- [ ] **Step 4: 提交**
+- [ ] **Step 5: 提交**
 
 ```bash
-git add .env docker-compose.yml
+git add .env.example docker-compose.yml
 git commit -m "chore: add OSS environment variables and docker-compose wiring
 Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
 ```

@@ -11,16 +11,10 @@ vi.mock("@/lib/upload/image-compress", () => ({
 }));
 
 vi.mock("@/lib/upload/oss-client", () => ({
-  requestStsToken: vi.fn().mockResolvedValue({
-    accessKey: "ak",
-    secretKey: "sk",
-    securityToken: "st",
-    ossRegion: "oss-r",
-    bucket: "b",
-    endpoint: "e",
-    uploadDir: "p/"
-  }),
-  uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg")
+  uploadImage: vi.fn().mockResolvedValue({
+    url: "https://example.com/img.jpg",
+    key: "uploads/products/123_test.jpg"
+  })
 }));
 
 afterEach(() => {

@@ -32,7 +32,7 @@ async function proxyAdminRequest(request: NextRequest, context: Params, method: 
     .getAll()
     .map(({ name, value }) => `${name}=${value}`)
     .join("; ");
-  const body = method === "GET" || method === "DELETE" ? undefined : await safeJsonBody(request);
+  const body = method === "GET" || method === "DELETE" ? undefined : await safeBody(request);
 
   return proxyBackendRequest({
     method,
@@ -43,10 +43,14 @@ async function proxyAdminRequest(request: NextRequest, context: Params, method: 
   });
 }
 
-async function safeJsonBody(request: NextRequest): Promise<unknown> {
+async function safeBody(request: NextRequest): Promise<unknown> {
   const contentLength = request.headers.get("content-length");
   if (!contentLength || contentLength === "0") {
     return undefined;
+  }
+  const contentType = request.headers.get("content-type") ?? "";
+  if (contentType.includes("multipart/form-data")) {
+    return await request.formData();
   }
   try {
     return await request.json();

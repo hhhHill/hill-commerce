@@ -58,11 +58,9 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 oss:
-  endpoint: ${OSS_ENDPOINT:}
-  bucket: ${OSS_BUCKET:}
-  oss-region: ${OSS_REGION:}
-  sts-region: ${OSS_STS_REGION:}
-  access-key-id: ${OSS_ACCESS_KEY_ID:}
-  access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
-  role-arn: ${OSS_STS_ROLE_ARN:}
-  upload-dir: ${OSS_UPLOAD_DIR:products/}
+  endpoint: ${OSS_ENDPOINT:oss-cn-shenzhen.aliyuncs.com}
+  bucket: ${OSS_BUCKET:hill-commerce}
+  region: ${OSS_REGION:cn-shenzhen}cd
+  access-key-id: ${OSS_ACCESS_KEY_ID}
+  access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+  base-dir: ${OSS_BASE_DIR:products/}

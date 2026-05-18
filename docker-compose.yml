@@ -78,11 +78,9 @@ services:
       OSS_ENDPOINT: ${OSS_ENDPOINT:-}
       OSS_BUCKET: ${OSS_BUCKET:-}
       OSS_REGION: ${OSS_REGION:-}
-      OSS_STS_REGION: ${OSS_STS_REGION:-}
       OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID:-}
       OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET:-}
-      OSS_STS_ROLE_ARN: ${OSS_STS_ROLE_ARN:-}
-      OSS_UPLOAD_DIR: ${OSS_UPLOAD_DIR:-products/}
+      OSS_BASE_DIR: ${OSS_BASE_DIR:-uploads/}
     ports:
       - "8080:8080"
 

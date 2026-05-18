@@ -1,84 +1,47 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { clearStsCache, requestStsToken, uploadToOss } from "./oss-client";
-import type { OssStsToken } from "./types";
+import { uploadImage } from "./oss-client";
 
-const putMock = vi.fn();
-
-vi.mock("ali-oss", () => ({
-  default: vi.fn(function OSSMock() {
-    return {
-      put: putMock
-    };
-  })
-}));
-
-const stsPayload = {
-  accessKey: "STS.ak",
-  secretKey: "STS.sk",
-  securityToken: "STS.token",
-  ossRegion: "oss-cn-hangzhou",
-  bucket: "test-bucket",
-  endpoint: "oss-cn-hangzhou.aliyuncs.com",
-  uploadDir: "products/"
-};
-
-describe("requestStsToken", () => {
-  beforeEach(() => {
-    clearStsCache();
-  });
-
-  it("fetches STS token from backend", async () => {
+describe("uploadImage", () => {
+  it("sends multipart request and returns upload result", async () => {
+    const responseBody = { url: "https://example.com/img.jpg", key: "uploads/products/123_test.jpg" };
     global.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify(stsPayload), {
+      new Response(JSON.stringify(responseBody), {
         status: 200,
         headers: { "Content-Type": "application/json" }
       })
     );
 
-    const token = await requestStsToken();
+    const result = await uploadImage(
+      new Blob(["image"], { type: "image/jpeg" }),
+      "test.jpg",
+      "products"
+    );
 
-    expect(token.accessKey).toBe("STS.ak");
-    expect(global.fetch).toHaveBeenCalledWith("/api/admin/oss/sts", {
+    expect(result.url).toBe("https://example.com/img.jpg");
+    expect(result.key).toBe("uploads/products/123_test.jpg");
+    expect(global.fetch).toHaveBeenCalledWith("/api/admin/oss/upload", {
+      method: "POST",
+      body: expect.any(FormData),
       credentials: "include"
     });
   });
 
-  it("throws a user facing error when token request fails", async () => {
-    global.fetch = vi.fn().mockResolvedValue(new Response(null, { status: 401 }));
-
-    await expect(requestStsToken()).rejects.toThrow("获取上传凭证失败");
-  });
-
-  it("reuses cached token within expiry window", async () => {
+  it("throws error message from response body on failure", async () => {
     global.fetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify(stsPayload), { status: 200 })
+      new Response(JSON.stringify({ message: "Category must not be blank" }), { status: 400 })
     );
 
-    await requestStsToken();
-    await requestStsToken();
-
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    await expect(uploadImage(new Blob(["image"]), "test.jpg", "")).rejects.toThrow(
+      "Category must not be blank"
+    );
   });
-});
 
-describe("uploadToOss", () => {
-  it("uploads with a generated object key and returns the OSS url", async () => {
-    putMock.mockResolvedValue({ name: "products/test.jpg", url: "https://img.example.com/test.jpg" });
-    const token: OssStsToken = {
-      accessKey: "STS.ak",
-      secretKey: "STS.sk",
-      securityToken: "STS.token",
-      ossRegion: "oss-cn-hangzhou",
-      bucket: "test-bucket",
-      endpoint: "oss-cn-hangzhou.aliyuncs.com",
-      uploadDir: "products/"
-    };
+  it("throws fallback error when response body is not json", async () => {
+    global.fetch = vi.fn().mockResolvedValue(new Response("Internal Server Error", { status: 500 }));
 
-    const url = await uploadToOss(new Blob(["image"], { type: "image/jpeg" }), "test.jpg", token);
-
-    expect(url).toBe("https://img.example.com/test.jpg");
-    expect(putMock.mock.calls[0][0]).toMatch(/^products\/\d+_[a-z0-9]+_test\.jpg$/);
-    expect(putMock.mock.calls[0][2]).toEqual({ timeout: 30_000 });
+    await expect(uploadImage(new Blob(["image"]), "test.jpg", "products")).rejects.toThrow(
+      "上传失败，请重试"
+    );
   });
 });

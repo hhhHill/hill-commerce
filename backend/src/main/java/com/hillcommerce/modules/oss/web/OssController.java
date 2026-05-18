@@ -1,9 +1,13 @@
 package com.hillcommerce.modules.oss.web;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.io.IOException;
 
-import com.hillcommerce.modules.oss.dto.OssStsToken;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.hillcommerce.modules.oss.dto.OssUploadResult;
 import com.hillcommerce.modules.oss.service.OssService;
 
 @RestController
@@ -15,8 +19,16 @@ public class OssController {
         this.ossService = ossService;
     }
 
-    @GetMapping("/api/admin/oss/sts")
-    public OssStsToken getStsToken() {
-        return ossService.generateStsToken();
+    @PostMapping("/api/admin/oss/upload")
+    public OssUploadResult upload(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("category") String category) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File must not be empty");
+        }
+        if (category == null || category.isBlank()) {
+            throw new IllegalArgumentException("Category must not be blank");
+        }
+        return ossService.upload(file.getInputStream(), file.getOriginalFilename(), category);
     }
 }

@@ -37,21 +37,34 @@
 
 ## Phase 2：核心组件
 
-- [ ] 2.1 改造商品卡 `ProductCard`
+- [x] 2.0 新增商品卡展示字段派生模型
+  - 文件：`frontend/next-app/src/features/storefront/catalog/product-card-view-model.ts`
+  - 新建 `buildProductCardViewModel(product: StorefrontProductCard)`
+  - 输出字段：`price`, `originalPrice`, `sales`, `shopName`, `tags`
+  - `originalPrice` 根据 `salePrice` 稳定派生，展示为划线原价
+  - `sales` 根据 `product.id` 稳定派生，例如「已售 2w+」
+  - `shopName` 根据 `categoryId` / `id` 稳定派生，例如「官方旗舰店」
+  - `tags` 从「百亿补贴」「包邮」「官方」「自营」「限时」中稳定派生 2-3 个
+  - 文件注释必须说明这些字段只用于前端视觉展示，不代表真实价格、销量或促销事实
+
+- [x] 2.1 改造商品卡 `ProductCard`
   - 文件：`frontend/next-app/src/features/storefront/catalog/product-card.tsx`
   - 圆角 `rounded-[28px]` → `rounded-lg`
   - 背景 `bg-white/90` → `bg-white`
   - 阴影改为 `shadow-[0_2px_8px_rgba(0,0,0,0.04)]`
-  - 图片容器移除渐变背景，改为 `bg-[var(--border-light)]`
-  - 价格颜色使用 `text-[var(--price)]`（兼容别名 `--accent-strong` 已映射到此值）
-  - 价格加粗 `font-bold`，字号 `text-xl`
-  - 移除"查看详情"药丸标签
-  - 新增全宽"马上抢"按钮：渐变橙底 + 白字 + 24px 圆角
-  - 按钮行为：`<Link href={/products/${product.id}}>` 跳转详情页（与卡片链接目标相同，无需加购能力——加购需先选 SKU）
+  - 图片容器改为 `aspect-square bg-[var(--border-light)]`
+  - 图片 hover 使用 `group-hover:scale-[1.04]`
+  - 内容区 padding 缩小到 `px-2.5 py-2`
+  - 促销标签放在标题上方，最多展示 3 个，4px 圆角
+  - 标题最多两行，`text-[13px] leading-[18px] line-clamp-2`
+  - 价格使用淘宝橙红，`¥` 符号较小，价格数字 `text-[22px] font-extrabold`
+  - 原价使用灰色划线，位于售价右侧
+  - 底部展示 `sales` 与 `shopName`
+  - 移除全宽"马上抢"按钮，卡片整体跳转商品详情
 
-- [ ] 2.2 改造商品列表 `StorefrontProductList`
+- [x] 2.2 改造商品列表 `StorefrontProductList`
   - 文件：`frontend/next-app/src/features/storefront/catalog/product-list.tsx`
-  - 栅格：`sm:grid-cols-2 xl:grid-cols-3` → `grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`
+  - 栅格改为自适应：`grid-cols-2 sm:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]`
   - 间距：`gap-5` → `gap-2.5`
   - 标题：移除英文小标题，中文标题 `text-4xl` → `text-2xl`
   - 商品计数徽章简化样式
@@ -71,25 +84,40 @@
 
 - [ ] 2.5 验证 Phase 2
   - 浏览首页、分类页、搜索页
-  - 确认商品卡新样式：白底、红价、马上抢按钮
+  - 确认商品卡新样式：白底、橙红价格、促销标签、划线原价、销量、店铺名
   - 确认不同断点下商品列数正确
   - 确认搜索栏全宽暖橙
 
 ## Phase 3：页面布局
 
-- [ ] 3.1 首页改造
+- [x] 3.0 新增首页固定分类配置
+  - 文件：`frontend/next-app/src/features/storefront/catalog/homepage-categories.ts`
+  - 固定分类顺序：
+    `手机数码`, `家用电器`, `服饰鞋包`, `美妆个护`, `家居生活`, `食品饮料`, `母婴玩具`, `运动户外`, `汽车用品`, `其他分类`
+  - 新建 `buildHomepageCategoryItems(categories: StorefrontCategory[])`
+  - 与固定分类同名的后端分类链接到 `/categories/{id}`
+  - 未匹配固定分类的后端分类归入「其他分类」
+  - 固定分类无后端匹配时链接到 `/search?keyword=<分类名>`
+
+- [x] 3.1 首页改造
   - 文件：`frontend/next-app/src/app/page.tsx`
   - 移除 Hero section（大标题 + 渐变背景 + 登录信息区）
-  - SearchForm 移到顶部全宽
-  - CategoryDirectory 改为横向滚动入口
-  - StorefrontProductList 的 pageSize 从 6 → 12，标题改为"猜你喜欢"
-  - 用户登录后的快捷入口精简为搜索栏下方一行小字链接
+  - SearchForm 放入顶部吸顶搜索区
+  - 桌面端主区域改为 `md:grid md:grid-cols-[156px_minmax(0,1fr)]`
+  - 左侧放 `CategoryDirectory` sticky 分类栏
+  - 右侧添加运营 Banner，突出「百亿补贴」「今日爆款」「限时会场」
+  - 右侧添加运营卡片区：限时秒杀 / 百亿补贴 / 官方好货
+  - StorefrontProductList 的 pageSize 保持 12，标题改为"猜你喜欢"
+  - 用户登录后的快捷入口精简为搜索栏附近一行小字链接
   - 购物车入口由底部 MobileBottomNav 统一提供，首页不单独放置购物车图标
 
-- [ ] 3.2 品类目录改为横向滚动
+- [x] 3.2 品类目录改为桌面左侧固定栏 + 移动横向滚动
   - 文件：`frontend/next-app/src/features/storefront/catalog/category-list.tsx`
-  - 2-3 列网格 → `flex gap-2 overflow-x-auto`
-  - 每个品类 `shrink-0 min-w-[80px]`，紧凑圆角入口
+  - 使用 `buildHomepageCategoryItems(categories)` 作为展示数据源
+  - 桌面端：`hidden md:sticky md:top-24 md:flex md:w-[156px] md:flex-col`
+  - 移动端：`md:hidden` 横向滚动固定分类入口
+  - 每个分类入口白底轻边框，hover/active 使用橙色高亮
+  - 「其他分类」必须始终显示在最后
 
 - [ ] 3.3 商品详情页布局改造
   - 文件：`frontend/next-app/src/features/storefront/catalog/product-detail.tsx`

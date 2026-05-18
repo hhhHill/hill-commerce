@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import { compressImage } from "@/lib/upload/image-compress";
-import { requestStsToken, uploadToOss } from "@/lib/upload/oss-client";
+import { uploadImage } from "@/lib/upload/oss-client";
 import type { UploadState } from "@/lib/upload/types";
 
 type ImageUploaderProps = {
@@ -40,13 +40,11 @@ export function ImageUploader({
 
       setState("uploading");
       setProgress(20);
-      const token = await requestStsToken();
-      setProgress(45);
 
-      const url = await uploadToOss(compressed, file.name, token);
+      const result = await uploadImage(compressed, file.name, "products");
       setProgress(100);
       setState("uploaded");
-      onChange(url);
+      onChange(result.url);
     } catch (error) {
       setErrorMsg(error instanceof Error ? error.message : "上传失败");
       setState("error");

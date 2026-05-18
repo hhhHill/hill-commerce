@@ -42,7 +42,7 @@ export function StorefrontProductList({
         <EmptyState description={emptyDescription} title="暂时没有可展示商品" />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

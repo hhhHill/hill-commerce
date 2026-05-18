@@ -1,8 +1,0 @@
-spring:
-  docker:
-    compose:
-      enabled: false
-logging:
-  level:
-    root: INFO
-    com.hillcommerce: INFO

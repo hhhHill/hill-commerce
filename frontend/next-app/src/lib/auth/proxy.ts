@@ -13,10 +13,11 @@ type ProxyOptions = {
 };
 
 export async function proxyBackendRequest(options: ProxyOptions): Promise<NextResponse> {
+  const requestBody = buildBody(options.body);
   const backendResponse = await fetch(`${getBackendBaseUrl()}${options.pathname}${options.search ?? ""}`, {
     method: options.method,
     headers: buildHeaders(options.cookieHeader, options.body),
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body: requestBody,
     cache: "no-store",
     redirect: "manual"
   });
@@ -57,9 +58,19 @@ function buildHeaders(cookieHeader?: string | null, body?: unknown): HeadersInit
     headers.cookie = cookieHeader;
   }
 
-  if (body !== undefined) {
+  if (body !== undefined && body !== null && !(body instanceof FormData)) {
     headers["content-type"] = "application/json";
   }
 
   return headers;
+}
+
+function buildBody(body: unknown): BodyInit | undefined {
+  if (body === undefined || body === null) {
+    return undefined;
+  }
+  if (body instanceof FormData) {
+    return body;
+  }
+  return JSON.stringify(body);
 }

@@ -7,12 +7,10 @@ public class OssProperties {
 
     private String endpoint;
     private String bucket;
-    private String ossRegion;
-    private String stsRegion;
+    private String region;
     private String accessKeyId;
     private String accessKeySecret;
-    private String roleArn;
-    private String uploadDir = "products/";
+    private String baseDir = "uploads/";
 
     public String getEndpoint() {
         return endpoint;
@@ -30,20 +28,12 @@ public class OssProperties {
         this.bucket = bucket;
     }
 
-    public String getOssRegion() {
-        return ossRegion;
+    public String getRegion() {
+        return region;
     }
 
-    public void setOssRegion(String ossRegion) {
-        this.ossRegion = ossRegion;
-    }
-
-    public String getStsRegion() {
-        return stsRegion;
-    }
-
-    public void setStsRegion(String stsRegion) {
-        this.stsRegion = stsRegion;
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getAccessKeyId() {
@@ -62,19 +52,11 @@ public class OssProperties {
         this.accessKeySecret = accessKeySecret;
     }
 
-    public String getRoleArn() {
-        return roleArn;
+    public String getBaseDir() {
+        return baseDir;
     }
 
-    public void setRoleArn(String roleArn) {
-        this.roleArn = roleArn;
-    }
-
-    public String getUploadDir() {
-        return uploadDir;
-    }
-
-    public void setUploadDir(String uploadDir) {
-        this.uploadDir = uploadDir;
+    public void setBaseDir(String baseDir) {
+        this.baseDir = baseDir;
     }
 }

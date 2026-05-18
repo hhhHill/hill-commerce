@@ -1,133 +1,144 @@
 package com.hillcommerce.modules.oss.service;
 
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.http.MethodType;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.sts.model.v20150401.AssumeRoleRequest;
-import com.aliyuncs.sts.model.v20150401.AssumeRoleResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.aliyun.oss.ClientException;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.OSSException;
+import com.aliyun.oss.common.auth.DefaultCredentialProvider;
+import com.aliyun.oss.model.ObjectMetadata;
 import com.hillcommerce.modules.oss.config.OssProperties;
-import com.hillcommerce.modules.oss.dto.OssStsToken;
+import com.hillcommerce.modules.oss.dto.OssUploadResult;
 
 @Service
 public class OssService {
 
     private static final Logger log = LoggerFactory.getLogger(OssService.class);
-    private static final long TOKEN_DURATION_SECONDS = 3600L;
-    private static final String ROLE_SESSION_NAME = "hill-commerce-upload";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final OssProperties properties;
-    private final StsClient stsClient;
+    private final OSS ossClient;
+    private volatile OSS lazyOssClient;
 
     @Autowired
     public OssService(OssProperties properties) {
-        this(properties, new AliyunStsClient(properties));
-    }
-
-    public OssService(OssProperties properties, StsClient stsClient) {
         this.properties = properties;
-        this.stsClient = stsClient;
+        this.ossClient = null;
     }
 
-    public OssStsToken generateStsToken() {
+    public OssService(OssProperties properties, OSS ossClient) {
+        this.properties = properties;
+        this.ossClient = ossClient;
+    }
+
+    public OssUploadResult upload(InputStream inputStream, String fileName, String category) {
         requireConfigured();
 
-        AssumeRoleRequest request = new AssumeRoleRequest();
-        request.setSysMethod(MethodType.POST);
-        request.setRoleArn(properties.getRoleArn());
-        request.setRoleSessionName(ROLE_SESSION_NAME);
-        request.setDurationSeconds(TOKEN_DURATION_SECONDS);
-        request.setPolicy(buildUploadPolicy());
+        String objectKey = buildObjectKey(category, fileName);
+        ObjectMetadata metadata = new ObjectMetadata();
+        String contentType = detectContentType(fileName);
+        if (contentType != null) {
+            metadata.setContentType(contentType);
+        }
 
         try {
-            AssumeRoleResponse response = stsClient.assumeRole(request);
-            AssumeRoleResponse.Credentials credentials = response.getCredentials();
-            if (credentials == null) {
-                throw new IllegalStateException("STS response missing credentials");
-            }
-            return new OssStsToken(
-                credentials.getAccessKeyId(),
-                credentials.getAccessKeySecret(),
-                credentials.getSecurityToken(),
-                properties.getOssRegion(),
-                properties.getBucket(),
-                properties.getEndpoint(),
-                normalizedUploadDir());
+            ossClient().putObject(properties.getBucket(), objectKey, inputStream, metadata);
+            String url = buildUrl(objectKey);
+            log.info("Uploaded to OSS: {}", objectKey);
+            return new OssUploadResult(url, objectKey);
         } catch (Exception e) {
-            log.error("Failed to generate STS token", e);
-            throw new IllegalStateException("Failed to generate STS token: " + e.getMessage(), e);
+            log.error("Failed to upload to OSS: {}", objectKey, e);
+            throw new IllegalStateException("Failed to upload file: " + e.getMessage(), e);
         }
+    }
+
+    private String buildObjectKey(String category, String fileName) {
+        String baseDir = normalizedBaseDir();
+        String safeCategory = sanitize(category);
+        String safeFileName = sanitize(fileName);
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String randomSuffix = Integer.toHexString(ThreadLocalRandom.current().nextInt(0x100000, 0xffffff));
+        return baseDir + safeCategory + "/" + timestamp + "_" + randomSuffix + "_" + safeFileName;
+    }
+
+    private String buildUrl(String objectKey) {
+        String host = properties.getEndpoint().replaceFirst("^https?://", "");
+        return "https://" + properties.getBucket() + "." + host + "/" + objectKey;
+    }
+
+    private String normalizedBaseDir() {
+        String dir = properties.getBaseDir();
+        if (dir == null || dir.isBlank()) {
+            return "uploads/";
+        }
+        return dir.endsWith("/") ? dir : dir + "/";
+    }
+
+    private static String sanitize(String input) {
+        return input.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
+
+    private static String detectContentType(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+        String lower = fileName.toLowerCase();
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+            return "image/jpeg";
+        }
+        if (lower.endsWith(".png")) {
+            return "image/png";
+        }
+        if (lower.endsWith(".webp")) {
+            return "image/webp";
+        }
+        if (lower.endsWith(".gif")) {
+            return "image/gif";
+        }
+        return null;
     }
 
     private void requireConfigured() {
         if (isBlank(properties.getEndpoint())
                 || isBlank(properties.getBucket())
-                || isBlank(properties.getOssRegion())
-                || isBlank(properties.getStsRegion())
+                || isBlank(properties.getRegion())
                 || isBlank(properties.getAccessKeyId())
-                || isBlank(properties.getAccessKeySecret())
-                || isBlank(properties.getRoleArn())) {
-            throw new IllegalStateException("OSS not configured: missing endpoint, bucket, region, access key, or roleArn");
+                || isBlank(properties.getAccessKeySecret())) {
+            throw new IllegalStateException(
+                "OSS not configured: missing endpoint, bucket, region, access key id, or access key secret");
         }
-    }
-
-    private String buildUploadPolicy() {
-        String resource = "acs:oss:*:*:" + properties.getBucket() + "/" + normalizedUploadDir() + "*";
-        Map<String, Object> policy = Map.of(
-            "Version", "1",
-            "Statement", List.of(Map.of(
-                "Effect", "Allow",
-                "Action", List.of("oss:PutObject"),
-                "Resource", List.of(resource)
-            ))
-        );
-        try {
-            return objectMapper.writeValueAsString(policy);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to build STS policy JSON", e);
-        }
-    }
-
-    private String normalizedUploadDir() {
-        String uploadDir = properties.getUploadDir();
-        if (isBlank(uploadDir)) {
-            return "products/";
-        }
-        return uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
     }
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
 
-    public interface StsClient {
-        AssumeRoleResponse assumeRole(AssumeRoleRequest request) throws Exception;
-    }
-
-    private static final class AliyunStsClient implements StsClient {
-        private final OssProperties properties;
-
-        private AliyunStsClient(OssProperties properties) {
-            this.properties = properties;
+    private OSS ossClient() {
+        if (ossClient != null) {
+            return ossClient;
         }
-
-        @Override
-        public AssumeRoleResponse assumeRole(AssumeRoleRequest request) throws Exception {
-            DefaultProfile profile = DefaultProfile.getProfile(
-                properties.getStsRegion(),
-                properties.getAccessKeyId(),
-                properties.getAccessKeySecret());
-            return new DefaultAcsClient(profile).getAcsResponse(request);
+        OSS local = lazyOssClient;
+        if (local == null) {
+            synchronized (this) {
+                local = lazyOssClient;
+                if (local == null) {
+                    local = OSSClientBuilder.create()
+                        .endpoint(properties.getEndpoint())
+                        .credentialsProvider(new DefaultCredentialProvider(
+                            properties.getAccessKeyId(),
+                            properties.getAccessKeySecret()))
+                        .region(properties.getRegion())
+                        .build();
+                    lazyOssClient = local;
+                }
+            }
         }
+        return local;
     }
 }

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import { compressImage } from "@/lib/upload/image-compress";
-import { requestStsToken, uploadToOss } from "@/lib/upload/oss-client";
+import { uploadImage } from "@/lib/upload/oss-client";
 import type { ImageUploadMeta } from "@/lib/upload/types";
 
 type ImagesUploaderProps = {
@@ -44,9 +44,8 @@ export function ImagesUploader({ value, onChange, onUploadingChange, maxCount = 
       const slotId = slotIdRef.current++;
       try {
         const compressed = await compressImage(file);
-        const token = await requestStsToken();
-        const url = await uploadToOss(compressed, file.name, token);
-        uploaded.push({ url, sortOrder: 0 });
+        const result = await uploadImage(compressed, file.name, "products");
+        uploaded.push({ url: result.url, sortOrder: 0 });
       } catch (error) {
         newFailed.push({
           slotId,

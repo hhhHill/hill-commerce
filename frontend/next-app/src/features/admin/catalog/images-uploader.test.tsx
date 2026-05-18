@@ -5,24 +5,20 @@ import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ImagesUploader } from "./images-uploader";
-import { uploadToOss } from "@/lib/upload/oss-client";
+import { uploadImage } from "@/lib/upload/oss-client";
 
 vi.mock("@/lib/upload/image-compress", () => ({
   compressImage: vi.fn().mockResolvedValue(new Blob(["test"], { type: "image/jpeg" }))
 }));
 
 vi.mock("@/lib/upload/oss-client", () => ({
-  requestStsToken: vi.fn().mockResolvedValue({
-    accessKey: "ak",
-    secretKey: "sk",
-    securityToken: "st",
-    ossRegion: "oss-r",
-    bucket: "b",
-    endpoint: "e",
-    uploadDir: "p/"
-  }),
-  uploadToOss: vi.fn().mockResolvedValue("https://example.com/img.jpg")
+  uploadImage: vi.fn().mockResolvedValue({
+    url: "https://example.com/img.jpg",
+    key: "uploads/products/123_test.jpg"
+  })
 }));
+
+const uploadImageMock = vi.mocked(uploadImage);
 
 afterEach(() => {
   cleanup();
@@ -90,7 +86,7 @@ describe("ImagesUploader", () => {
   });
 
   it("shows failed upload summary when upload errors occur", async () => {
-    uploadToOss.mockRejectedValueOnce(new Error("模拟上传失败"));
+    uploadImageMock.mockRejectedValueOnce(new Error("模拟上传失败"));
     const onChange = vi.fn();
     const file = new File(["image"], "fail.jpg", { type: "image/jpeg" });
 

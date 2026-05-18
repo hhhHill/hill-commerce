@@ -9,6 +9,14 @@
 
 改造策略：**修改视觉层，不动业务逻辑层**。所有改动限制在 CSS 变量、组件 JSX 结构和样式类名，不碰数据流、API 调用、状态管理。
 
+本次 refinement 在既有改造基础上继续收敛为「淘宝首页 Feed 化」：
+
+- 桌面首页采用左侧 sticky 固定分类栏 + 右侧运营 Banner / 秒杀补贴 / 商品流
+- 移动首页保留双列商品流，分类入口改为顶部横向滑动
+- 首页分类使用固定运营分类：手机数码、家用电器、服饰鞋包、美妆个护、家居生活、食品饮料、母婴玩具、运动户外、汽车用品、其他分类
+- 商品卡移除后台系统式空旷结构，补充前端派生展示字段：划线原价、销量、店铺名、促销标签
+- 不修改后端 API；派生字段只用于前端视觉展示，不参与金额、库存、订单等业务计算
+
 ## 技术决策
 
 ### CSS 变量集中管理
@@ -34,6 +42,35 @@ TailwindCSS v4 使用 `@tailwindcss/postcss` 插件，配置通过 CSS `@theme` 
 ### 不改变 Server Component 模式
 
 现有组件已是 RSC，继续保留。需要客户端交互的部分（底部导航、搜索表单、加购按钮）保持 `"use client"` 不变。
+
+### 首页固定分类映射
+
+新建 storefront 首页分类配置文件，集中维护固定分类和映射逻辑。
+
+目标文件：`frontend/next-app/src/features/storefront/catalog/homepage-categories.ts`
+
+责任：
+
+- 导出固定分类名称列表
+- 接收后端 `StorefrontCategory[]`
+- 生成首页展示入口
+- 与固定分类同名的后端分类链接到 `/categories/{id}`
+- 未匹配固定分类的后端分类聚合到「其他分类」
+- 暂无后端分类匹配的固定分类链接到 `/search?keyword=<分类名>`
+- 「其他分类」在存在未匹配后端分类时链接到 `/search?keyword=其他分类`，后续可替换为聚合分类页
+
+### 商品展示字段派生
+
+新建商品卡展示模型辅助文件，避免把 mock 派生逻辑散落在组件 JSX 中。
+
+目标文件：`frontend/next-app/src/features/storefront/catalog/product-card-view-model.ts`
+
+责任：
+
+- 输入 `StorefrontProductCard`
+- 输出商品卡需要的展示字段：`price`, `originalPrice`, `sales`, `shopName`, `tags`
+- 派生逻辑必须稳定：同一个商品 id 在刷新后展示一致
+- 派生字段只用于视觉展示，不作为真实价格或销量事实
 
 ## Phase 1：全局设计令牌
 
@@ -107,12 +144,15 @@ TailwindCSS v4 使用 `@tailwindcss/postcss` 插件，配置通过 CSS `@theme` 
 阴影: shadow-[0_16px_40px_...] → shadow-[0_2px_8px_rgba(0,0,0,0.04)]
 hover: hover:-translate-y-1 保持
 图片容器: bg-[linear-gradient(...)] → bg-[var(--border-light)]
-价格颜色: text-[var(--accent-strong)] → text-[var(--price)]
-价格字号: text-2xl → text-xl font-bold
-价格字体: 添加 font-[family-name:var(--font-price)]
-移除: "查看详情" 药丸标签
-新增: 底部全宽按钮 "马上抢"
-  className="mt-3 w-full rounded-[24px] bg-[var(--brand-gradient)] py-2.5 text-center text-sm font-semibold text-white"
+图片比例: aspect-[4/5] → aspect-square（商品流统一比例）
+图片占比: 通过减少内容区 padding、压缩文字行高，让图片占卡片高度约 70%-75%
+价格颜色: 使用 #ff4400 / var(--price)
+价格字号: 数字 text-[22px] font-extrabold，¥ 符号 text-xs
+原价: text-xs line-through text-[var(--price-strike)]
+标签: 展示 2-3 个促销标签，例如「百亿补贴」「包邮」「官方」
+标题: line-clamp-2，13px，紧凑行高
+销量/店铺: 一行展示，例如「已售 2w+ · 官方旗舰店」
+移除: 底部全宽 "马上抢" 按钮，商品流卡片整体可点击
 ```
 
 ### product-list.tsx 变更
@@ -135,8 +175,8 @@ placeholder: "按商品名称搜索" → "搜你想要的…"
 ### 验证方式
 
 浏览首页、分类页、搜索页，确认：
-- 商品卡白底浅阴影，红色价格
-- 商品卡有"马上抢"按钮
+- 商品卡白底浅阴影，淘宝橙红价格
+- 商品卡有促销标签、划线原价、销量和店铺名
 - 不同断点下列数正确
 - 搜索栏全宽暖橙按钮
 
@@ -154,16 +194,21 @@ placeholder: "按商品名称搜索" → "搜你想要的…"
 | `features/storefront/cart/cart-summary.tsx` | 移动端底部固定 |
 | `app/cart/page.tsx` | 布局调整 |
 | `components/mobile-bottom-nav.tsx` | **新建** |
-| `features/storefront/catalog/category-list.tsx` | 横向滚动入口 |
+| `features/storefront/catalog/category-list.tsx` | 桌面左侧固定分类栏 + 移动横向分类 |
+| `features/storefront/catalog/homepage-categories.ts` | **新建**：固定分类配置与映射 |
+| `features/storefront/catalog/product-card-view-model.ts` | **新建**：商品卡展示字段派生 |
 
 ### 首页 page.tsx 变更
 
 ```
 移除: Hero section 整个 <section> 块（大标题+渐变背景+登录信息区）
-保留: SearchForm（移到顶部全宽）
-改造: CategoryDirectory → 横向滚动品类入口（保留数据获取，改布局）
-改造: StorefrontProductList → pageSize 从 6 → 12，标题改为 "猜你喜欢"
-精简: 用户登录后的快捷入口 → 搜索栏下方一行小字链接
+保留: SearchForm（移到顶部吸顶区域）
+新增: 桌面两栏布局，左侧固定分类栏，右侧运营内容和商品流
+新增: 运营 Banner，文案突出「百亿补贴」「今日爆款」「限时会场」
+新增: 运营卡片区：限时秒杀 / 百亿补贴 / 官方好货
+改造: CategoryDirectory → 桌面 sticky 侧栏，移动横向滚动
+改造: StorefrontProductList → pageSize 12，标题改为 "猜你喜欢"
+精简: 用户登录后的快捷入口 → 搜索栏附近一行小字链接
 购物车入口: 由 MobileBottomNav 统一提供，首页不单独放置
 ```
 
@@ -204,9 +249,12 @@ cart/page.tsx:
 ### category-list.tsx 变更
 
 ```
-从 2-3 列网格 → 横向滚动容器
-  className="flex gap-2 overflow-x-auto pb-2"
-  每个品类: shrink-0 最小宽度，圆角入口样式
+输入: 后端 categories
+内部: 使用 buildHomepageCategoryItems(categories)
+桌面: hidden md:flex sticky top-24 w-[156px] flex-col
+移动: md:hidden 横向滚动容器
+固定分类: 手机数码 / 家用电器 / 服饰鞋包 / 美妆个护 / 家居生活 / 食品饮料 / 母婴玩具 / 运动户外 / 汽车用品 / 其他分类
+每个入口: 紧凑白底，当前 hover 橙色高亮
 ```
 
 ### Admin 后台页面
@@ -234,7 +282,9 @@ AdminShell: 背景使用 --bg-admin（纯白 #fff），保持高对比度
 | TailwindCSS v4 与 CSS 变量兼容 | Phase 1 先验证，有问题回退到直接硬编码值 |
 | 旧组件引用 `--accent` 等旧变量 | Phase 1 添加兼容别名（`--accent: var(--brand-primary)` 等），无需逐个组件修改 |
 | 移动端底部栏遮挡内容 | 给页面 `main` 添加 `pb-16` 底部留白 |
-| 品类横向滚动体验差 | 仅在品类 ≤ 8 个时使用，否则保持网格 |
+| 桌面左侧分类挤压商品流 | 左侧栏控制在 156px 左右，右侧使用 `minmax(150px, 1fr)` 自适应网格 |
+| 移动端左侧分类挤压双列商品 | 移动端不用左侧栏，改为顶部横向滑动 |
+| 前端派生原价/销量被误认为真实数据 | 派生逻辑集中在 `product-card-view-model.ts`，文件注释说明仅用于视觉展示 |
 | Admin 后台风格过于暖色 | Admin 页面使用 `--bg-admin`（纯白）而非 `--bg-page`，保持高对比度 |
 
 ## 文件变更总览
@@ -254,3 +304,5 @@ AdminShell: 背景使用 --bg-admin（纯白 #fff），保持高对比度
 | **修改** | `src/features/storefront/cart/cart-list.tsx` |
 | **修改** | `src/features/storefront/cart/cart-summary.tsx` |
 | **新建** | `src/components/mobile-bottom-nav.tsx` |
+| **新建** | `src/features/storefront/catalog/homepage-categories.ts` |
+| **新建** | `src/features/storefront/catalog/product-card-view-model.ts` |

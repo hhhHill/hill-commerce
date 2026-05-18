@@ -1,12 +1,13 @@
 package com.hillcommerce.modules.payment.service;
 
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentAttemptResponse;
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentActionResponse;
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentOrderResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentAttemptResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentActionResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentOrderResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.hillcommerce.modules.payment.enums.PaymentStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ import com.hillcommerce.modules.order.entity.OrderStatusHistoryEntity;
 import com.hillcommerce.modules.order.mapper.OrderItemMapper;
 import com.hillcommerce.modules.order.mapper.OrderMapper;
 import com.hillcommerce.modules.order.mapper.OrderStatusHistoryMapper;
-import com.hillcommerce.modules.order.service.OrderStatus;
+import com.hillcommerce.modules.order.enums.OrderStatus;
 import com.hillcommerce.modules.payment.entity.PaymentEntity;
 import com.hillcommerce.modules.payment.mapper.PaymentMapper;
 import com.hillcommerce.modules.recommendation.GorseFeedbackService;

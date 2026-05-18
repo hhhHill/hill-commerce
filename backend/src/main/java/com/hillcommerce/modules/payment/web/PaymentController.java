@@ -1,9 +1,9 @@
 package com.hillcommerce.modules.payment.web;
 
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentAttemptResponse;
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentActionResponse;
-import static com.hillcommerce.modules.payment.web.PaymentDtos.CloseExpiredPaymentsResponse;
-import static com.hillcommerce.modules.payment.web.PaymentDtos.PaymentOrderResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentAttemptResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentActionResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.CloseExpiredPaymentsResponse;
+import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentOrderResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;

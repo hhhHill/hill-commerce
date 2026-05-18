@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.ProductRankItem;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.ProductRankingResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.ProductRankItem;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.ProductRankingResponse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

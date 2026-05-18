@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.order.web;
 
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CreateOrderResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CreateOrderResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;

@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.product.web;
 
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.CategoryRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.CategoryResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.CategoryRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.CategoryResponse;
 
 import java.util.List;
 

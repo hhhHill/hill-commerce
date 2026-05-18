@@ -1,8 +1,8 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.CreateSalesRequest;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.SalesUserResponse;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.UserActionResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateSalesRequest;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.UserActionResponse;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

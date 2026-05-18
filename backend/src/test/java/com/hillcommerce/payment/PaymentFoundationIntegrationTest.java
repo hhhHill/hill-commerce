@@ -17,7 +17,7 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import com.hillcommerce.modules.order.entity.OrderEntity;
 import com.hillcommerce.modules.order.mapper.OrderMapper;
-import com.hillcommerce.modules.order.service.OrderStatus;
+import com.hillcommerce.modules.order.enums.OrderStatus;
 import com.hillcommerce.modules.payment.entity.PaymentEntity;
 import com.hillcommerce.modules.payment.mapper.PaymentMapper;
 

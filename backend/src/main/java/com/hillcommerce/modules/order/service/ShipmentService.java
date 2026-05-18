@@ -1,20 +1,22 @@
 package com.hillcommerce.modules.order.service;
 
-import static com.hillcommerce.modules.order.web.OrderCenterDtos.OrderListQuery;
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutAddressResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderDetailResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderItemResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderStatusHistoryResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.AdminOrderListItemResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.AdminOrderListResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.AutoCompleteResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ConfirmReceiptResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ShipOrderResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ShipmentInfoResponse;
+import static com.hillcommerce.modules.order.dto.OrderCenterDtos.OrderListQuery;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutAddressResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderDetailResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderItemResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderStatusHistoryResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.AdminOrderListItemResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.AdminOrderListResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.AutoCompleteResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ConfirmReceiptResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipmentInfoResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.hillcommerce.modules.order.enums.OrderStatus;
+import com.hillcommerce.modules.order.enums.ShipmentStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

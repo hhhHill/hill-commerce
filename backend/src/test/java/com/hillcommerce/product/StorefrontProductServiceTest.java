@@ -28,9 +28,9 @@ import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 import com.hillcommerce.modules.product.service.StorefrontProductService;
-import com.hillcommerce.modules.product.web.StorefrontProductDtos.PagedResponse;
-import com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductCardResponse;
-import com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductDetailResponse;
+import com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
+import com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
+import com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductDetailResponse;
 
 class StorefrontProductServiceTest {
 

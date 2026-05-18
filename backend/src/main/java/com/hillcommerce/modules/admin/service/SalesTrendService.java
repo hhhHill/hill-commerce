@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendPoint;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendPoint;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

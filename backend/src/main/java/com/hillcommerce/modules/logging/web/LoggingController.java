@@ -1,12 +1,12 @@
 package com.hillcommerce.modules.logging.web;
 
-import static com.hillcommerce.modules.logging.web.LoggingDtos.LoginLogEntry;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.LoginLogListResult;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.OperationLogEntry;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.OperationLogListResult;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.ProductViewLogEntry;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.ProductViewLogListResult;
-import static com.hillcommerce.modules.logging.web.LoggingDtos.ViewLogRequest;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.LoginLogEntry;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.LoginLogListResult;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.OperationLogEntry;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.OperationLogListResult;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.ProductViewLogEntry;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.ProductViewLogListResult;
+import static com.hillcommerce.modules.logging.dto.LoggingDtos.ViewLogRequest;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

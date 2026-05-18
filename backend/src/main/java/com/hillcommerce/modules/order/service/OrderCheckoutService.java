@@ -1,24 +1,22 @@
 package com.hillcommerce.modules.order.service;
 
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutAddressResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutItemResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutSummaryMetaResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CreateOrderResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutAddressResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutItemResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutSummaryMetaResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CreateOrderResponse;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hillcommerce.modules.order.enums.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.hillcommerce.modules.cart.entity.CartItemEntity;
 import com.hillcommerce.modules.cart.mapper.CartItemMapper;
 import com.hillcommerce.modules.cart.service.CartService;
-import com.hillcommerce.modules.cart.web.CartDtos;
+import com.hillcommerce.modules.cart.dto.CartDtos;
 import com.hillcommerce.modules.common.infrastructure.BusinessIdGenerator;
 import com.hillcommerce.modules.common.infrastructure.NumberPrefix;
 import com.hillcommerce.modules.order.entity.OrderEntity;
@@ -141,28 +139,21 @@ public class OrderCheckoutService {
         OrderEntity order = buildOrder(userId, checkoutSummary);
         orderMapper.insert(order);
 
+        /**
+         * 检查库存，库存不足则回滚
+         */
         for (CartDtos.CheckoutItemResponse item : checkoutSummary.items()) {
             UpdateWrapper<ProductSkuEntity> updateWrapper = new UpdateWrapper<>();
             updateWrapper.eq("id",  item.skuId())
+                    .ge("stock", item.quantity())
                     .setDecrBy(true, "stock", item.quantity());
             int updated = productSkuMapper.update(null, updateWrapper);
             if (updated == 0) {
                 throw new IllegalArgumentException("Insufficient stock for SKU: " + item.skuId());
             }
 
-            OrderItemEntity orderItem = new OrderItemEntity();
-            orderItem.setOrderId(order.getId());
-            orderItem.setProductId(item.productId());
-            orderItem.setSkuId(item.skuId());
-            orderItem.setProductNameSnapshot(item.productName());
-            orderItem.setSkuCodeSnapshot(item.skuCode());
-            orderItem.setSkuAttrTextSnapshot(item.skuSpecText());
-            orderItem.setProductImageSnapshot(item.productCoverImageUrl());
-            orderItem.setUnitPrice(item.unitPrice());
-            orderItem.setQuantity(item.quantity());
-            orderItem.setSubtotalAmount(item.subtotalAmount());
+            OrderItemEntity orderItem = buildOrderItem(order, item);
             orderItemMapper.insert(orderItem);
-
             cartItemMapper.deleteById(item.id());
         }
 
@@ -199,5 +190,28 @@ public class OrderCheckoutService {
         order.setAddressSnapshotDetail(address.detailAddress());
         order.setAddressSnapshotPostalCode(address.postalCode());
         return order;
+    }
+
+    /**
+     * 构建订单商品实体
+     * @param order
+     * @param item
+     * @return
+     */
+    private OrderItemEntity buildOrderItem(OrderEntity order, CartDtos.CheckoutItemResponse item) {
+        OrderItemEntity orderItem = new OrderItemEntity();
+
+        orderItem.setOrderId(order.getId());
+        orderItem.setProductId(item.productId());
+        orderItem.setSkuId(item.skuId());
+        orderItem.setProductNameSnapshot(item.productName());
+        orderItem.setSkuCodeSnapshot(item.skuCode());
+        orderItem.setSkuAttrTextSnapshot(item.skuSpecText());
+        orderItem.setProductImageSnapshot(item.productCoverImageUrl());
+        orderItem.setUnitPrice(item.unitPrice());
+        orderItem.setQuantity(item.quantity());
+        orderItem.setSubtotalAmount(item.subtotalAmount());
+
+        return orderItem;
     }
 }

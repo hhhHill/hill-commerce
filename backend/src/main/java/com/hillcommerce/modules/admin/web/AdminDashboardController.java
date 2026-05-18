@@ -1,6 +1,6 @@
 package com.hillcommerce.modules.admin.web;
 
-import static com.hillcommerce.modules.admin.web.AdminDashboardDtos.DashboardSummaryResponse;
+import static com.hillcommerce.modules.admin.dto.AdminDashboardDtos.DashboardSummaryResponse;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;

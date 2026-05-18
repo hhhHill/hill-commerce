@@ -253,7 +253,7 @@ git commit -m "feat: add analytics entity classes and mappers"
 ### Task 3: DTO records
 
 **Files:**
-- Create: `backend/src/main/java/com/hillcommerce/modules/admin/web/AdminAnalyticsDtos.java`
+- Create: `backend/src/main/java/com/hillcommerce/modules/admin/dto/AdminAnalyticsDtos.java`
 
 - [X] **Step 1: 编写所有 DTO**
 
@@ -518,8 +518,8 @@ git commit -m "feat: add analytics aggregation scheduler"
 ```java
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendPoint;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendPoint;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

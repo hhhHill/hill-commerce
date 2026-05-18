@@ -20,7 +20,7 @@ import com.hillcommerce.modules.order.mapper.OrderItemMapper;
 import com.hillcommerce.modules.order.mapper.OrderMapper;
 import com.hillcommerce.modules.order.mapper.OrderStatusHistoryMapper;
 import com.hillcommerce.modules.order.service.OrderNumberGenerator;
-import com.hillcommerce.modules.order.service.OrderStatus;
+import com.hillcommerce.modules.order.enums.OrderStatus;
 import com.hillcommerce.modules.user.service.PasswordService;
 
 @SpringBootTest

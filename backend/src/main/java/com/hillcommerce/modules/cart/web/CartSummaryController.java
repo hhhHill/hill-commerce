@@ -1,6 +1,6 @@
 package com.hillcommerce.modules.cart.web;
 
-import static com.hillcommerce.modules.cart.web.CartDtos.CheckoutSummaryResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CheckoutSummaryResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

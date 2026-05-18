@@ -1,12 +1,12 @@
 package com.hillcommerce.modules.product.service;
 
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.CategorySummaryResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.PagedResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductCardResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductDetailResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductSkuResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.SalesAttributeResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.SalesAttributeValueResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.CategorySummaryResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductDetailResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductSkuResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.SalesAttributeResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.SalesAttributeValueResponse;
 
 import java.math.BigDecimal;
 import java.util.Collection;

@@ -1,21 +1,21 @@
 package com.hillcommerce.modules.product.service;
 
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.CategoryRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.CategoryResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductAttributeRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductAttributeResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductImageRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductImageResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSalesAttributeRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSalesAttributeResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSalesAttributeValueRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSalesAttributeValueResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSkuRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSkuResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductStatusRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSummaryResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.CategoryRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.CategoryResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductAttributeRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductAttributeResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductImageRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductImageResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSalesAttributeRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSalesAttributeResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSalesAttributeValueRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSalesAttributeValueResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSkuRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSkuResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductStatusRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSummaryResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

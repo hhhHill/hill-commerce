@@ -1,8 +1,8 @@
 package com.hillcommerce.modules.user.web;
 
-import static com.hillcommerce.modules.user.web.AuthDtos.AuthUserResponse;
-import static com.hillcommerce.modules.user.web.AuthDtos.LoginRequest;
-import static com.hillcommerce.modules.user.web.AuthDtos.RegisterRequest;
+import static com.hillcommerce.modules.user.dto.AuthDtos.AuthUserResponse;
+import static com.hillcommerce.modules.user.dto.AuthDtos.LoginRequest;
+import static com.hillcommerce.modules.user.dto.AuthDtos.RegisterRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

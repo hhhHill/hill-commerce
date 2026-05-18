@@ -1,12 +1,12 @@
 package com.hillcommerce.modules.order.web;
 
-import static com.hillcommerce.modules.order.web.OrderCenterDtos.OrderListQuery;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderDetailResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.AdminOrderListResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.AutoCompleteResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ConfirmReceiptResponse;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ShipOrderRequest;
-import static com.hillcommerce.modules.order.web.ShipmentDtos.ShipOrderResponse;
+import static com.hillcommerce.modules.order.dto.OrderCenterDtos.OrderListQuery;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderDetailResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.AdminOrderListResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.AutoCompleteResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ConfirmReceiptResponse;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderRequest;
+import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 

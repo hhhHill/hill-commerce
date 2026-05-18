@@ -1,13 +1,13 @@
 package com.hillcommerce.modules.cart.service;
 
-import static com.hillcommerce.modules.cart.web.CartDtos.CartItemResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CartMutationResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CartResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CartSummaryResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CheckoutAddressResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CheckoutItemResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CheckoutSummaryMetaResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CheckoutSummaryResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartItemResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartMutationResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartSummaryResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CheckoutAddressResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CheckoutItemResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CheckoutSummaryMetaResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CheckoutSummaryResponse;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -387,12 +387,12 @@ public class CartService {
     }
 
     private Map<Long, ProductEntity> loadProductMap(Collection<Long> productIds) {
-        return productMapper.selectBatchIds(productIds).stream()
+        return productMapper.selectByIds(productIds).stream()
             .collect(Collectors.toMap(ProductEntity::getId, Function.identity(), (left, right) -> left, LinkedHashMap::new));
     }
 
     private Map<Long, ProductSkuEntity> loadSkuMap(Collection<Long> skuIds) {
-        return productSkuMapper.selectBatchIds(skuIds).stream()
+        return productSkuMapper.selectByIds(skuIds).stream()
             .collect(Collectors.toMap(ProductSkuEntity::getId, Function.identity(), (left, right) -> left, LinkedHashMap::new));
     }
 

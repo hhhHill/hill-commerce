@@ -5,6 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.ProductRankingResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileDetail;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -13,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,10 +26,6 @@ import com.hillcommerce.modules.admin.service.AnomalyDetectionService;
 import com.hillcommerce.modules.admin.service.ProductRankingService;
 import com.hillcommerce.modules.admin.service.SalesTrendService;
 import com.hillcommerce.modules.admin.service.UserProfileService;
-import com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AnomalyItem;
-import com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.ProductRankingResponse;
-import com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendResponse;
-import com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.UserProfileDetail;
 
 class AdminAnalyticsServiceTest {
 
@@ -47,7 +47,7 @@ class AdminAnalyticsServiceTest {
             .thenReturn(List.of(new BigDecimal("100.00"), new BigDecimal("101.00"), new BigDecimal("99.00"), new BigDecimal("100.00")));
 
         AnomalyDetectionService service = new AnomalyDetectionService(jdbcTemplate);
-        List<AnomalyItem> anomalies = service.detectLatest();
+        List<AdminAnalyticsDtos.AnomalyItem> anomalies = service.detectLatest();
 
         assertThat(anomalies).hasSize(1);
         assertThat(anomalies.getFirst().direction()).isEqualTo("high");

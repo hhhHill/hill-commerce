@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.order.web;
 
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderDetailResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CancelOrderResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderDetailResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CancelOrderResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.order.web;
 
-import static com.hillcommerce.modules.order.web.OrderCenterDtos.OrderListQuery;
-import static com.hillcommerce.modules.order.web.OrderCenterDtos.OrderListResponse;
+import static com.hillcommerce.modules.order.dto.OrderCenterDtos.OrderListQuery;
+import static com.hillcommerce.modules.order.dto.OrderCenterDtos.OrderListResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

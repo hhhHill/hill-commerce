@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.user.service;
 
-import static com.hillcommerce.modules.user.web.UserAddressDtos.UserAddressRequest;
-import static com.hillcommerce.modules.user.web.UserAddressDtos.UserAddressResponse;
+import static com.hillcommerce.modules.user.dto.UserAddressDtos.UserAddressRequest;
+import static com.hillcommerce.modules.user.dto.UserAddressDtos.UserAddressResponse;
 
 import java.util.List;
 

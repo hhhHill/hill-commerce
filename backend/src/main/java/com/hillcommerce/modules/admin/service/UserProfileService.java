@@ -1,11 +1,11 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AggregateProfileResponse;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.CategoryPreference;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.PurchasingPowerTier;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.RegionDistribution;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.UserProfileDetail;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.UserProfileSummary;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AggregateProfileResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.CategoryPreference;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.PurchasingPowerTier;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.RegionDistribution;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileDetail;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileSummary;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

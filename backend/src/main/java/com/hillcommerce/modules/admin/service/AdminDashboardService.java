@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminDashboardDtos.DashboardSummaryResponse;
-import static com.hillcommerce.modules.admin.web.AdminDashboardDtos.SalesRankItem;
+import static com.hillcommerce.modules.admin.dto.AdminDashboardDtos.DashboardSummaryResponse;
+import static com.hillcommerce.modules.admin.dto.AdminDashboardDtos.SalesRankItem;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;

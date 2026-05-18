@@ -1,9 +1,9 @@
 package com.hillcommerce.modules.product.web;
 
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductResponse;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductStatusRequest;
-import static com.hillcommerce.modules.product.web.ProductAdminDtos.ProductSummaryResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductResponse;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductStatusRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSummaryResponse;
 
 import java.util.List;
 

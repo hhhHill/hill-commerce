@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AnomalyItem;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AnomalyStatusResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AnomalyItem;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AnomalyStatusResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class AnomalyDetectionService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<AnomalyItem> detectLatest() {
+    public List<AdminAnalyticsDtos.AnomalyItem> detectLatest() {
         List<HourlySnapshot> latest = jdbcTemplate.query(
             """
             select snapshot_hour, order_count, total_amount

@@ -1,9 +1,9 @@
 package com.hillcommerce.modules.cart.web;
 
-import static com.hillcommerce.modules.cart.web.CartDtos.AddCartItemRequest;
-import static com.hillcommerce.modules.cart.web.CartDtos.CartMutationResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.CartResponse;
-import static com.hillcommerce.modules.cart.web.CartDtos.UpdateCartItemRequest;
+import static com.hillcommerce.modules.cart.dto.CartDtos.AddCartItemRequest;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartMutationResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.CartResponse;
+import static com.hillcommerce.modules.cart.dto.CartDtos.UpdateCartItemRequest;
 
 import jakarta.validation.Valid;
 

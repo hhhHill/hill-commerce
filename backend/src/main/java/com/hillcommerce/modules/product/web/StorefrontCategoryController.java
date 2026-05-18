@@ -1,8 +1,8 @@
 package com.hillcommerce.modules.product.web;
 
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.CategorySummaryResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.PagedResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductCardResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.CategorySummaryResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
 
 import java.util.List;
 

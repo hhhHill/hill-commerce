@@ -1,13 +1,14 @@
 package com.hillcommerce.modules.order.service;
 
-import static com.hillcommerce.modules.order.web.OrderDtos.CheckoutAddressResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.CancelOrderResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderDetailResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderItemResponse;
-import static com.hillcommerce.modules.order.web.OrderDtos.OrderStatusHistoryResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CheckoutAddressResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.CancelOrderResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderDetailResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderItemResponse;
+import static com.hillcommerce.modules.order.dto.OrderDtos.OrderStatusHistoryResponse;
 
 import java.util.List;
 
+import com.hillcommerce.modules.order.enums.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

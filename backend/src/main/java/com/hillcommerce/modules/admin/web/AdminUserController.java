@@ -1,10 +1,10 @@
 package com.hillcommerce.modules.admin.web;
 
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.CreateSalesRequest;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.ResetPasswordRequest;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.SalesUserListResponse;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.SalesUserResponse;
-import static com.hillcommerce.modules.admin.web.AdminUserDtos.UserActionResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateSalesRequest;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.ResetPasswordRequest;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserListResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.UserActionResponse;
 
 import jakarta.validation.Valid;
 

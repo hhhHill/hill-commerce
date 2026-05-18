@@ -1,12 +1,12 @@
 package com.hillcommerce.modules.admin.web;
 
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AggregateProfileResponse;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AnomalyItem;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.AnomalyStatusResponse;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.ProductRankingResponse;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.TrendResponse;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.UserProfileDetail;
-import static com.hillcommerce.modules.admin.web.AdminAnalyticsDtos.UserProfileSummary;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AggregateProfileResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AnomalyItem;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AnomalyStatusResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.ProductRankingResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileDetail;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileSummary;
 
 import java.time.LocalDate;
 import java.util.List;

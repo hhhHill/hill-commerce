@@ -1,8 +1,8 @@
 package com.hillcommerce.modules.product.web;
 
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.PagedResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductCardResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductDetailResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductDetailResponse;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

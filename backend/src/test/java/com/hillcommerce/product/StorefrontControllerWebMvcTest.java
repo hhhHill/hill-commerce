@@ -9,11 +9,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.CategorySummaryResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.PagedResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductCardResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductDetailResponse;
-import static com.hillcommerce.modules.product.web.StorefrontProductDtos.ProductSkuResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.CategorySummaryResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductDetailResponse;
+import static com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductSkuResponse;
 
 import java.math.BigDecimal;
 import java.util.List;

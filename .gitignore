@@ -1,23 +1,29 @@
+# =========================================================
+# IDE
+# =========================================================
 .idea/
 .vscode/
 *.iml
 
+# =========================================================
+# Environment Variables
+# =========================================================
 .env
 .env.local
 .env.*.local
 
+# =========================================================
+# Java / Maven / SpringBoot
+# =========================================================
+target/
 **/target/
-backend/target/
-backend/.mvn/
-backend/*.log
-backend/boot-debug*.log
 
-frontend/next-app/.next/
-frontend/next-app/out/
-frontend/next-app/node_modules/
-frontend/next-app/.turbo/
-frontend/next-app/coverage/
-frontend/next-app/tsconfig.tsbuildinfo
+.mvn/
+backend/.mvn/
+
+*.class
+*.jar
+*.war
 
 logs/
 *.log
@@ -25,11 +31,59 @@ logs/
 *.err
 *.pid
 
+boot-debug*.log
+
+# =========================================================
+# SpringBoot Config
+# =========================================================
+application-local.yml
+application-dev.yml
+
+# =========================================================
+# Frontend / Next.js
+# =========================================================
+node_modules/
+.next/
+out/
 dist/
-build/
 coverage/
+
+.turbo/
+tsconfig.tsbuildinfo
+
+frontend/next-app/node_modules/
+frontend/next-app/.next/
+frontend/next-app/out/
+frontend/next-app/.turbo/
+frontend/next-app/coverage/
+frontend/next-app/tsconfig.tsbuildinfo
+
+# =========================================================
+# Build / Temp
+# =========================================================
+build/
 tmp/
 temp/
+.cache/
 
+# =========================================================
+# OS
+# =========================================================
 .DS_Store
 Thumbs.db
+
+# =========================================================
+# AI Coding Tools
+# =========================================================
+.agents/
+.claude/
+.specify/
+.superpowers/
+
+# =========================================================
+# Secrets / Certificates
+# =========================================================
+*.pem
+*.key
+*.crt
+*.p12

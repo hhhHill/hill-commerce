@@ -2,20 +2,21 @@
 
 :root {
   --bg-page: #f5f5f5;
+  --bg-section: #f7f7f7;
   --bg-surface: #ffffff;
   --bg-warm: #fefaf5;
   --bg-admin: #ffffff;
-  --brand-primary: #ff4d1e;
-  --brand-gradient: linear-gradient(135deg, #ff6b35 0%, #ff3d00 100%);
-  --brand-deep: #d6380e;
-  --price: #ff3d00;
+  --brand-primary: #ff5000;
+  --brand-gradient: linear-gradient(135deg, #ff6b35 0%, #ff5000 100%);
+  --brand-deep: #e04a00;
+  --price: #ff5000;
   --price-strike: #999999;
-  --text-primary: #1a1a1a;
+  --text-primary: #222222;
   --text-secondary: #666666;
   --text-hint: #999999;
   --text-inverse: #ffffff;
   --border-light: #f0f0f0;
-  --border-normal: #e8e8e8;
+  --border-normal: #ebebeb;
   --font-body: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
   --font-price: "DIN Alternate", "PingFang SC", sans-serif;
   --background: var(--bg-page);
@@ -36,14 +37,8 @@ body {
   font-family: var(--font-body);
 }
 
-button,
 a {
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    background-color 160ms ease;
+  transition: color 160ms ease, background-color 160ms ease;
 }
 
 @layer components {
@@ -52,29 +47,30 @@ a {
   }
 
   .page-stack {
-    @apply mx-auto flex max-w-[1200px] flex-col gap-4;
+    @apply mx-auto flex max-w-[1600px] flex-col gap-4;
+  }
+
+  .section-flat {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-normal);
+  }
+
+  .section-gray {
+    background: var(--bg-section);
   }
 
   .surface-card {
     background: var(--bg-surface);
     border: 1px solid var(--border-normal);
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
-
-  .surface-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
   }
 
   .surface-subtle {
     background: var(--bg-warm);
     border: 1px solid var(--border-light);
-    border-radius: 8px;
   }
 
   .chip-badge {
-    @apply inline-flex items-center rounded-[4px] px-2 py-1 text-xs font-semibold;
+    @apply inline-flex items-center rounded-[2px] px-1.5 py-0.5 text-[10px] font-semibold;
     background: #fff2ec;
     color: var(--brand-deep);
   }
@@ -82,29 +78,28 @@ a {
   .btn-primary,
   .btn-secondary,
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold;
-    border-radius: 24px;
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold;
+    border-radius: 2px;
+    transition: background-color 160ms ease, opacity 160ms ease;
   }
 
   .btn-primary {
-    background: var(--brand-gradient);
+    background: var(--brand-primary);
     color: var(--text-inverse);
-    box-shadow: 0 8px 18px rgba(255, 77, 30, 0.18);
-  }
-
-  .btn-primary:active,
-  .btn-secondary:active,
-  .btn-ghost:active {
-    transform: scale(0.97);
   }
 
   .btn-primary:hover {
-    box-shadow: 0 10px 24px rgba(255, 77, 30, 0.24);
+    background: var(--brand-deep);
   }
 
   .btn-secondary {
     background: var(--bg-surface);
-    border: 1px solid rgba(255, 77, 30, 0.28);
+    border: 1px solid var(--border-normal);
+    color: var(--text-primary);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--brand-primary);
     color: var(--brand-primary);
   }
 
@@ -112,10 +107,22 @@ a {
     color: var(--text-secondary);
   }
 
+  .btn-ghost:hover {
+    color: var(--text-primary);
+  }
+
   .btn-disabled {
     @apply cursor-not-allowed;
     background: #d9d9d9;
     color: #ffffff;
-    box-shadow: none;
+  }
+
+  .nav-link {
+    @apply text-sm font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--brand-primary)];
+  }
+
+  .nav-link-active {
+    color: var(--brand-primary);
+    font-weight: 700;
   }
 }

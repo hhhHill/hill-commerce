@@ -11,19 +11,20 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
   const items = buildHomepageCategoryItems(categories);
 
   return (
-    <section className="md:sticky md:top-24 md:self-start">
-      <div className="hidden flex-col gap-2 rounded-lg border border-[var(--border-normal)] bg-white p-2 shadow-[0_2px_8px_rgba(0,0,0,0.04)] md:flex">
-        <div className="px-2 pb-1 pt-1">
+    <section>
+      {/* Desktop: vertical sidebar */}
+      <div className="hidden flex-col overflow-hidden rounded-xl bg-white md:flex">
+        <div className="border-b border-[var(--border-normal)] px-3 py-3">
           <h2 className="text-sm font-bold text-[var(--text-primary)]">全部分类</h2>
-          <p className="mt-0.5 text-[11px] text-[var(--text-hint)]">固定频道入口</p>
         </div>
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col">
           {items.map((item) => (
-            <CategoryLink className="min-h-9 px-2.5 py-2" item={item} key={item.name} />
+            <CategoryLink className="px-3 py-3" item={item} key={item.name} />
           ))}
         </nav>
       </div>
 
+      {/* Mobile: horizontal scroll */}
       <div className="md:hidden">
         <div className="-mx-3 overflow-x-auto px-3 [scrollbar-width:none]">
           <nav className="flex min-w-max gap-2">
@@ -45,14 +46,14 @@ type CategoryLinkProps = {
 function CategoryLink({ item, className }: CategoryLinkProps) {
   return (
     <BrowseEventLink
-      className={`group flex items-center justify-between gap-2 rounded-lg border border-transparent bg-white text-sm font-semibold text-[var(--text-primary)] transition hover:border-[#ffd5c2] hover:bg-[#fff2ec] hover:text-[#ff4400] ${className}`}
+      className={`group flex items-center justify-between gap-2 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[#fff2ec] hover:text-[var(--brand-primary)] ${className}`}
       eventName={STOREFRONT_BROWSE_EVENTS.categoryEnter}
       eventPayload={{ categoryId: item.categoryId ?? item.name, source: "category-directory" }}
       href={item.href}
     >
-      <span className="truncate">{item.name}</span>
-      <span className="text-[11px] font-medium text-[var(--text-hint)] group-hover:text-[#ff4400]">
-        {item.name === "其他分类" && item.unmatchedCount ? `${item.unmatchedCount}+` : "逛"}
+      <span className="truncate font-medium">{item.name}</span>
+      <span className="text-[11px] text-[var(--text-hint)] group-hover:text-[var(--brand-primary)]">
+        {item.name === "其他分类" && item.unmatchedCount ? `${item.unmatchedCount}+` : "›"}
       </span>
     </BrowseEventLink>
   );

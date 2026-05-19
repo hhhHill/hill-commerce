@@ -48,8 +48,8 @@ export function StorefrontProductList({
             ))}
           </div>
           {buildPageHref ? (
-            <div className="surface-card flex flex-wrap items-center justify-between gap-3 rounded-lg px-4 py-3">
-              <p className="text-sm text-[var(--text-secondary)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-normal)] bg-white px-4 py-3">
+              <p className="text-xs text-[var(--text-secondary)]">
                 第 {page} / {totalPages} 页
               </p>
               <div className="flex gap-3">

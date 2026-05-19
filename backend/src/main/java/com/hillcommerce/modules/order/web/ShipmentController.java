@@ -8,6 +8,8 @@ import static com.hillcommerce.modules.order.dto.ShipmentDtos.ConfirmReceiptResp
 import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderRequest;
 import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderResponse;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.order.service.ShipmentService;
@@ -72,18 +73,18 @@ public class ShipmentController {
 
     private Long requireUserId(Authentication authentication) {
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new IllegalStateException("Authenticated user is required");
+            throw new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED, "Authenticated user is required");
         }
         return principal.id();
     }
 
     private Long requireStaff(Authentication authentication) {
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new IllegalStateException("Authenticated user is required");
+            throw new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED, "Authenticated user is required");
         }
         boolean allowed = principal.roles().stream().anyMatch(role -> "ADMIN".equals(role) || "SALES".equals(role));
         if (!allowed) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+            throw new BusinessException(ErrorCode.FORBIDDEN, "Forbidden");
         }
         return principal.id();
     }

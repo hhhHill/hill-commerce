@@ -30,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 px-2 py-2">
+      <div className="flex flex-1 flex-col gap-1.5 px-2.5 py-2.5">
         <div className="flex min-h-5 flex-wrap gap-1 overflow-hidden">
           {view.tags.slice(0, 3).map((tag) => (
             <span
@@ -41,15 +41,15 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           ))}
         </div>
-        <span className="line-clamp-2 min-h-9 text-[13px] leading-[18px] text-[var(--text-primary)]">
+        <span className="line-clamp-2 min-h-[40px] text-sm leading-[20px] text-[var(--text-primary)]">
           {product.name}
         </span>
         <div className="flex min-w-0 items-end gap-1.5">
           {product.salePrice ? (
             <>
               <p className="min-w-0 leading-none text-[var(--price)]" style={{ fontFamily: "var(--font-price)" }}>
-                <span className="align-baseline text-xs font-bold">¥</span>
-                <span className="text-[20px] font-extrabold tracking-normal">{view.price}</span>
+                <span className="align-baseline text-sm font-bold">¥</span>
+                <span className="text-[22px] font-extrabold tracking-normal">{view.price}</span>
               </p>
               {view.originalPrice ? (
                 <span className="pb-0.5 text-xs leading-none text-[var(--price-strike)] line-through">
@@ -58,10 +58,10 @@ export function ProductCard({ product }: ProductCardProps) {
               ) : null}
             </>
           ) : (
-            <p className="text-base font-bold leading-none text-[var(--price)]">{view.price}</p>
+            <p className="text-lg font-bold leading-none text-[var(--price)]">{view.price}</p>
           )}
         </div>
-        <div className="flex min-w-0 items-center gap-1 text-[11px] leading-4 text-[var(--text-hint)]">
+        <div className="flex min-w-0 items-center gap-1 text-xs leading-4 text-[var(--text-hint)]">
           <span className="shrink-0">{view.sales}</span>
           <span className="shrink-0">·</span>
           <span className="truncate">{view.shopName}</span>

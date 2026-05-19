@@ -9,10 +9,10 @@ import static com.hillcommerce.modules.order.dto.OrderDtos.OrderStatusHistoryRes
 import java.util.List;
 
 import com.hillcommerce.modules.order.enums.OrderStatus;
-import org.springframework.http.HttpStatus;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hillcommerce.modules.order.entity.OrderEntity;
@@ -50,7 +50,7 @@ public class OrderService {
     public OrderDetailResponse getOrder(Long userId, Long orderId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
 
         List<OrderItemResponse> items = orderItemMapper.selectList(
@@ -111,14 +111,14 @@ public class OrderService {
     public CancelOrderResponse cancelOrder(Long userId, Long orderId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
 
         if (OrderStatus.CANCELLED.name().equals(order.getOrderStatus())) {
             return new CancelOrderResponse(order.getId(), order.getOrderStatus());
         }
         if (!OrderStatus.PENDING_PAYMENT.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only pending payment orders can be cancelled");
+            throw new BusinessException(ErrorCode.ORDER_NOT_PENDING_PAYMENT, "Only pending payment orders can be cancelled");
         }
 
         List<OrderItemEntity> items = orderItemMapper.selectList(

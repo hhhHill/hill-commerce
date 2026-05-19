@@ -7,10 +7,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -115,7 +116,7 @@ public class UserAddressService {
     private UserAddressEntity requireOwnedAddress(Long userId, Long addressId) {
         UserAddressEntity entity = userAddressMapper.selectById(addressId);
         if (entity == null || !entity.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found");
+            throw new BusinessException(ErrorCode.ADDRESS_NOT_FOUND, "Address not found");
         }
         return entity;
     }

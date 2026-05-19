@@ -2,6 +2,8 @@ package com.hillcommerce.modules.logging.service;
 
 import org.springframework.stereotype.Service;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.logging.entity.LoginLogEntity;
 import com.hillcommerce.modules.logging.entity.OperationLogEntity;
 import com.hillcommerce.modules.logging.entity.ProductViewLogEntity;
@@ -74,7 +76,7 @@ public class LoggingService {
 
     public void recordProductView(Long userId, String anonymousId, Long productId, Long categoryId) {
         if (userId == null && (anonymousId == null || anonymousId.isBlank())) {
-            throw new IllegalArgumentException("anonymousId is required for anonymous view logs");
+            throw new BusinessException(ErrorCode.ANONYMOUS_ID_REQUIRED, "anonymousId is required for anonymous view logs");
         }
 
         ProductViewLogEntity entity = new ProductViewLogEntity();

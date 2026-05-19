@@ -36,8 +36,8 @@ export function StorefrontNav({ user, cartQuantity }: StorefrontNavProps) {
       <div className="hidden border-b border-[var(--border-normal)] bg-white/95 backdrop-blur md:block md:sticky md:top-0 md:z-40">
         <div className="mx-auto max-w-[1600px] px-2 py-3">
           <div className="flex gap-3">
-            {/* Left: logo area — 200px, mirrors sidebar width */}
-            <div className="hidden w-[200px] shrink-0 md:flex md:justify-center">
+            {/* Left: logo area — 260px, mirrors sidebar width */}
+            <div className="hidden w-[260px] shrink-0 md:flex md:justify-center">
               <Link href="/">
                 <img alt="Hill Commerce" className="h-12 w-auto" src="/images/logo_with_slogan.png" />
               </Link>
@@ -55,8 +55,8 @@ export function StorefrontNav({ user, cartQuantity }: StorefrontNavProps) {
               <SearchForm />
             </div>
 
-            {/* Right: user links — 200px on lg+, compact on md */}
-            <div className="hidden w-[200px] shrink-0 items-center justify-end gap-4 text-xs lg:flex">
+            {/* Right: user links — 260px on lg+, compact on md */}
+            <div className="hidden w-[260px] shrink-0 items-center justify-end gap-4 text-xs lg:flex">
               {user ? (
                 <>
                   <span className="text-[var(--text-secondary)]">
@@ -111,7 +111,7 @@ export function StorefrontNav({ user, cartQuantity }: StorefrontNavProps) {
       <nav className="hidden border-b border-[var(--border-normal)] bg-white md:block">
         <div className="mx-auto flex max-w-[1600px] px-2">
           {/* Spacer matching left sidebar width */}
-          <div className="hidden w-[200px] shrink-0 md:block" />
+          <div className="hidden w-[260px] shrink-0 md:block" />
           <div className="flex min-w-0 flex-1 gap-0">
             {NAV_ITEMS.map((item) => {
               const isActive =

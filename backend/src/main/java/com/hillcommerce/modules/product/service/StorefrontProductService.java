@@ -18,9 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hillcommerce.modules.product.entity.ProductCategoryEntity;
@@ -35,6 +33,9 @@ import com.hillcommerce.modules.product.mapper.ProductMapper;
 import com.hillcommerce.modules.product.mapper.ProductSalesAttributeMapper;
 import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
+
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 
 @Service
 public class StorefrontProductService {
@@ -190,7 +191,7 @@ public class StorefrontProductService {
     }
 
     private <T> T notFound() {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND, "Product not found");
     }
 
     private ProductEntity requireVisibleDetailProduct(Long productId) {
@@ -207,7 +208,7 @@ public class StorefrontProductService {
     private ProductCategoryEntity requireVisibleCategory(Long categoryId) {
         ProductCategoryEntity category = productCategoryMapper.selectById(categoryId);
         if (!isVisibleCategory(category)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, "Category not found");
         }
         return category;
     }

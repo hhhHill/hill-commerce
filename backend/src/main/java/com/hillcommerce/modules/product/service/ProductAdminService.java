@@ -50,6 +50,9 @@ import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 import com.hillcommerce.modules.recommendation.GorseCatalogSyncService;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
+
 @Service
 public class ProductAdminService {
 
@@ -133,7 +136,7 @@ public class ProductAdminService {
             new LambdaQueryWrapper<ProductEntity>()
                 .eq(ProductEntity::getCategoryId, categoryId));
         if (relatedProductCount > 0) {
-            throw new IllegalStateException("Category has been used by products");
+            throw new BusinessException(ErrorCode.CATEGORY_IN_USE, "Category has been used by products");
         }
 
         productCategoryMapper.deleteById(categoryId);
@@ -202,7 +205,7 @@ public class ProductAdminService {
                     .eq(ProductSkuEntity::getProductId, productId)
                     .eq(ProductSkuEntity::getDeleted, false));
             if (skuCount == 0) {
-                throw new IllegalStateException("At least one SKU is required before putting product on shelf");
+                throw new BusinessException(ErrorCode.AT_LEAST_ONE_SKU_REQUIRED, "At least one SKU is required before putting product on shelf");
             }
         }
 
@@ -233,7 +236,7 @@ public class ProductAdminService {
         validateProductRequest(productId, request);
         ProductCategoryEntity category = requireCategory(request.categoryId());
         if (!CATEGORY_STATUS_ENABLED.equals(category.getStatus())) {
-            throw new IllegalArgumentException("Category must be enabled");
+            throw new BusinessException(ErrorCode.CATEGORY_MUST_BE_ENABLED, "Category must be enabled");
         }
 
         ProductEntity product = productId == null ? new ProductEntity() : requireActiveProduct(productId);
@@ -275,7 +278,7 @@ public class ProductAdminService {
     private void validateCategoryRequest(CategoryRequest request, Long currentCategoryId) {
         String normalizedStatus = normalizeCategoryStatus(request.status());
         if (!Set.of(CATEGORY_STATUS_ENABLED, CATEGORY_STATUS_DISABLED).contains(normalizedStatus)) {
-            throw new IllegalArgumentException("Unsupported category status");
+            throw new BusinessException(ErrorCode.UNSUPPORTED_CATEGORY_STATUS, "Unsupported category status");
         }
 
         Long duplicateCount = productCategoryMapper.selectCount(
@@ -283,7 +286,7 @@ public class ProductAdminService {
                 .eq(ProductCategoryEntity::getName, request.name().trim())
                 .ne(currentCategoryId != null, ProductCategoryEntity::getId, currentCategoryId));
         if (duplicateCount > 0) {
-            throw new IllegalArgumentException("Category name already exists");
+            throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATE, "Category name already exists");
         }
     }
 
@@ -296,12 +299,12 @@ public class ProductAdminService {
                 .eq(ProductEntity::getDeleted, false)
                 .ne(productId != null, ProductEntity::getId, productId));
         if (duplicateSpuCount > 0) {
-            throw new IllegalArgumentException("SPU code already exists");
+            throw new BusinessException(ErrorCode.SPU_CODE_DUPLICATE, "SPU code already exists");
         }
 
         List<ProductSalesAttributeRequest> salesAttributes = request.salesAttributes() == null ? List.of() : request.salesAttributes();
         if (salesAttributes.size() > 2) {
-            throw new IllegalArgumentException("At most 2 sales attributes are allowed");
+            throw new BusinessException(ErrorCode.MAX_SALES_ATTRIBUTES_EXCEEDED, "At most 2 sales attributes are allowed");
         }
 
         for (ProductSalesAttributeRequest salesAttribute : salesAttributes) {
@@ -310,7 +313,7 @@ public class ProductAdminService {
                 .map(String::trim)
                 .collect(Collectors.toSet());
             if (uniqueValues.size() != salesAttribute.values().size()) {
-                throw new IllegalArgumentException("Sales attribute values must be unique");
+                throw new BusinessException(ErrorCode.SALES_ATTR_VALUES_NOT_UNIQUE, "Sales attribute values must be unique");
             }
         }
 
@@ -320,11 +323,11 @@ public class ProductAdminService {
             .map(String::trim)
             .collect(Collectors.toSet());
         if (uniqueKeys.size() != skus.size()) {
-            throw new IllegalArgumentException("SKU combinations must be unique");
+            throw new BusinessException(ErrorCode.SKU_COMBINATIONS_NOT_UNIQUE, "SKU combinations must be unique");
         }
 
         if (PRODUCT_STATUS_ON_SHELF.equals(normalizeProductStatus(request.status())) && skus.isEmpty()) {
-            throw new IllegalArgumentException("At least one SKU is required before putting product on shelf");
+            throw new BusinessException(ErrorCode.AT_LEAST_ONE_SKU_REQUIRED, "At least one SKU is required before putting product on shelf");
         }
 
         List<String> providedSkuCodes = skus.stream()
@@ -333,7 +336,7 @@ public class ProductAdminService {
             .map(String::trim)
             .toList();
         if (providedSkuCodes.size() != Set.copyOf(providedSkuCodes).size()) {
-            throw new IllegalArgumentException("SKU codes must be unique");
+            throw new BusinessException(ErrorCode.SKU_CODES_NOT_UNIQUE, "SKU codes must be unique");
         }
 
         for (String skuCode : providedSkuCodes) {
@@ -346,7 +349,7 @@ public class ProductAdminService {
 
             Long duplicateSkuCount = productSkuMapper.selectCount(duplicateSkuQuery);
             if (duplicateSkuCount > 0) {
-                throw new IllegalArgumentException("SKU code already exists");
+                throw new BusinessException(ErrorCode.SKU_CODE_DUPLICATE, "SKU code already exists");
             }
         }
     }
@@ -529,7 +532,7 @@ public class ProductAdminService {
     private ProductCategoryEntity requireCategory(Long categoryId) {
         ProductCategoryEntity category = productCategoryMapper.selectById(categoryId);
         if (category == null) {
-            throw new IllegalArgumentException("Category not found");
+            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, "Category not found");
         }
         return category;
     }
@@ -537,7 +540,7 @@ public class ProductAdminService {
     private ProductEntity requireActiveProduct(Long productId) {
         ProductEntity product = productMapper.selectById(productId);
         if (product == null || Boolean.TRUE.equals(product.getDeleted())) {
-            throw new IllegalArgumentException("Product not found");
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND, "Product not found");
         }
         return product;
     }
@@ -557,7 +560,7 @@ public class ProductAdminService {
     private String normalizeCategoryStatus(String status) {
         String normalizedStatus = status == null ? "" : status.trim();
         if (!Set.of(CATEGORY_STATUS_ENABLED, CATEGORY_STATUS_DISABLED).contains(normalizedStatus)) {
-            throw new IllegalArgumentException("Unsupported category status");
+            throw new BusinessException(ErrorCode.UNSUPPORTED_CATEGORY_STATUS, "Unsupported category status");
         }
         return normalizedStatus;
     }
@@ -565,7 +568,7 @@ public class ProductAdminService {
     private String normalizeProductStatus(String status) {
         String normalizedStatus = status == null ? "" : status.trim();
         if (!Set.of(PRODUCT_STATUS_DRAFT, PRODUCT_STATUS_ON_SHELF, PRODUCT_STATUS_OFF_SHELF).contains(normalizedStatus)) {
-            throw new IllegalArgumentException("Unsupported product status");
+            throw new BusinessException(ErrorCode.UNSUPPORTED_PRODUCT_STATUS, "Unsupported product status");
         }
         return normalizedStatus;
     }
@@ -573,7 +576,7 @@ public class ProductAdminService {
     private String normalizeSkuStatus(String status) {
         String normalizedStatus = status == null ? "" : status.trim();
         if (!Set.of(SKU_STATUS_ENABLED, SKU_STATUS_DISABLED).contains(normalizedStatus)) {
-            throw new IllegalArgumentException("Unsupported sku status");
+            throw new BusinessException(ErrorCode.UNSUPPORTED_SKU_STATUS, "Unsupported sku status");
         }
         return normalizedStatus;
     }

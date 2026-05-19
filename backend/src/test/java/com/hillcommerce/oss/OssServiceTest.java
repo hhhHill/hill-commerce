@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.ObjectMetadata;
+import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.modules.oss.config.OssProperties;
 import com.hillcommerce.modules.oss.dto.OssUploadResult;
 import com.hillcommerce.modules.oss.service.OssService;
@@ -27,7 +28,7 @@ class OssServiceTest {
         OssService service = new OssService(new OssProperties(), mock(OSS.class));
 
         assertThatThrownBy(() -> service.upload(stream("test"), "test.jpg", "products"))
-            .isInstanceOf(IllegalStateException.class)
+            .isInstanceOf(BusinessException.class)
             .hasMessageContaining("OSS not configured");
     }
 
@@ -78,7 +79,7 @@ class OssServiceTest {
         OssService service = new OssService(properties, ossMock);
 
         assertThatThrownBy(() -> service.upload(stream("data"), "test.jpg", "products"))
-            .isInstanceOf(IllegalStateException.class)
+            .isInstanceOf(BusinessException.class)
             .hasMessageContaining("Failed to upload file")
             .hasMessageContaining("Bucket not found");
     }

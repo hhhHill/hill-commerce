@@ -7,11 +7,11 @@ import static com.hillcommerce.modules.payment.dto.PaymentDtos.PaymentOrderRespo
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.payment.enums.PaymentStatus;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hillcommerce.modules.common.infrastructure.BusinessIdGenerator;
@@ -74,7 +74,7 @@ public class PaymentService {
     public PaymentAttemptResponse createOrReuseAttempt(Long userId, Long orderId) {
         OrderEntity order = requireOwnedOrder(userId, orderId);
         if (!OrderStatus.PENDING_PAYMENT.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only pending payment orders can create payment attempts");
+            throw new BusinessException(ErrorCode.ONLY_PENDING_PAYMENT_CAN_CREATE_PAYMENT, "Only pending payment orders can create payment attempts");
         }
 
         PaymentEntity existingAttempt = paymentMapper.selectOne(
@@ -109,13 +109,13 @@ public class PaymentService {
             return toActionResponse(payment, order);
         }
         if (!PaymentStatus.INITIATED.name().equals(payment.getPaymentStatus())) {
-            throw new IllegalArgumentException("Only initiated payment attempts can succeed");
+            throw new BusinessException(ErrorCode.ONLY_INITIATED_PAYMENT_CAN_SUCCEED, "Only initiated payment attempts can succeed");
         }
         if (OrderStatus.PAID.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Order is already paid");
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_PAID, "Order is already paid");
         }
         if (!OrderStatus.PENDING_PAYMENT.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only pending payment orders can be paid");
+            throw new BusinessException(ErrorCode.ONLY_PENDING_PAYMENT_CAN_CREATE_PAYMENT, "Only pending payment orders can be paid");
         }
 
         LocalDateTime paidAt = LocalDateTime.now();
@@ -149,13 +149,13 @@ public class PaymentService {
             return toActionResponse(payment, order);
         }
         if (PaymentStatus.SUCCESS.name().equals(payment.getPaymentStatus())) {
-            throw new IllegalArgumentException("Successful payment cannot be marked as failed");
+            throw new BusinessException(ErrorCode.SUCCESSFUL_PAYMENT_CANNOT_FAIL, "Successful payment cannot be marked as failed");
         }
         if (!PaymentStatus.INITIATED.name().equals(payment.getPaymentStatus())) {
-            throw new IllegalArgumentException("Only initiated payment attempts can fail");
+            throw new BusinessException(ErrorCode.ONLY_INITIATED_PAYMENT_CAN_FAIL, "Only initiated payment attempts can fail");
         }
         if (!OrderStatus.PENDING_PAYMENT.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only pending payment orders can fail");
+            throw new BusinessException(ErrorCode.ONLY_PENDING_PAYMENT_CAN_CREATE_PAYMENT, "Only pending payment orders can fail");
         }
 
         payment.setPaymentStatus(PaymentStatus.FAILED.name());
@@ -168,7 +168,7 @@ public class PaymentService {
     private OrderEntity requireOwnedOrder(Long userId, Long orderId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
         return order;
     }
@@ -176,7 +176,7 @@ public class PaymentService {
     private PaymentEntity requireOwnedPayment(Long userId, Long paymentId) {
         PaymentEntity payment = paymentMapper.selectById(paymentId);
         if (payment == null || payment.getUserId() == null || !payment.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found");
+            throw new BusinessException(ErrorCode.PAYMENT_NOT_FOUND, "Payment not found");
         }
         return payment;
     }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.user.entity.RoleEntity;
 import com.hillcommerce.modules.user.entity.UserEntity;
 import com.hillcommerce.modules.user.entity.UserRoleEntity;
@@ -61,13 +63,13 @@ public class UserAccountService {
             userMapper.insert(user);
         }
         catch (DuplicateKeyException exception) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "Email already exists");
         }
 
         RoleEntity customerRole = roleMapper.selectOne(
             new LambdaQueryWrapper<RoleEntity>().eq(RoleEntity::getCode, ROLE_CUSTOMER));
         if (customerRole == null) {
-            throw new IllegalStateException("Default customer role not found");
+            throw new BusinessException(ErrorCode.ROLE_NOT_FOUND, "Default customer role not found");
         }
 
         UserRoleEntity userRole = new UserRoleEntity();

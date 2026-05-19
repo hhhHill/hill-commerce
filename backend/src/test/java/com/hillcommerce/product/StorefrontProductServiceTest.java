@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 
 import com.hillcommerce.modules.product.entity.ProductCategoryEntity;
 import com.hillcommerce.modules.product.entity.ProductEntity;
@@ -99,9 +99,9 @@ class StorefrontProductServiceTest {
         assertThat(detail.detailImages()).containsExactly("https://img.example.com/archive-detail.jpg");
 
         assertThatThrownBy(() -> storefrontProductService.getProductDetail(12L))
-            .isInstanceOf(ResponseStatusException.class)
-            .extracting(exception -> ((ResponseStatusException) exception).getStatusCode())
-            .isEqualTo(HttpStatus.NOT_FOUND);
+            .isInstanceOf(BusinessException.class)
+            .extracting(exception -> ((BusinessException) exception).errorCode())
+            .isEqualTo(ErrorCode.PRODUCT_NOT_FOUND);
     }
 
     private ProductCategoryEntity category(Long id, String name, String status) {

@@ -5,7 +5,7 @@ import { ProductCard } from "@/features/storefront/catalog/product-card";
 import type { StorefrontProductCard } from "@/lib/storefront/types";
 
 type StorefrontProductListProps = {
-  title: string;
+  title?: string;
   products: StorefrontProductCard[];
   emptyDescription: string;
   page?: number;
@@ -29,20 +29,22 @@ export function StorefrontProductList({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      {title ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          </div>
+          <div className="chip-badge">
+            共 {total} 件商品
+          </div>
         </div>
-        <div className="chip-badge">
-          共 {total} 件商品
-        </div>
-      </div>
+      ) : null}
 
       {products.length === 0 ? (
         <EmptyState description={emptyDescription} title="暂时没有可展示商品" />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

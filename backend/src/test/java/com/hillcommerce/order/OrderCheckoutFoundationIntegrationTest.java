@@ -19,7 +19,8 @@ import com.hillcommerce.modules.order.entity.OrderStatusHistoryEntity;
 import com.hillcommerce.modules.order.mapper.OrderItemMapper;
 import com.hillcommerce.modules.order.mapper.OrderMapper;
 import com.hillcommerce.modules.order.mapper.OrderStatusHistoryMapper;
-import com.hillcommerce.modules.order.service.OrderNumberGenerator;
+import com.hillcommerce.modules.common.infrastructure.BusinessIdGenerator;
+import com.hillcommerce.modules.common.infrastructure.NumberPrefix;
 import com.hillcommerce.modules.order.enums.OrderStatus;
 import com.hillcommerce.modules.user.service.PasswordService;
 
@@ -56,7 +57,7 @@ class OrderCheckoutFoundationIntegrationTest {
     private OrderStatusHistoryMapper orderStatusHistoryMapper;
 
     @Autowired
-    private OrderNumberGenerator orderNumberGenerator;
+    private BusinessIdGenerator businessIdGenerator;
 
     @BeforeEach
     void cleanUp() {
@@ -85,7 +86,7 @@ class OrderCheckoutFoundationIntegrationTest {
         Long categoryId = createCategory("Order Foundation-Shirts");
         Long productId = createProduct(categoryId, "Order Foundation Tee", "ORDER-FOUNDATION-TEE");
         Long skuId = createSku(productId, "ORDER-FOUNDATION-001");
-        String orderNo = orderNumberGenerator.nextOrderNo();
+        String orderNo = businessIdGenerator.next(NumberPrefix.ORDER);
         LocalDateTime paymentDeadline = LocalDateTime.now().plusMinutes(30);
 
         OrderEntity order = new OrderEntity();

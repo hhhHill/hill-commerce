@@ -14,12 +14,12 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
     <section>
       {/* Desktop: vertical sidebar */}
       <div className="hidden flex-col overflow-hidden rounded-xl bg-white md:flex">
-        <div className="border-b border-[var(--border-normal)] px-3 py-3">
+        <div className="border-b border-[var(--border-normal)] px-3 py-2">
           <h2 className="text-sm font-bold text-[var(--text-primary)]">全部分类</h2>
         </div>
         <nav className="flex flex-col">
           {items.map((item) => (
-            <CategoryLink className="px-3 py-3" item={item} key={item.name} />
+            <CategoryLink className="px-3 py-1.5" item={item} key={item.name} />
           ))}
         </nav>
       </div>

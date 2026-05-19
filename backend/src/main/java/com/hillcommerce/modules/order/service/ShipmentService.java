@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.hillcommerce.modules.order.enums.OrderStatus;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.order.enums.ShipmentStatus;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -64,10 +64,10 @@ public class ShipmentService {
     public OrderDetailResponse getShipOrderDetail(Long orderId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
         if (!OrderStatus.PAID.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only paid orders can be shipped");
+            throw new BusinessException(ErrorCode.ONLY_PAID_ORDERS_CAN_BE_SHIPPED, "Only paid orders can be shipped");
         }
         return toOrderDetailResponse(order, null);
     }
@@ -102,17 +102,17 @@ public class ShipmentService {
     public ShipOrderResponse shipOrder(Long operatorUserId, Long orderId, String carrierName, String trackingNo) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
         if (!OrderStatus.PAID.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only paid orders can be shipped");
+            throw new BusinessException(ErrorCode.ONLY_PAID_ORDERS_CAN_BE_SHIPPED, "Only paid orders can be shipped");
         }
 
         String normalizedCarrierName = requireText(carrierName, "Carrier name is required");
         String normalizedTrackingNo = requireText(trackingNo, "Tracking number is required");
         ShipmentEntity existingShipment = findActiveShipment(orderId);
         if (existingShipment != null) {
-            throw new IllegalArgumentException("Order has already been shipped");
+            throw new BusinessException(ErrorCode.ORDER_ALREADY_SHIPPED, "Order has already been shipped");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -126,7 +126,7 @@ public class ShipmentService {
                 .eq(OrderEntity::getId, orderId)
                 .eq(OrderEntity::getOrderStatus, OrderStatus.PAID.name()));
         if (updated == 0) {
-            throw new IllegalArgumentException("Only paid orders can be shipped");
+            throw new BusinessException(ErrorCode.ONLY_PAID_ORDERS_CAN_BE_SHIPPED, "Only paid orders can be shipped");
         }
 
         ShipmentEntity shipment = new ShipmentEntity();
@@ -145,7 +145,7 @@ public class ShipmentService {
     public ConfirmReceiptResponse confirmReceipt(Long userId, Long orderId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
         }
 
         ShipmentEntity shipment = findLatestShipment(orderId);
@@ -156,10 +156,10 @@ public class ShipmentService {
                 shipment == null ? ShipmentStatus.DELIVERED.name() : shipment.getShipmentStatus());
         }
         if (!OrderStatus.SHIPPED.name().equals(order.getOrderStatus())) {
-            throw new IllegalArgumentException("Only shipped orders can be confirmed");
+            throw new BusinessException(ErrorCode.ONLY_SHIPPED_ORDERS_CAN_BE_CONFIRMED, "Only shipped orders can be confirmed");
         }
         if (shipment == null || !ShipmentStatus.SHIPPED.name().equals(shipment.getShipmentStatus())) {
-            throw new IllegalArgumentException("Shipment is not ready for receipt confirmation");
+            throw new BusinessException(ErrorCode.SHIPMENT_NOT_READY, "Shipment is not ready for receipt confirmation");
         }
 
         boolean completed = completeOrder(order, shipment, userId, USER_RECEIVED_REASON);
@@ -307,7 +307,7 @@ public class ShipmentService {
 
     private String requireText(String value, String message) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(message);
+            throw new BusinessException(ErrorCode.BAD_REQUEST, message);
         }
         return value.trim();
     }

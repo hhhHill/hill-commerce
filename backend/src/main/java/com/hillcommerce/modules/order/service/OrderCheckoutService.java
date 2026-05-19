@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.order.enums.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,7 +135,7 @@ public class OrderCheckoutService {
     public CreateOrderResponse createOrder(Long userId) {
         CartDtos.CheckoutSummaryResponse checkoutSummary = cartService.getCheckoutSummary(userId);
         if (!Boolean.TRUE.equals(checkoutSummary.summary().canProceed())) {
-            throw new IllegalArgumentException("Selected cart items are not ready for checkout");
+            throw new BusinessException(ErrorCode.CART_ITEM_NOT_READY_FOR_CHECKOUT, "Selected cart items are not ready for checkout");
         }
 
         OrderEntity order = buildOrder(userId, checkoutSummary);
@@ -149,7 +151,7 @@ public class OrderCheckoutService {
                     .setDecrBy(true, "stock", item.quantity());
             int updated = productSkuMapper.update(null, updateWrapper);
             if (updated == 0) {
-                throw new IllegalArgumentException("Insufficient stock for SKU: " + item.skuId());
+                throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK, "Insufficient stock for SKU: " + item.skuId());
             }
 
             OrderItemEntity orderItem = buildOrderItem(order, item);

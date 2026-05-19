@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.user.entity.RoleEntity;
 import com.hillcommerce.modules.user.entity.UserEntity;
 import com.hillcommerce.modules.user.entity.UserRoleEntity;
@@ -71,7 +73,7 @@ public class AdminUserService {
     public SalesUserResponse createSalesUser(CreateSalesRequest request) {
         String email = request.email().trim();
         if (existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "Email already exists");
         }
 
         UserEntity user = new UserEntity();
@@ -93,7 +95,7 @@ public class AdminUserService {
     @Transactional
     public UserActionResponse disableSalesUser(Long targetUserId, Long operatorUserId) {
         if (targetUserId.equals(operatorUserId)) {
-            throw new IllegalArgumentException("Admin cannot disable current user");
+            throw new BusinessException(ErrorCode.CANNOT_DISABLE_SELF, "Admin cannot disable current user");
         }
 
         UserEntity salesUser = requireSalesUser(targetUserId);
@@ -138,7 +140,7 @@ public class AdminUserService {
             new LambdaQueryWrapper<RoleEntity>()
                 .eq(RoleEntity::getCode, code));
         if (role == null) {
-            throw new IllegalStateException("Role not found: " + code);
+            throw new BusinessException(ErrorCode.ROLE_NOT_FOUND, "Role not found: " + code);
         }
         return role;
     }
@@ -146,12 +148,12 @@ public class AdminUserService {
     private UserEntity requireSalesUser(Long userId) {
         List<String> roles = userMapper.findRoleCodesByUserId(userId);
         if (!roles.contains(ROLE_SALES) || roles.contains("ADMIN")) {
-            throw new IllegalArgumentException("Sales user not found");
+            throw new BusinessException(ErrorCode.SALES_USER_NOT_FOUND, "Sales user not found");
         }
 
         UserEntity user = userMapper.selectById(userId);
         if (user == null) {
-            throw new IllegalArgumentException("Sales user not found");
+            throw new BusinessException(ErrorCode.SALES_USER_NOT_FOUND, "Sales user not found");
         }
         return user;
     }

@@ -19,10 +19,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hillcommerce.modules.cart.entity.CartEntity;
@@ -84,7 +85,7 @@ public class CartService {
     @Transactional
     public CartMutationResponse addItem(Long userId, Long skuId, Integer quantity) {
         if (quantity == null || quantity < 1) {
-            throw new IllegalArgumentException("Quantity must be at least 1");
+            throw new BusinessException(ErrorCode.QUANTITY_MUST_BE_AT_LEAST_1, "Quantity must be at least 1");
         }
 
         ProductSkuEntity sku = requirePurchasableSku(skuId);
@@ -119,10 +120,10 @@ public class CartService {
     @Transactional
     public CartMutationResponse updateItem(Long userId, Long itemId, Integer quantity, Boolean selected) {
         if (quantity == null || quantity < 1) {
-            throw new IllegalArgumentException("Quantity must be at least 1");
+            throw new BusinessException(ErrorCode.QUANTITY_MUST_BE_AT_LEAST_1, "Quantity must be at least 1");
         }
         if (selected == null) {
-            throw new IllegalArgumentException("Selected flag is required");
+            throw new BusinessException(ErrorCode.SELECTED_FLAG_REQUIRED, "Selected flag is required");
         }
 
         CartEntity cart = requireCart(userId);
@@ -164,7 +165,7 @@ public class CartService {
         CartItemView updatedItem = itemViews.stream()
             .filter(item -> item.response().id().equals(itemId))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("Cart item not found after update"));
+            .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND, "Cart item not found after update"));
         return new CartMutationResponse(updatedItem.response(), summarize(itemViews));
     }
 
@@ -175,7 +176,7 @@ public class CartService {
     private CartEntity requireCart(Long userId) {
         CartEntity cart = findCart(userId);
         if (cart == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found");
+            throw new BusinessException(ErrorCode.CART_NOT_FOUND, "Cart not found");
         }
         return cart;
     }
@@ -194,7 +195,7 @@ public class CartService {
     private CartItemEntity requireOwnedItem(Long cartId, Long itemId) {
         CartItemEntity item = cartItemMapper.selectById(itemId);
         if (item == null || !item.getCartId().equals(cartId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found");
+            throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND, "Cart item not found");
         }
         return item;
     }
@@ -202,7 +203,7 @@ public class CartService {
     private ProductEntity requirePurchasableProduct(Long productId) {
         ProductEntity product = productMapper.selectById(productId);
         if (product == null || Boolean.TRUE.equals(product.getDeleted()) || !PRODUCT_STATUS_ON_SHELF.equals(product.getStatus())) {
-            throw new IllegalArgumentException("Product is not available for cart");
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_AVAILABLE, "Product is not available for cart");
         }
         return product;
     }
@@ -210,7 +211,7 @@ public class CartService {
     private ProductSkuEntity requirePurchasableSku(Long skuId) {
         ProductSkuEntity sku = requireSku(skuId);
         if (Boolean.TRUE.equals(sku.getDeleted()) || !SKU_STATUS_ENABLED.equals(sku.getStatus())) {
-            throw new IllegalArgumentException("SKU is not available for cart");
+            throw new BusinessException(ErrorCode.SKU_NOT_AVAILABLE, "SKU is not available for cart");
         }
         return sku;
     }
@@ -218,7 +219,7 @@ public class CartService {
     private ProductSkuEntity requireSku(Long skuId) {
         ProductSkuEntity sku = productSkuMapper.selectById(skuId);
         if (sku == null) {
-            throw new IllegalArgumentException("SKU not found");
+            throw new BusinessException(ErrorCode.SKU_NOT_FOUND, "SKU not found");
         }
         return sku;
     }
@@ -226,7 +227,7 @@ public class CartService {
     private void validateRequestedQuantity(int quantity, ProductSkuEntity sku) {
         int stock = sku.getStock() == null ? 0 : sku.getStock();
         if (quantity > stock) {
-            throw new IllegalArgumentException("Quantity exceeds available stock");
+            throw new BusinessException(ErrorCode.QUANTITY_EXCEEDS_STOCK, "Quantity exceeds available stock");
         }
     }
 
@@ -247,7 +248,7 @@ public class CartService {
                 ProductEntity product = products.get(item.getProductId());
                 ProductSkuEntity sku = skus.get(item.getSkuId());
                 if (product == null || sku == null) {
-                    throw new IllegalStateException("Cart item references missing product data");
+                    throw new BusinessException(ErrorCode.CART_ITEM_MISSING_PRODUCT_DATA, "Cart item references missing product data");
                 }
                 BigDecimal unitPrice = sku.getPrice();
                 BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));

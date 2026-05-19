@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.order.enums.OrderStatus;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +98,7 @@ public class OrderCenterService {
             return DEFAULT_PAGE;
         }
         if (page < 1) {
-            throw new IllegalArgumentException("Page must be at least 1");
+            throw new BusinessException(ErrorCode.PAGE_MUST_BE_AT_LEAST_1, "Page must be at least 1");
         }
         return page;
     }
@@ -106,10 +108,10 @@ public class OrderCenterService {
             return DEFAULT_SIZE;
         }
         if (size < 1) {
-            throw new IllegalArgumentException("Size must be at least 1");
+            throw new BusinessException(ErrorCode.SIZE_MUST_BE_BETWEEN_1_AND_50, "Size must be at least 1");
         }
         if (size > MAX_SIZE) {
-            throw new IllegalArgumentException("Size must be at most 50");
+            throw new BusinessException(ErrorCode.SIZE_MUST_BE_BETWEEN_1_AND_50, "Size must be at most 50");
         }
         return size;
     }
@@ -120,7 +122,7 @@ public class OrderCenterService {
         }
         String normalized = status.trim().toUpperCase(Locale.ROOT);
         if (!ALLOWED_STATUSES.contains(normalized)) {
-            throw new IllegalArgumentException("Unsupported order status");
+            throw new BusinessException(ErrorCode.UNSUPPORTED_ORDER_STATUS, "Unsupported order status");
         }
         return normalized;
     }

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 import com.hillcommerce.modules.user.service.UserAddressService;
 
@@ -68,7 +70,7 @@ public class UserAddressController {
 
     private Long requireUserId(Authentication authentication) {
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new IllegalStateException("Authenticated user is required");
+            throw new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED, "Authenticated user is required");
         }
         return principal.id();
     }

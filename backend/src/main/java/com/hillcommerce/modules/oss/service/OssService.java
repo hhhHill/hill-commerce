@@ -14,6 +14,8 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import com.aliyun.oss.model.ObjectMetadata;
+import com.hillcommerce.framework.web.BusinessException;
+import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.oss.config.OssProperties;
 import com.hillcommerce.modules.oss.dto.OssUploadResult;
 
@@ -54,7 +56,7 @@ public class OssService {
             return new OssUploadResult(url, objectKey);
         } catch (Exception e) {
             log.error("Failed to upload to OSS: {}", objectKey, e);
-            throw new IllegalStateException("Failed to upload file: " + e.getMessage(), e);
+            throw new BusinessException(ErrorCode.UPLOAD_FAILED, "Failed to upload file: " + e.getMessage());
         }
     }
 
@@ -110,7 +112,7 @@ public class OssService {
                 || isBlank(properties.getRegion())
                 || isBlank(properties.getAccessKeyId())
                 || isBlank(properties.getAccessKeySecret())) {
-            throw new IllegalStateException(
+            throw new BusinessException(ErrorCode.OSS_NOT_CONFIGURED,
                 "OSS not configured: missing endpoint, bucket, region, access key id, or access key secret");
         }
     }

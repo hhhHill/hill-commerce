@@ -28,6 +28,7 @@ import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 import com.hillcommerce.modules.product.service.StorefrontProductService;
+import com.hillcommerce.modules.recommendation.GorseFeedbackService;
 import com.hillcommerce.modules.product.dto.StorefrontProductDtos.PagedResponse;
 import com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductCardResponse;
 import com.hillcommerce.modules.product.dto.StorefrontProductDtos.ProductDetailResponse;
@@ -50,13 +51,15 @@ class StorefrontProductServiceTest {
         productSalesAttributeMapper = mock(ProductSalesAttributeMapper.class);
         productSalesAttributeValueMapper = mock(ProductSalesAttributeValueMapper.class);
         productSkuMapper = mock(ProductSkuMapper.class);
+        GorseFeedbackService gorseFeedbackService = mock(GorseFeedbackService.class);
         storefrontProductService = new StorefrontProductService(
             productCategoryMapper,
             productMapper,
             productImageMapper,
             productSalesAttributeMapper,
             productSalesAttributeValueMapper,
-            productSkuMapper);
+            productSkuMapper,
+            gorseFeedbackService);
     }
 
     @Test

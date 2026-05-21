@@ -1,5 +1,10 @@
 package com.hillcommerce.modules.recommendation.web;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +30,7 @@ public class StorefrontRecommendationController {
     @GetMapping
     public RecommendationResponse recommendations(
         Authentication authentication,
+        HttpSession session,
         @RequestParam(defaultValue = "home") String type,
         @RequestParam(required = false) Long productId,
         @RequestParam(defaultValue = "0") int n
@@ -35,7 +41,7 @@ public class StorefrontRecommendationController {
         if ("detail".equals(type) && productId == null) {
             throw new BusinessException(ErrorCode.PRODUCT_ID_REQUIRED_FOR_DETAIL_RECOMMENDATION, "productId is required for detail recommendations");
         }
-        return recommendationService.recommend(type, productId, n, userId(authentication));
+        return recommendationService.recommend(type, productId, n, userId(authentication), recentCategories(session));
     }
 
     private Long userId(Authentication authentication) {
@@ -43,5 +49,17 @@ public class StorefrontRecommendationController {
             return principal.id();
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<Long> recentCategories(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
+        try {
+            return (LinkedHashSet<Long>) session.getAttribute("RECENT_CATEGORIES");
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 }

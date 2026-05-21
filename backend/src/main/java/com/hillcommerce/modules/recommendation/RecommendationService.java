@@ -4,9 +4,13 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +31,10 @@ public class RecommendationService {
     }
 
     public RecommendationResponse recommend(String type, Long productId, int n, Long userId) {
+        return recommend(type, productId, n, userId, null);
+    }
+
+    public RecommendationResponse recommend(String type, Long productId, int n, Long userId, Set<Long> recentCategories) {
         int limit = normalizeLimit(n, "detail".equals(type) ? 6 : 10);
         try {
             List<Long> ids = candidateIds(type, productId, limit, userId);
@@ -45,11 +53,53 @@ public class RecommendationService {
                 .distinct()
                 .limit(limit)
                 .toList();
+            filteredIds = boostRecentCategories(filteredIds, recentCategories);
             return new RecommendationResponse(loadProductCards(filteredIds));
         } catch (RuntimeException exception) {
             log.warn("Failed to load storefront recommendations", exception);
             return new RecommendationResponse(List.of());
         }
+    }
+
+    private List<Long> boostRecentCategories(List<Long> ids, Set<Long> recentCategories) {
+        if (recentCategories == null || recentCategories.isEmpty() || ids.size() <= 1) {
+            return ids;
+        }
+        Map<Long, Long> productCategoryMap = loadProductCategories(ids);
+        if (productCategoryMap.isEmpty()) {
+            return ids;
+        }
+        List<Long> boosted = new ArrayList<>();
+        List<Long> rest = new ArrayList<>();
+        for (Long id : ids) {
+            Long catId = productCategoryMap.get(id);
+            if (catId != null && recentCategories.contains(catId)) {
+                boosted.add(id);
+            } else {
+                rest.add(id);
+            }
+        }
+        if (boosted.isEmpty()) {
+            return ids;
+        }
+        boosted.addAll(rest);
+        return boosted;
+    }
+
+    private Map<Long, Long> loadProductCategories(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String placeholders = String.join(",", ids.stream().map(id -> "?").toList());
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+            "select id, category_id from products where id in (%s)".formatted(placeholders),
+            ids.toArray());
+        return rows.stream()
+            .collect(Collectors.toMap(
+                row -> ((Number) row.get("id")).longValue(),
+                row -> ((Number) row.get("category_id")).longValue(),
+                (a, b) -> a,
+                LinkedHashMap::new));
     }
 
     private List<Long> candidateIds(String type, Long productId, int limit, Long userId) {

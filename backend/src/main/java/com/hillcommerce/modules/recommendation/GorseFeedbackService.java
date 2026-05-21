@@ -1,6 +1,7 @@
 package com.hillcommerce.modules.recommendation;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,18 @@ public class GorseFeedbackService {
 
     public void fireAndForgetPurchase(Long userId, Long productId) {
         fireAndForget(userKey(userId, null), productId, "purchase");
+    }
+
+    public void fireAndForgetAddToCart(Long userId, Long productId) {
+        fireAndForget("user:" + userId, productId, "add_to_cart");
+    }
+
+    public void fireAndForgetSearch(Long userId, String anonymousId, List<Long> productIds) {
+        String userKey = userKey(userId, anonymousId);
+        if (userKey == null || productIds == null || productIds.isEmpty()) return;
+        for (Long productId : productIds) {
+            fireAndForget(userKey, productId, "search");
+        }
     }
 
     private void fireAndForget(String userKey, Long productId, String feedbackType) {

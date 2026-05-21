@@ -20,7 +20,7 @@ cache_size = 100
 fallback_recommend = ["popular", "latest"]
 
 [recommend.data_source]
-positive_feedback_types = ["view", "purchase"]
+positive_feedback_types = ["view","purchase","add_to_cart","search"]
 read_feedback_types = ["view"]
 
 [recommend.collaborative]

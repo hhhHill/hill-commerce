@@ -36,6 +36,7 @@ import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
+import com.hillcommerce.modules.recommendation.GorseFeedbackService;
 
 @Service
 public class StorefrontProductService {
@@ -52,6 +53,7 @@ public class StorefrontProductService {
     private final ProductSalesAttributeMapper productSalesAttributeMapper;
     private final ProductSalesAttributeValueMapper productSalesAttributeValueMapper;
     private final ProductSkuMapper productSkuMapper;
+    private final GorseFeedbackService gorseFeedbackService;
 
     public StorefrontProductService(
         ProductCategoryMapper productCategoryMapper,
@@ -59,7 +61,8 @@ public class StorefrontProductService {
         ProductImageMapper productImageMapper,
         ProductSalesAttributeMapper productSalesAttributeMapper,
         ProductSalesAttributeValueMapper productSalesAttributeValueMapper,
-        ProductSkuMapper productSkuMapper
+        ProductSkuMapper productSkuMapper,
+        GorseFeedbackService gorseFeedbackService
     ) {
         this.productCategoryMapper = productCategoryMapper;
         this.productMapper = productMapper;
@@ -67,6 +70,7 @@ public class StorefrontProductService {
         this.productSalesAttributeMapper = productSalesAttributeMapper;
         this.productSalesAttributeValueMapper = productSalesAttributeValueMapper;
         this.productSkuMapper = productSkuMapper;
+        this.gorseFeedbackService = gorseFeedbackService;
     }
 
     public List<CategorySummaryResponse> listVisibleCategories() {
@@ -107,7 +111,15 @@ public class StorefrontProductService {
         List<ProductEntity> matchedProducts = listDiscoverableProducts(null).stream()
             .filter(product -> product.getName() != null && product.getName().toLowerCase().contains(normalizedKeyword.toLowerCase()))
             .toList();
-        return toPagedCards(matchedProducts, normalizePage(page), normalizePageSize(pageSize));
+        PagedResponse<ProductCardResponse> result = toPagedCards(matchedProducts, normalizePage(page), normalizePageSize(pageSize));
+
+        List<Long> topProductIds = result.items().stream()
+            .limit(10)
+            .map(ProductCardResponse::id)
+            .toList();
+        gorseFeedbackService.fireAndForgetSearch(null, null, topProductIds);
+
+        return result;
     }
 
     public ProductDetailResponse getProductDetail(Long productId) {

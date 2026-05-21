@@ -1,6 +1,11 @@
 package com.hillcommerce.modules.logging.service;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
@@ -86,5 +91,27 @@ public class LoggingService {
         entity.setCategoryId(categoryId);
         productViewLogMapper.insert(entity);
         gorseFeedbackService.fireAndForgetView(userId, anonymousId, productId);
+
+        if (categoryId != null) {
+            try {
+                ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+                jakarta.servlet.http.HttpSession session = attrs.getRequest().getSession(false);
+                if (session != null) {
+                    @SuppressWarnings("unchecked")
+                    LinkedHashSet<Long> recentCategories = (LinkedHashSet<Long>) session.getAttribute("RECENT_CATEGORIES");
+                    if (recentCategories == null) {
+                        recentCategories = new LinkedHashSet<>();
+                    }
+                    if (recentCategories.size() >= 10) {
+                        Long oldest = recentCategories.iterator().next();
+                        recentCategories.remove(oldest);
+                    }
+                    recentCategories.add(categoryId);
+                    session.setAttribute("RECENT_CATEGORIES", recentCategories);
+                }
+            } catch (RuntimeException ignored) {
+                // session not available (e.g., non-web context) — silently skip
+            }
+        }
     }
 }

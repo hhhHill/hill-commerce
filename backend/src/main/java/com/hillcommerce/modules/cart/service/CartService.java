@@ -35,6 +35,7 @@ import com.hillcommerce.modules.product.entity.ProductSkuEntity;
 import com.hillcommerce.modules.product.mapper.ProductMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 import com.hillcommerce.modules.product.service.ProductAdminService;
+import com.hillcommerce.modules.recommendation.GorseFeedbackService;
 import com.hillcommerce.modules.user.entity.UserAddressEntity;
 import com.hillcommerce.modules.user.mapper.UserAddressMapper;
 
@@ -55,19 +56,22 @@ public class CartService {
     private final ProductMapper productMapper;
     private final ProductSkuMapper productSkuMapper;
     private final UserAddressMapper userAddressMapper;
+    private final GorseFeedbackService gorseFeedbackService;
 
     public CartService(
         CartMapper cartMapper,
         CartItemMapper cartItemMapper,
         ProductMapper productMapper,
         ProductSkuMapper productSkuMapper,
-        UserAddressMapper userAddressMapper
+        UserAddressMapper userAddressMapper,
+        GorseFeedbackService gorseFeedbackService
     ) {
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
         this.productMapper = productMapper;
         this.productSkuMapper = productSkuMapper;
         this.userAddressMapper = userAddressMapper;
+        this.gorseFeedbackService = gorseFeedbackService;
     }
 
     public CartResponse getCart(Long userId) {
@@ -106,6 +110,7 @@ public class CartService {
             item.setQuantity(quantity);
             item.setSelected(true);
             cartItemMapper.insert(item);
+            gorseFeedbackService.fireAndForgetAddToCart(userId, product.getId());
             return buildMutationResponse(item.getId(), cart.getId());
         }
 
@@ -114,6 +119,7 @@ public class CartService {
         existingItem.setQuantity(mergedQuantity);
         existingItem.setSelected(true);
         cartItemMapper.updateById(existingItem);
+        gorseFeedbackService.fireAndForgetAddToCart(userId, product.getId());
         return buildMutationResponse(existingItem.getId(), cart.getId());
     }
 

@@ -50,9 +50,9 @@ export function CartItemActions({ item }: CartItemActionsProps) {
       </label>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center rounded-full border border-black/10 bg-white">
+        <div className="flex items-center">
           <button
-            className="px-3 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex h-6 w-6 items-center justify-center rounded border border-[#e0e0e0] text-sm leading-none text-[var(--text-secondary)] disabled:opacity-40"
             disabled={isPending || quantity <= 1}
             type="button"
             onClick={() => {
@@ -65,7 +65,7 @@ export function CartItemActions({ item }: CartItemActionsProps) {
           </button>
           <span className="min-w-10 text-center text-sm font-semibold">{quantity}</span>
           <button
-            className="px-3 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex h-6 w-6 items-center justify-center rounded border border-[#e0e0e0] text-sm leading-none text-[var(--text-secondary)] disabled:opacity-40"
             disabled={isPending}
             type="button"
             onClick={() => {
@@ -79,7 +79,7 @@ export function CartItemActions({ item }: CartItemActionsProps) {
         </div>
 
         <button
-          className="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
+          className="ml-2 text-xs text-red-400"
           disabled={isPending}
           type="button"
           onClick={() => {

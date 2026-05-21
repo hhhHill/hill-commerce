@@ -33,21 +33,21 @@ public class ProductCategoryAdminController {
     }
 
     @GetMapping
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole("ADMIN")
     public List<CategoryResponse> listCategories() {
         return productAdminService.listCategories();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole("ADMIN")
     @OperationLog(action = "CREATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#result.id")
     public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest request) {
         return productAdminService.createCategory(request);
     }
 
     @PutMapping("/{categoryId}")
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole("ADMIN")
     @OperationLog(action = "UPDATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public CategoryResponse updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequest request) {
         return productAdminService.updateCategory(categoryId, request);
@@ -55,7 +55,7 @@ public class ProductCategoryAdminController {
 
     @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole("ADMIN")
     @OperationLog(action = "DELETE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public void deleteCategory(@PathVariable Long categoryId) {
         productAdminService.deleteCategory(categoryId);

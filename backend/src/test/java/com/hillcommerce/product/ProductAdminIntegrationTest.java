@@ -96,11 +96,11 @@ class ProductAdminIntegrationTest {
     }
 
     @Test
-    void salesCanManageCategories() throws Exception {
-        MockHttpSession merchantSession = loginAsMerchant("task4-sales@example.com", "Sales@123456");
+    void adminCanManageCategories() throws Exception {
+        MockHttpSession adminSession = loginAsAdmin();
 
         MvcResult createResult = mockMvc.perform(post("/api/admin/categories")
-                .session(merchantSession)
+                .session(adminSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -116,12 +116,12 @@ class ProductAdminIntegrationTest {
 
         Long categoryId = readId(createResult);
 
-        mockMvc.perform(get("/api/admin/categories").session(merchantSession))
+        mockMvc.perform(get("/api/admin/categories").session(adminSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.name=='Task4-Shirts')]").exists());
 
         mockMvc.perform(put("/api/admin/categories/{id}", categoryId)
-                .session(merchantSession)
+                .session(adminSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -134,7 +134,7 @@ class ProductAdminIntegrationTest {
             .andExpect(jsonPath("$.name").value("Task4-Shirts-Updated"))
             .andExpect(jsonPath("$.status").value("DISABLED"));
 
-        mockMvc.perform(delete("/api/admin/categories/{id}", categoryId).session(merchantSession))
+        mockMvc.perform(delete("/api/admin/categories/{id}", categoryId).session(adminSession))
             .andExpect(status().isNoContent());
 
         Integer remaining = jdbcTemplate.queryForObject(
@@ -154,8 +154,9 @@ class ProductAdminIntegrationTest {
 
     @Test
     void salesCanCreateUpdateAndDeleteProductAggregate() throws Exception {
+        MockHttpSession adminSession = loginAsAdmin();
         MockHttpSession merchantSession = loginAsMerchant("task4-product-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Task4-Tops");
+        Long categoryId = createCategory(adminSession, "Task4-Tops");
 
         MvcResult createResult = mockMvc.perform(post("/api/admin/products")
                 .session(merchantSession)
@@ -325,8 +326,9 @@ class ProductAdminIntegrationTest {
 
     @Test
     void salesCanCreateProductWhenSkuUsesEnabledStatus() throws Exception {
+        MockHttpSession adminSession = loginAsAdmin();
         MockHttpSession merchantSession = loginAsMerchant("task4-sku-status-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Task4-Phones");
+        Long categoryId = createCategory(adminSession, "Task4-Phones");
 
         mockMvc.perform(post("/api/admin/products")
                 .session(merchantSession)
@@ -363,8 +365,9 @@ class ProductAdminIntegrationTest {
 
     @Test
     void productKeywordFilterMatchesNameFuzzilyOrSpuExactly() throws Exception {
+        MockHttpSession adminSession = loginAsAdmin();
         MockHttpSession merchantSession = loginAsMerchant("task4-filter-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Task4-Filter");
+        Long categoryId = createCategory(adminSession, "Task4-Filter");
 
         mockMvc.perform(post("/api/admin/products")
                 .session(merchantSession)
@@ -443,8 +446,9 @@ class ProductAdminIntegrationTest {
 
     @Test
     void categoryCannotBeDeletedAfterItHasEverBeenUsedByProduct() throws Exception {
+        MockHttpSession adminSession = loginAsAdmin();
         MockHttpSession merchantSession = loginAsMerchant("task4-category-guard-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Task4-Delete-Guard");
+        Long categoryId = createCategory(adminSession, "Task4-Delete-Guard");
 
         MvcResult productResult = mockMvc.perform(post("/api/admin/products")
                 .session(merchantSession)
@@ -482,13 +486,17 @@ class ProductAdminIntegrationTest {
         mockMvc.perform(delete("/api/admin/products/{id}", productId).session(merchantSession))
             .andExpect(status().isNoContent());
 
-        mockMvc.perform(delete("/api/admin/categories/{id}", categoryId).session(merchantSession))
+        mockMvc.perform(delete("/api/admin/categories/{id}", categoryId).session(adminSession))
             .andExpect(status().isBadRequest());
     }
 
     private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
         seedMerchantUser(email, rawPassword);
         return login(email, rawPassword);
+    }
+
+    private MockHttpSession loginAsAdmin() throws Exception {
+        return login("admin@hill-commerce.local", "Admin@123456");
     }
 
     private MockHttpSession registerAndLogin(String email) throws Exception {

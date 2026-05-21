@@ -55,7 +55,7 @@ public class GorseClient {
         if (!enabled) {
             return List.of();
         }
-        return readIds(endpoint + "/api/popular?n=" + n);
+        return readIds(endpoint + "/api/recommend/popular?n=" + n);
     }
 
     public List<String> getItemNeighbors(String itemId, int n) {

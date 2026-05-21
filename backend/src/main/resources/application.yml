@@ -51,7 +51,7 @@ hill:
     anomaly-check-cron: "${ANALYTICS_ANOMALY_CHECK_CRON:0 10 * * * *}"
   recommendation:
     gorse:
-      enabled: ${GORSE_ENABLED:false}
+      enabled: ${GORSE_ENABLED:true}
       endpoint: ${GORSE_ENDPOINT:http://localhost:8088}
       timeout: ${GORSE_TIMEOUT:2s}
 mybatis-plus:

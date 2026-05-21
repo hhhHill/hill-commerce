@@ -1,11 +1,21 @@
 package com.hillcommerce.modules.admin.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public final class ShopDtos {
 
     private ShopDtos() {
+    }
+
+    public record ShopListResponse(
+        List<ShopResponse> items,
+        int page,
+        int pageSize,
+        long total
+    ) {
     }
 
     public record ShopResponse(

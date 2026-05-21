@@ -22,25 +22,22 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
     const payment = await getServerPaymentOrder(Number(orderId));
 
     return (
-      <main className="min-h-screen px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-3">
+      <main className="min-h-screen bg-white pb-28">
+        <div className="mx-auto max-w-[800px] px-4">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-3">
               <HomeShortcut />
-              <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href={`/orders/${orderId}/result`}>
-                返回订单结果页
+              <Link
+                className="text-sm text-[var(--text-secondary)]"
+                href={`/orders/${orderId}/result`}
+              >
+                返回订单结果
               </Link>
             </div>
-            <SearchForm className="w-full max-w-md" />
+            <SearchForm />
           </div>
 
-          <section className="space-y-3">
-            <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
-              Pay
-            </span>
-            <h1 className="text-4xl font-semibold tracking-tight">订单支付</h1>
-            <p className="max-w-3xl text-sm leading-7 text-black/65">这里承接 `order-checkout` 已经创建完成的订单，只处理支付尝试、模拟支付成功 / 失败，以及订单终态展示。</p>
-          </section>
+          <h1 className="py-2 text-lg font-semibold">订单支付</h1>
 
           <PaymentPanel payment={payment} />
         </div>
@@ -50,7 +47,6 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
     if (error instanceof PaymentRequestError && error.status === 404) {
       notFound();
     }
-
     throw error;
   }
 }

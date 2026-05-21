@@ -1,7 +1,7 @@
 # 后台账户管理与仪表盘任务清单
 
 **Status**: active  
-**Parent Plan**: `specs/admin-account-management/plan.md`
+**Parent Plan**: `specs/admin/account-management/plan.md`
 
 ## 一、后端 DTO
 

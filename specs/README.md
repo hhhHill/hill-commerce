@@ -23,13 +23,13 @@
 开始任何中高复杂度开发前，按以下顺序阅读：
 
 1. `.specify/memory/constitution.md`
-2. 目标 `specs/<feature>/spec.md`
-3. 目标 `specs/<feature>/plan.md`
-4. 目标 `specs/<feature>/tasks.md`
+2. 目标 `specs/<module>/<feature>/spec.md`
+3. 目标 `specs/<module>/<feature>/plan.md`
+4. 目标 `specs/<module>/<feature>/tasks.md`
 5. 本文件
 6. `specs/migration-map.md`
 
-如果与 `specs/<feature>/spec.md` 冲突，以具体 feature spec 为准。
+如果与具体 feature spec 冲突，以具体 feature spec 为准。
 
 ## Current Baseline
 
@@ -40,15 +40,45 @@
 
 当前第一阶段只要求存在这一组 baseline 文档，不要求预先创建未来按需 feature 目录。
 
+## Directory Structure
+
+```
+specs/
+├── README.md
+├── admin/                       # 管理后台模块
+│   ├── account-management/      # 账户管理与仪表盘
+│   ├── analytics/               # 数据分析
+│   └── product-management/      # 后台商品管理
+├── order/                       # 订单模块
+│   ├── center/                  # 订单中心
+│   ├── checkout/                # 订单结算
+│   └── fulfillment/             # 履约发货
+├── product/                     # 商品模块
+│   └── discovery/               # 商品发现与浏览
+├── cart/                        # 购物车模块
+├── payment/                     # 支付模块
+├── oss/                         # OSS 图片上传
+├── recommendation/              # 推荐引擎
+├── platform/                    # 平台级（跨模块）
+│   ├── auth-permission/         # 认证与权限
+│   ├── merchant-platform/       # 多商家改造
+│   ├── scheduler-separation/    # 调度器拆分
+│   └── observability/           # 运维可观测性
+└── storefront/                  # 前台体验（前端为主）
+    ├── shopping-journey/        # 购物旅程
+    └── ux-transformation/       # UX 改造
+```
+
 ## Naming Rules
 
-- 只有当某个模块、子系统或功能复杂到需要独立规范生命周期时，才创建新的 `specs/<feature-name>/`
-- feature 名称使用短横线命名，如 `order`、`payment`、`admin-product-management`
+- 第一级目录按模块分组，对应 backend `modules/` 或前端 `features/`，跨模块的放 `platform/`，前端为主的放 `storefront/`
+- 第二级为具体 feature，路径为 `specs/<module>/<feature>/`
+- 当模块只有一个 feature 时，可直接放在模块目录下（如 `specs/cart/spec.md`）
+- feature 名称使用短横线命名，如 `account-management`、`product-management`
 - 每个 feature 目录内固定三件套：
-- `spec.md`
-- `plan.md`
-- `tasks.md`
-- 目标目录树在第一阶段只展示必备目录，不展示未来按需 feature 目录
+  - `spec.md` — 业务事实与验收意图
+  - `plan.md` — 技术方案、边界和关键实现约束
+  - `tasks.md` — 当前可执行任务视图
 
 ## Update Rules
 

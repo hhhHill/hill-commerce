@@ -21,7 +21,7 @@
 - 前端已有 `ProductCard` 组件（`features/storefront/catalog/product-card.tsx`），推荐区域可复用它
 - 前端首页 `app/page.tsx` 和商品详情页 `app/products/[productId]/page.tsx` 均已存在，推荐区域为增量插入
 - 前端已有 `lib/storefront/client.ts` 和 `types.ts`，可扩展推荐接口
-- `specs/product-discovery` 已将"推荐系统正式版"列为 Out of Scope，本 feature 为其补充实现
+- `specs/product/discovery` 已将"推荐系统正式版"列为 Out of Scope，本 feature 为其补充实现
 
 ## Technical Boundaries
 

@@ -70,7 +70,7 @@
 
 ### Phase 6: Verification And Manual Regression (S)
 
-- [ ] 补充 `specs/order-center/manual-verification.md`
+- [ ] 补充 `specs/order/center/manual-verification.md`
 - [ ] 列出默认列表验证项
 - [ ] 列出状态筛选验证项
 - [ ] 列出订单号搜索验证项

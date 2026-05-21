@@ -5,7 +5,7 @@
 
 ## Purpose
 
-定义登录用户从商品详情后的购物准备体验，包括购物车、地址管理与结算前汇总；前台访客商品浏览、搜索与商品详情规则由 `specs/product-discovery/spec.md` 定义。
+定义登录用户从商品详情后的购物准备体验，包括购物车、地址管理与结算前汇总；前台访客商品浏览、搜索与商品详情规则由 `specs/product/discovery/spec.md` 定义。
 
 ## Scope
 

@@ -4,7 +4,7 @@ import { requireRole } from "@/lib/auth/server";
 import { getAdminCategories } from "@/lib/admin/server";
 
 export default async function AdminCategoriesPage() {
-  const user = await requireRole(["ADMIN", "SALES"], "/admin/categories");
+  const user = await requireRole(["ADMIN"], "/admin/categories");
   const categories = await getAdminCategories();
 
   return (

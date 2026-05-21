@@ -1,7 +1,7 @@
 # Tasks: operations-observability
 
 **Status**: active  
-**Parent Plan**: `specs/operations-observability/plan.md`
+**Parent Plan**: `specs/platform/observability/plan.md`
 
 ## 一、后端 Entity 与 Mapper
 

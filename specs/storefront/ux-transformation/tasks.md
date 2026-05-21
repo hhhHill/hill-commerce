@@ -1,7 +1,7 @@
 # 电商 UX 改造任务清单
 
 **Status**: active
-**Parent Plan**: `specs/ecommerce-ux-transformation/plan.md`
+**Parent Plan**: `specs/storefront/ux-transformation/plan.md`
 
 ## Phase 1：全局设计令牌
 

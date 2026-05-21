@@ -1,7 +1,7 @@
 # 履约模块任务清单
 
 **Status**: active  
-**Parent Plan**: `specs/fulfillment/plan.md`
+**Parent Plan**: `specs/order/fulfillment/plan.md`
 
 ## 一、后端枚举与实体
 

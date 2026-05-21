@@ -19,7 +19,7 @@ const STATUS_OPTIONS: Array<{ label: string; value?: OrderListStatus }> = [
 
 export function OrderCenterToolbar({ currentStatus, currentOrderNo }: OrderCenterToolbarProps) {
   return (
-    <section className="surface-card rounded-lg p-4">
+    <section className="border-b border-[#f0f0f0] py-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-3">
           {STATUS_OPTIONS.map((option) => {
@@ -27,11 +27,7 @@ export function OrderCenterToolbar({ currentStatus, currentOrderNo }: OrderCente
             return (
               <Link
                 key={option.label}
-                className={
-                  isActive
-                    ? "btn-primary px-4 py-2"
-                    : "btn-secondary px-4 py-2"
-                }
+                className={`text-sm${isActive ? " font-semibold text-[var(--brand-primary)]" : " text-[var(--text-secondary)]"}`}
                 href={`/orders${buildQueryString({ status: option.value, orderNo: currentOrderNo })}`}
               >
                 {option.label}

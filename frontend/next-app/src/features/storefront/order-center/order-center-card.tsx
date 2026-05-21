@@ -8,11 +8,11 @@ type OrderCenterCardProps = {
 
 export function OrderCenterCard({ order }: OrderCenterCardProps) {
   return (
-    <article className="surface-card rounded-lg p-4">
+    <article className="border-b border-[#f0f0f0] py-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="chip-badge">
+            <span className="text-sm font-medium text-[var(--brand-primary)]">
               {renderStatus(order.orderStatus)}
             </span>
             <span className="text-sm text-[var(--text-hint)]">{formatDateTime(order.createdAt)}</span>
@@ -30,7 +30,7 @@ export function OrderCenterCard({ order }: OrderCenterCardProps) {
               {formatPrice(order.payableAmount)}
             </p>
           </div>
-          <Link className="btn-secondary px-4 py-2" href={`/orders/${order.orderId}`}>
+          <Link className="text-sm text-[var(--text-secondary)] hover:text-[var(--brand-primary)]" href={`/orders/${order.orderId}`}>
             查看详情
           </Link>
         </div>

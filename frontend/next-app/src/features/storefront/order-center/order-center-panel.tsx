@@ -14,12 +14,8 @@ export function OrderCenterPanel({ result, status, orderNo }: OrderCenterPanelPr
   return (
     <section className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <span className="chip-badge w-fit">我的订单</span>
-          <h1 className="text-3xl font-semibold tracking-tight">订单查询中心</h1>
-          <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">这里负责回访已创建订单、按状态查看和按订单号快速定位，不重新定义订单详情和支付规则。</p>
-        </div>
-        <div className="chip-badge">共 {result.total} 笔订单</div>
+        <h1 className="text-3xl font-semibold tracking-tight">我的订单</h1>
+        <span className="text-sm text-[var(--text-hint)]">共 {result.total} 笔订单</span>
       </div>
 
       <OrderCenterToolbar currentOrderNo={orderNo} currentStatus={status} />

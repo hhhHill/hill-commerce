@@ -7,8 +7,8 @@ export default async function NewAdminUserPage() {
 
   return (
     <AdminShell
-      description="为新的销售同学开通后台账号，创建成功后可直接使用邮箱和初始密码登录。"
-      title="新增 Sales"
+      description="为新的 Merchant 用户开通后台账号，创建成功后可直接使用邮箱和初始密码登录。"
+      title="新增 Merchant"
       user={user}
     >
       <AdminUserForm />

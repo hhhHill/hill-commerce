@@ -1,4 +1,4 @@
-export type SessionUserRole = "CUSTOMER" | "SALES" | "ADMIN";
+export type SessionUserRole = "CUSTOMER" | "MERCHANT" | "ADMIN";
 
 export type SessionUser = {
   email: string;

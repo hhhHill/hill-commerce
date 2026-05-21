@@ -5,20 +5,22 @@ import type {
   AutoCompleteResult,
   Category,
   CategoryStatus,
-  CreateSalesInput,
+  CreateMerchantInput,
   DashboardSummary,
   DisableResult,
   ProductDetail,
   LoginLogListResult,
+  MerchantUser,
+  MerchantUserListResult,
   OperationLogListResult,
   ProductPayload,
   ProductViewLogListResult,
   ProductStatus,
   ProductSummary,
   ResetPasswordInput,
-  SalesUser,
-  SalesUserListResult,
-  ShipOrderResult
+  Shop,
+  ShipOrderResult,
+  UpdateShopRequest
 } from "@/lib/admin/types";
 
 type CategoryInput = {
@@ -87,37 +89,64 @@ export async function triggerAutoComplete(): Promise<AutoCompleteResult> {
   });
 }
 
-export async function listSalesUsers(): Promise<SalesUser[]> {
-  const result = await sendAdminRequest<SalesUserListResult>("/api/admin/users", {
+export async function listMerchantUsers(): Promise<MerchantUser[]> {
+  const result = await sendAdminRequest<MerchantUserListResult>("/api/admin/users", {
     method: "GET"
   });
   return result.users;
 }
 
-export async function createSalesUser(input: CreateSalesInput): Promise<SalesUser> {
-  return sendAdminRequest<SalesUser>("/api/admin/users", {
+export async function createMerchantUser(input: CreateMerchantInput): Promise<MerchantUser> {
+  return sendAdminRequest<MerchantUser>("/api/admin/users", {
     method: "POST",
     body: JSON.stringify(input)
   });
 }
 
-export async function disableSalesUser(userId: number): Promise<DisableResult> {
+export async function disableMerchantUser(userId: number): Promise<DisableResult> {
   return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/disable`, {
     method: "POST"
   });
 }
 
-export async function enableSalesUser(userId: number): Promise<DisableResult> {
+export async function enableMerchantUser(userId: number): Promise<DisableResult> {
   return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/enable`, {
     method: "POST"
   });
 }
 
-export async function resetSalesPassword(userId: number, input: ResetPasswordInput): Promise<DisableResult> {
+export async function resetMerchantPassword(userId: number, input: ResetPasswordInput): Promise<DisableResult> {
   return sendAdminRequest<DisableResult>(`/api/admin/users/${userId}/reset-password`, {
     method: "POST",
     body: JSON.stringify(input)
   });
+}
+
+export async function getMyShop(): Promise<Shop> {
+  return sendAdminRequest<Shop>("/api/admin/shop", {
+    method: "GET"
+  });
+}
+
+export async function updateMyShop(req: UpdateShopRequest): Promise<Shop> {
+  return sendAdminRequest<Shop>("/api/admin/shop", {
+    method: "PUT",
+    body: JSON.stringify(req)
+  });
+}
+
+export async function listShops(page = 1, size = 20): Promise<{ items: Shop[]; total: number }> {
+  return sendAdminRequest<{ items: Shop[]; total: number }>(`/api/admin/shops?page=${page}&size=${size}`, {
+    method: "GET"
+  });
+}
+
+export async function disableShop(id: number): Promise<void> {
+  await sendAdminRequest(`/api/admin/shops/${id}/disable`, { method: "POST" });
+}
+
+export async function enableShop(id: number): Promise<void> {
+  await sendAdminRequest(`/api/admin/shops/${id}/enable`, { method: "POST" });
 }
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {

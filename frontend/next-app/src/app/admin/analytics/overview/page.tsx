@@ -5,7 +5,7 @@ import { getServerAnalyticsProductRankings, getServerAnalyticsTrends } from "@/l
 import { requireRole } from "@/lib/auth/server";
 
 export default async function AnalyticsOverviewPage() {
-  const user = await requireRole(["ADMIN", "SALES"], "/admin/analytics/overview");
+  const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/analytics/overview");
   const [trends, rankings] = await Promise.all([
     getServerAnalyticsTrends({ granularity: "day" }).catch(() => null),
     getServerAnalyticsProductRankings({ range: "today", limit: 10 }).catch(() => null)

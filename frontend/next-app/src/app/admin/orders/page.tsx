@@ -14,7 +14,7 @@ type AdminOrdersPageProps = {
 const ALLOWED_STATUSES = new Set<AdminOrderStatus>(["PENDING_PAYMENT", "PAID", "SHIPPED", "COMPLETED", "CANCELLED", "CLOSED"]);
 
 export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
-  const user = await requireRole(["ADMIN", "SALES"], "/admin/orders");
+  const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/orders");
   const { status, page } = await searchParams;
   const currentStatus = parseStatus(status);
   const currentPage = parsePositiveInteger(page) ?? 1;

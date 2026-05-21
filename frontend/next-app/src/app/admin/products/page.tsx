@@ -12,7 +12,7 @@ type ProductListPageProps = {
 };
 
 export default async function AdminProductsPage({ searchParams }: ProductListPageProps) {
-  const user = await requireRole(["ADMIN", "SALES"], "/admin/products");
+  const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/products");
   const filters = await searchParams;
   const [categories, products] = await Promise.all([
     getAdminCategories(),

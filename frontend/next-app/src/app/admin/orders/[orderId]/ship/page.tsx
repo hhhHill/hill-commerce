@@ -15,7 +15,7 @@ type AdminShipOrderPageProps = {
 
 export default async function AdminShipOrderPage({ params }: AdminShipOrderPageProps) {
   const { orderId } = await params;
-  const user = await requireRole(["ADMIN", "SALES"], `/admin/orders/${orderId}/ship`);
+  const user = await requireRole(["ADMIN", "MERCHANT"], `/admin/orders/${orderId}/ship`);
 
   try {
     const order = await getAdminShipOrder(Number(orderId));

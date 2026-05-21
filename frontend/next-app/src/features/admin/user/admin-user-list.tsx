@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { disableSalesUser, enableSalesUser, resetSalesPassword } from "@/lib/admin/client";
-import type { SalesUser } from "@/lib/admin/types";
+import { disableMerchantUser, enableMerchantUser, resetMerchantPassword } from "@/lib/admin/client";
+import type { MerchantUser } from "@/lib/admin/types";
 
 type AdminUserListProps = {
-  users: SalesUser[];
+  users: MerchantUser[];
 };
 
 export function AdminUserList({ users }: AdminUserListProps) {
@@ -16,7 +16,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  function handleResetPassword(user: SalesUser) {
+  function handleResetPassword(user: MerchantUser) {
     const password = window.prompt(`为 ${user.nickname} 设置新密码（至少 6 位）`, "");
     if (!password) {
       return;
@@ -25,7 +25,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
     setMessage("");
     startTransition(async () => {
       try {
-        await resetSalesPassword(user.id, { password });
+        await resetMerchantPassword(user.id, { password });
         setMessage(`${user.nickname} 的密码已重置`);
         router.refresh();
       } catch (error) {
@@ -34,7 +34,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
     });
   }
 
-  function handleDisable(user: SalesUser) {
+  function handleDisable(user: MerchantUser) {
     if (!window.confirm(`确认禁用 ${user.nickname} 吗？`)) {
       return;
     }
@@ -42,7 +42,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
     setMessage("");
     startTransition(async () => {
       try {
-        await disableSalesUser(user.id);
+        await disableMerchantUser(user.id);
         setMessage(`${user.nickname} 已禁用`);
         router.refresh();
       } catch (error) {
@@ -51,7 +51,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
     });
   }
 
-  function handleEnable(user: SalesUser) {
+  function handleEnable(user: MerchantUser) {
     if (!window.confirm(`确认启用 ${user.nickname} 吗？`)) {
       return;
     }
@@ -59,7 +59,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
     setMessage("");
     startTransition(async () => {
       try {
-        await enableSalesUser(user.id);
+        await enableMerchantUser(user.id);
         setMessage(`${user.nickname} 已启用`);
         router.refresh();
       } catch (error) {
@@ -73,11 +73,11 @@ export function AdminUserList({ users }: AdminUserListProps) {
       <section className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Sales 账户</h2>
-            <p className="mt-2 text-sm text-black/65">查看全部 Sales，支持直接重置密码、禁用和重新启用。</p>
+            <h2 className="text-2xl font-semibold">Merchant 账户</h2>
+            <p className="mt-2 text-sm text-black/65">查看全部 Merchant，支持直接重置密码、禁用和重新启用。</p>
           </div>
           <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white" href="/admin/users/new">
-            新增 Sales
+            新增 Merchant
           </Link>
         </div>
         {message ? <p className="mt-4 text-sm text-black/65">{message}</p> : null}
@@ -86,7 +86,7 @@ export function AdminUserList({ users }: AdminUserListProps) {
       <section className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
         {users.length === 0 ? (
           <p className="rounded-[24px] border border-dashed border-black/10 px-5 py-10 text-center text-sm text-black/55">
-            当前还没有 Sales 账户。
+            当前还没有 Merchant 账户。
           </p>
         ) : (
           <div className="space-y-4">

@@ -98,7 +98,7 @@ export type ApiErrorResponse = {
   message?: string;
 };
 
-export type SalesUser = {
+export type MerchantUser = {
   id: number;
   email: string;
   nickname: string;
@@ -106,11 +106,11 @@ export type SalesUser = {
   createdAt: string;
 };
 
-export type SalesUserListResult = {
-  users: SalesUser[];
+export type MerchantUserListResult = {
+  users: MerchantUser[];
 };
 
-export type CreateSalesInput = {
+export type CreateMerchantInput = {
   email: string;
   nickname: string;
   password: string;
@@ -125,7 +125,7 @@ export type DisableResult = {
   enabled: boolean;
 };
 
-export type SalesRankItem = {
+export type MerchantRankItem = {
   nickname: string;
   orderCount: number;
 };
@@ -133,7 +133,7 @@ export type SalesRankItem = {
 export type DashboardSummary = {
   orderStatusCounts: Record<string, number>;
   totalSalesAmount: number;
-  salesRanking: SalesRankItem[];
+  salesRanking: MerchantRankItem[];
 };
 
 export type AdminOrderStatus = "PENDING_PAYMENT" | "PAID" | "SHIPPED" | "COMPLETED" | "CANCELLED" | "CLOSED";
@@ -168,7 +168,7 @@ export type AutoCompleteResult = {
   completedCount: number;
 };
 
-export type SessionUserRole = "CUSTOMER" | "SALES" | "ADMIN";
+export type SessionUserRole = "CUSTOMER" | "MERCHANT" | "ADMIN";
 
 export type LoginLogEntry = {
   id: number;
@@ -213,3 +213,18 @@ export type ProductViewLogEntry = {
 export type ProductViewLogListResult = {
   items: ProductViewLogEntry[];
 };
+
+export interface Shop {
+  id: number;
+  name: string;
+  slug: string;
+  logoUrl: string;
+  description: string;
+  status: "ACTIVE" | "DISABLED";
+}
+
+export interface UpdateShopRequest {
+  name: string;
+  logoUrl?: string;
+  description?: string;
+}

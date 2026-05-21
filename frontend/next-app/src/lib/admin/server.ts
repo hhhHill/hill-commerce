@@ -16,7 +16,8 @@ import type {
   ProductListFilters,
   ProductSummary,
   ProductViewLogListResult,
-  SalesUserListResult
+  MerchantUserListResult,
+  Shop
 } from "@/lib/admin/types";
 import type { OrderDetail, OrderListStatus } from "@/lib/order/types";
 
@@ -63,9 +64,13 @@ export async function getAdminShipOrder(orderId: number): Promise<OrderDetail> {
   return fetchAdminJson<OrderDetail>(`/api/admin/orders/${orderId}/ship`);
 }
 
-export async function getServerSalesUsers() {
-  const result = await fetchAdminJson<SalesUserListResult>("/api/admin/users");
+export async function getServerMerchantUsers() {
+  const result = await fetchAdminJson<MerchantUserListResult>("/api/admin/users");
   return result.users;
+}
+
+export async function getServerMyShop(): Promise<Shop> {
+  return fetchAdminJson<Shop>("/api/admin/shop");
 }
 
 export async function getServerDashboardSummary(): Promise<DashboardSummary> {

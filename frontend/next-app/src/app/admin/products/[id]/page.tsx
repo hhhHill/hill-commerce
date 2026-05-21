@@ -11,7 +11,7 @@ type EditAdminProductPageProps = {
 
 export default async function EditAdminProductPage({ params }: EditAdminProductPageProps) {
   const { id } = await params;
-  const user = await requireRole(["ADMIN", "SALES"], `/admin/products/${id}`);
+  const user = await requireRole(["ADMIN", "MERCHANT"], `/admin/products/${id}`);
   const productId = Number(id);
   const [categories, product] = await Promise.all([getAdminCategories(), getAdminProduct(productId)]);
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState, useTransition } from "react";
 
-import { createSalesUser } from "@/lib/admin/client";
+import { createMerchantUser } from "@/lib/admin/client";
 
 export function AdminUserForm() {
   const router = useRouter();
@@ -20,19 +20,19 @@ export function AdminUserForm() {
 
     startTransition(async () => {
       try {
-        await createSalesUser({ email, nickname, password });
+        await createMerchantUser({ email, nickname, password });
         router.push("/admin/users");
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "创建 Sales 失败");
+        setMessage(error instanceof Error ? error.message : "创建 Merchant 失败");
       }
     });
   }
 
   return (
     <section className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
-      <h2 className="text-2xl font-semibold">新增 Sales</h2>
-      <p className="mt-2 text-sm text-black/65">创建后会自动分配 `SALES` 角色，并立即可用于后台登录。</p>
+      <h2 className="text-2xl font-semibold">新增 Merchant</h2>
+      <p className="mt-2 text-sm text-black/65">创建后会自动分配 `MERCHANT` 角色，并立即可用于后台登录。</p>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         <label className="flex flex-col gap-2 text-sm font-medium">
           邮箱
@@ -40,7 +40,7 @@ export function AdminUserForm() {
             required
             className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="sales@example.com"
+            placeholder="merchant@example.com"
             type="email"
             value={email}
           />

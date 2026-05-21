@@ -30,7 +30,7 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen px-6 py-12">
-      <section className="mx-auto grid max-w-5xl gap-8 rounded-[32px] border border-black/10 bg-[var(--surface)] p-8 shadow-[0_20px_60px_rgba(74,42,18,0.08)] md:grid-cols-[1.1fr_0.9fr] md:p-12">
+      <section className="mx-auto grid max-w-5xl gap-8 border-b border-[#f0f0f0] bg-white p-8 md:grid-cols-[1.1fr_0.9fr] md:p-12">
         <div className="space-y-4">
           <span className="w-fit rounded-full bg-[var(--accent)] px-4 py-1 text-sm font-semibold text-white">
             Register
@@ -41,11 +41,11 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form className="flex flex-col gap-4 rounded-[28px] bg-white p-6 shadow-[0_12px_30px_rgba(29,20,13,0.08)]" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4 border-b border-[#f0f0f0] bg-white p-6" onSubmit={handleSubmit}>
           <label className="flex flex-col gap-2 text-sm font-medium">
             邮箱
             <input
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -56,7 +56,7 @@ export default function RegisterPage() {
           <label className="flex flex-col gap-2 text-sm font-medium">
             昵称
             <input
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="text"
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
@@ -67,7 +67,7 @@ export default function RegisterPage() {
           <label className="flex flex-col gap-2 text-sm font-medium">
             密码
             <input
-              className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="password"
               minLength={8}
               value={password}
@@ -76,10 +76,10 @@ export default function RegisterPage() {
             />
           </label>
 
-          {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+          {error ? <p className="rounded-[2px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
           <button
-            className="rounded-2xl bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-[2px] bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
             type="submit"
             disabled={isPending}
           >

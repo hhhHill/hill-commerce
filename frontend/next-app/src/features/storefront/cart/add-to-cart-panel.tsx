@@ -39,7 +39,7 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
     selectedSku.stockStatus !== "OUT_OF_STOCK";
 
   return (
-    <section className="surface-subtle px-4 py-4">
+    <section className="bg-white border-t border-[#f0f0f0] px-4 py-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">选择规格后立即购买</h2>
@@ -59,7 +59,7 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
           return (
             <button
               key={sku.id}
-              className={`min-h-11 rounded-2xl border px-3 py-2 text-sm ${
+              className={`min-h-11 rounded-[2px] border px-3 py-2 text-sm ${
                 active
                   ? "border-[var(--brand-primary)] bg-[#fff2ec] font-semibold text-[var(--brand-primary)]"
                   : "border-[var(--border-normal)] bg-white text-[var(--text-secondary)]"
@@ -75,7 +75,7 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
       </div>
 
       <div className="mt-4 flex flex-col gap-3">
-        <div className="flex items-center rounded-3xl border border-[var(--border-normal)] bg-white">
+        <div className="flex items-center rounded-[2px] border border-[var(--border-normal)] bg-white">
           <button
             className="min-h-11 px-4 text-sm font-semibold disabled:opacity-40"
             disabled={quantity <= 1 || isPending}

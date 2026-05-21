@@ -41,7 +41,7 @@ export function MobileBottomNav({ cartQuantity, isAuthenticated }: MobileBottomN
             return (
               <Link
                 key={item.href}
-                className={`relative flex min-w-0 flex-col items-center justify-center rounded-2xl px-2 py-2 text-[11px] font-medium ${
+                className={`relative flex min-w-0 flex-col items-center justify-center rounded-[2px] px-2 py-2 text-[11px] font-medium ${
                   active ? "bg-[#fff2ec] text-[var(--brand-primary)]" : "text-[var(--text-secondary)]"
                 }`}
                 href={item.href}

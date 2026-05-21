@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
       title="仪表盘"
       user={user}
     >
-      <AdminDashboard summary={summary} />
+      <AdminDashboard summary={summary} user={user} />
     </AdminShell>
   );
 }

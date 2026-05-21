@@ -8,7 +8,7 @@ export default async function AnalyticsProductsPage() {
 
   return (
     <AdminShell description="按今日、本周、本月查看商品销量排行和品类占比。" title="商品分析" user={user}>
-      <AnalyticsShell active="products">
+      <AnalyticsShell active="products" user={user}>
         <ClientProductAnalytics />
       </AnalyticsShell>
     </AdminShell>

@@ -10,7 +10,7 @@ export default async function AnalyticsUsersPage() {
 
   return (
     <AdminShell description="群体画像、购买力分层与个体用户分析。" title="用户画像" user={user}>
-      <AnalyticsShell active="users">
+      <AnalyticsShell active="users" user={user}>
         <ClientUserAnalytics aggregate={aggregate} />
       </AnalyticsShell>
     </AdminShell>

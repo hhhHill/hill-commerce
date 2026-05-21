@@ -1,22 +1,26 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import type { SessionUser } from "@/lib/auth/types";
+
 type AnalyticsShellProps = {
   active: "overview" | "users" | "products";
   children: ReactNode;
+  user: SessionUser;
 };
 
-const TABS = [
-  { key: "overview", label: "销售概览", href: "/admin/analytics/overview" },
-  { key: "users", label: "用户画像", href: "/admin/analytics/users" },
-  { key: "products", label: "商品分析", href: "/admin/analytics/products" }
-] as const;
+export function AnalyticsShell({ active, children, user }: AnalyticsShellProps) {
+  const isAdmin = user.roles.includes("ADMIN");
+  const tabs = [
+    { key: "overview", label: "概览", href: "/admin/analytics/overview" },
+    ...(isAdmin ? [{ key: "users", label: "用户画像", href: "/admin/analytics/users" }] : []),
+    { key: "products", label: "商品分析", href: "/admin/analytics/products" }
+  ];
 
-export function AnalyticsShell({ active, children }: AnalyticsShellProps) {
   return (
     <section className="space-y-6">
       <nav className="flex flex-wrap gap-3 rounded-[28px] border border-black/10 bg-white/90 p-3 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <Link
             key={tab.key}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${

@@ -13,7 +13,7 @@ export default async function AnalyticsOverviewPage() {
 
   return (
     <AdminShell description="销售趋势、异常告警、商品排行与用户画像。" title="数据分析" user={user}>
-      <AnalyticsShell active="overview">
+      <AnalyticsShell active="overview" user={user}>
         <OverviewGrid topProducts={rankings?.items ?? []} trends={trends} />
       </AnalyticsShell>
     </AdminShell>

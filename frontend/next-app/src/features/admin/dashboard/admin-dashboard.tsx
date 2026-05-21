@@ -1,7 +1,9 @@
 import type { DashboardSummary } from "@/lib/admin/types";
+import type { SessionUser } from "@/lib/auth/types";
 
 type AdminDashboardProps = {
   summary: DashboardSummary;
+  user: SessionUser;
 };
 
 const STATUS_LABELS: Array<{ key: string; label: string }> = [
@@ -13,11 +15,14 @@ const STATUS_LABELS: Array<{ key: string; label: string }> = [
   { key: "CLOSED", label: "已关闭" }
 ];
 
-export function AdminDashboard({ summary }: AdminDashboardProps) {
+export function AdminDashboard({ summary, user }: AdminDashboardProps) {
+  const isAdmin = user.roles.includes("ADMIN");
+  const title = isAdmin ? "平台概览" : "店铺概览";
+
   return (
     <section className="grid gap-6 lg:grid-cols-3">
       <article className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
-        <h2 className="text-2xl font-semibold">订单状态分布</h2>
+        <h2 className="text-2xl font-semibold">{title}</h2>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {STATUS_LABELS.map((status) => (
             <div key={status.key} className="rounded-[20px] bg-[#fffaf5] p-4">
@@ -35,7 +40,7 @@ export function AdminDashboard({ summary }: AdminDashboardProps) {
       </article>
 
       <article className="rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_16px_40px_rgba(29,20,13,0.06)]">
-        <h2 className="text-2xl font-semibold">Sales 发货排行</h2>
+        <h2 className="text-2xl font-semibold">发货排行</h2>
         <div className="mt-5 space-y-3">
           {summary.salesRanking.map((item, index) => (
             <div key={`${item.nickname}-${index}`} className="flex items-center justify-between rounded-[20px] bg-[#fffaf5] px-4 py-3">

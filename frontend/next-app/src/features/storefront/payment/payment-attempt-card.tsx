@@ -6,7 +6,7 @@ type PaymentAttemptCardProps = {
 
 export function PaymentAttemptCard({ attempt }: PaymentAttemptCardProps) {
   return (
-    <article className="border-b border-black/10 pb-6">
+    <article className="border-b border-[#f0f0f0] pb-6">
       <h2 className="text-2xl font-semibold tracking-tight">当前支付尝试</h2>
       <dl className="mt-5 grid gap-4">
         <Metric label="支付流水号" value={attempt.paymentNo} />
@@ -28,8 +28,8 @@ export function PaymentAttemptCard({ attempt }: PaymentAttemptCardProps) {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3 last:border-b-0 last:pb-0">
-      <dt className="text-sm text-black/50">{label}</dt>
+    <div className="flex items-center justify-between gap-4 border-b border-[#f0f0f0] pb-3 last:border-b-0 last:pb-0">
+      <dt className="text-sm text-[var(--text-secondary)]">{label}</dt>
       <dd className="text-right text-base font-semibold">{value}</dd>
     </div>
   );

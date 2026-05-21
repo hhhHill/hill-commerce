@@ -28,11 +28,11 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
           </svg>
         </div>
         <h1 className="mt-4 text-2xl font-semibold tracking-tight">{renderHeadline(order.orderStatus)}</h1>
-        <p className="mt-2 text-center text-sm leading-6 text-black/65">{renderDescription(order.orderStatus)}</p>
+        <p className="mt-2 text-center text-sm leading-6 text-[var(--text-secondary)]">{renderDescription(order.orderStatus)}</p>
       </div>
 
       {/* Compact metrics with bottom border dividers */}
-      <dl className="mt-8 divide-y divide-black/6 border-t border-black/6">
+      <dl className="mt-8 divide-y divide-black/6 border-t border-[#f0f0f0]">
         <Metric label="订单号" value={order.orderNo} />
         <Metric label="订单状态" value={renderStatus(order.orderStatus)} />
         <Metric label="应付金额" value={formatPrice(order.payableAmount)} />
@@ -40,12 +40,12 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
       </dl>
 
       {/* Address */}
-      <div className="border-b border-black/6 py-4">
+      <div className="border-b border-[#f0f0f0] py-4">
         <p className="text-sm font-semibold text-black">收货地址</p>
-        <p className="mt-2 text-sm leading-7 text-black/70">
+        <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">
           {order.address.receiverName} · {order.address.receiverPhone}
         </p>
-        <p className="text-sm leading-7 text-black/70">
+        <p className="text-sm leading-7 text-[var(--text-primary)]">
           {order.address.province}
           {order.address.city}
           {order.address.district}
@@ -54,8 +54,8 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
       </div>
 
       {/* Info hint */}
-      <div className="border-b border-black/6 py-4">
-        <p className="text-sm leading-6 text-black/60">
+      <div className="border-b border-[#f0f0f0] py-4">
+        <p className="text-sm leading-6 text-[var(--text-secondary)]">
           本阶段先把订单创建稳定下来。支付能力尚未接入，但这里已经保留了结果页和未支付取消入口，便于下一阶段继续串联。
         </p>
       </div>
@@ -70,7 +70,7 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
             去支付
           </Link>
         ) : (
-          <div className="rounded-xl bg-black/5 px-4 py-3 text-center text-sm font-medium text-black/60">
+          <div className="rounded-xl bg-[#f5f5f5] px-4 py-3 text-center text-sm font-medium text-[var(--text-secondary)]">
             {renderPaymentHint(order.orderStatus)}
           </div>
         )}
@@ -101,19 +101,19 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
         {message ? <p className="text-sm text-red-700">{message}</p> : null}
 
         <Link
-          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          className="flex w-full items-center justify-center rounded-full border border-[#f0f0f0] px-5 py-3 text-sm font-medium"
           href={`/orders/${order.id}`}
         >
           查看订单详情
         </Link>
         <Link
-          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          className="flex w-full items-center justify-center rounded-full border border-[#f0f0f0] px-5 py-3 text-sm font-medium"
           href="/orders"
         >
           返回我的订单
         </Link>
         <Link
-          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          className="flex w-full items-center justify-center rounded-full border border-[#f0f0f0] px-5 py-3 text-sm font-medium"
           href="/cart"
         >
           返回购物车
@@ -126,7 +126,7 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 py-3">
-      <dt className="text-sm text-black/50">{label}</dt>
+      <dt className="text-sm text-[var(--text-secondary)]">{label}</dt>
       <dd className="text-right text-lg font-semibold">{value}</dd>
     </div>
   );

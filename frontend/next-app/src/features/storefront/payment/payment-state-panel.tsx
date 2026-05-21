@@ -7,11 +7,11 @@ type PaymentStatePanelProps = {
 
 export function PaymentStatePanel({ orderId, orderStatus }: PaymentStatePanelProps) {
   return (
-    <article className="border-b border-black/10 pb-6">
+    <article className="border-b border-[#f0f0f0] pb-6">
       <h2 className="text-2xl font-semibold tracking-tight">当前支付状态</h2>
       <div className="mt-5">
         <p className="text-lg font-semibold">{renderStateHeadline(orderStatus)}</p>
-        <p className="mt-3 text-sm leading-7 text-black/65">{renderStateDescription(orderStatus)}</p>
+        <p className="mt-3 text-sm leading-7 text-[var(--text-secondary)]">{renderStateDescription(orderStatus)}</p>
       </div>
 
       <div className="mt-6 flex flex-col gap-3">

@@ -104,11 +104,11 @@ class PaymentIntegrationTest {
 
     @Test
     void ownerCanReadPaymentOrderAndCreateFirstAttempt() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Shirts");
-        createProduct(salesSession, categoryId, "Payment Tee", "PAYMENT-TEE", "ON_SHELF", 188.00, 8, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Shirts");
+        createProduct(merchantSession, categoryId, "Payment Tee", "PAYMENT-TEE", "ON_SHELF", 188.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-TEE-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -138,11 +138,11 @@ class PaymentIntegrationTest {
 
     @Test
     void initiatedAttemptIsReusedForSameOrder() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-reuse-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-reuse-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-reuse-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Reuse");
-        createProduct(salesSession, categoryId, "Payment Reuse Tee", "PAYMENT-REUSE", "ON_SHELF", 129.00, 5, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Reuse");
+        createProduct(merchantSession, categoryId, "Payment Reuse Tee", "PAYMENT-REUSE", "ON_SHELF", 129.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REUSE-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -166,11 +166,11 @@ class PaymentIntegrationTest {
 
     @Test
     void failedAttemptCreatesNextInitiatedAttempt() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-fail-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-fail-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-fail-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Fail");
-        createProduct(salesSession, categoryId, "Payment Fail Tee", "PAYMENT-FAIL", "ON_SHELF", 109.00, 5, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Fail");
+        createProduct(merchantSession, categoryId, "Payment Fail Tee", "PAYMENT-FAIL", "ON_SHELF", 109.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-FAIL-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -197,12 +197,12 @@ class PaymentIntegrationTest {
 
     @Test
     void userCannotReadOrCreatePaymentAttemptForAnotherUsersOrder() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-owner-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-owner-sales@example.com", "Sales@123456");
         MockHttpSession ownerSession = loginAsCustomer("payment-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("payment-other@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Owner");
-        createProduct(salesSession, categoryId, "Payment Owner Tee", "PAYMENT-OWNER", "ON_SHELF", 119.00, 5, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Owner");
+        createProduct(merchantSession, categoryId, "Payment Owner Tee", "PAYMENT-OWNER", "ON_SHELF", 119.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-OWNER-001");
 
         addCartItem(ownerSession, skuId, 1);
@@ -218,11 +218,11 @@ class PaymentIntegrationTest {
 
     @Test
     void initiatedPaymentCanSucceedAndMarksOrderPaid() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-success-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-success-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-success-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Success");
-        createProduct(salesSession, categoryId, "Payment Success Tee", "PAYMENT-SUCCESS", "ON_SHELF", 168.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Success");
+        createProduct(merchantSession, categoryId, "Payment Success Tee", "PAYMENT-SUCCESS", "ON_SHELF", 168.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-SUCCESS-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -255,11 +255,11 @@ class PaymentIntegrationTest {
 
     @Test
     void initiatedPaymentCanFailAndOrderRemainsPendingPayment() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-failure-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-failure-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-failure-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Failure");
-        createProduct(salesSession, categoryId, "Payment Failure Tee", "PAYMENT-FAILURE", "ON_SHELF", 138.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Failure");
+        createProduct(merchantSession, categoryId, "Payment Failure Tee", "PAYMENT-FAILURE", "ON_SHELF", 138.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-FAILURE-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -289,11 +289,11 @@ class PaymentIntegrationTest {
 
     @Test
     void repeatSuccessIsIdempotent() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-repeat-success-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-repeat-success-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-repeat-success-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Repeat-Success");
-        createProduct(salesSession, categoryId, "Payment Repeat Tee", "PAYMENT-REPEAT-SUCCESS", "ON_SHELF", 128.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Repeat-Success");
+        createProduct(merchantSession, categoryId, "Payment Repeat Tee", "PAYMENT-REPEAT-SUCCESS", "ON_SHELF", 128.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REPEAT-SUCCESS-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -324,11 +324,11 @@ class PaymentIntegrationTest {
 
     @Test
     void successfulPaymentCannotFallbackToFailed() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-cannot-fallback-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-cannot-fallback-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-cannot-fallback-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Cannot-Fallback");
-        createProduct(salesSession, categoryId, "Payment Locked Tee", "PAYMENT-CANNOT-FALLBACK", "ON_SHELF", 158.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Cannot-Fallback");
+        createProduct(merchantSession, categoryId, "Payment Locked Tee", "PAYMENT-CANNOT-FALLBACK", "ON_SHELF", 158.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CANNOT-FALLBACK-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -353,11 +353,11 @@ class PaymentIntegrationTest {
 
     @Test
     void expiredPendingPaymentOrderCanBeClosedAndRestocksInventory() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-close-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-close-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-close-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Close");
-        createProduct(salesSession, categoryId, "Payment Close Tee", "PAYMENT-CLOSE", "ON_SHELF", 188.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Close");
+        createProduct(merchantSession, categoryId, "Payment Close Tee", "PAYMENT-CLOSE", "ON_SHELF", 188.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSE-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -371,7 +371,7 @@ class PaymentIntegrationTest {
             "update orders set payment_deadline_at = date_sub(now(3), interval 5 minute) where id = ?",
             orderId);
 
-        mockMvc.perform(post("/api/payments/close-expired").session(salesSession))
+        mockMvc.perform(post("/api/payments/close-expired").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.closedOrderCount").value(1));
 
@@ -395,11 +395,11 @@ class PaymentIntegrationTest {
 
     @Test
     void repeatCloseIsIdempotentAndDoesNotRestockTwice() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-repeat-close-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-repeat-close-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-repeat-close-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Repeat-Close");
-        createProduct(salesSession, categoryId, "Payment Repeat Close Tee", "PAYMENT-REPEAT-CLOSE", "ON_SHELF", 166.00, 5, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Repeat-Close");
+        createProduct(merchantSession, categoryId, "Payment Repeat Close Tee", "PAYMENT-REPEAT-CLOSE", "ON_SHELF", 166.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REPEAT-CLOSE-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -413,11 +413,11 @@ class PaymentIntegrationTest {
             "update orders set payment_deadline_at = date_sub(now(3), interval 5 minute) where id = ?",
             orderId);
 
-        mockMvc.perform(post("/api/payments/close-expired").session(salesSession))
+        mockMvc.perform(post("/api/payments/close-expired").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.closedOrderCount").value(1));
 
-        mockMvc.perform(post("/api/payments/close-expired").session(salesSession))
+        mockMvc.perform(post("/api/payments/close-expired").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.closedOrderCount").value(0));
 
@@ -435,11 +435,11 @@ class PaymentIntegrationTest {
 
     @Test
     void paidOrderIsIgnoredByCloseExpired() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-close-paid-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-close-paid-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-close-paid-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Close-Paid");
-        createProduct(salesSession, categoryId, "Payment Close Paid Tee", "PAYMENT-CLOSE-PAID", "ON_SHELF", 176.00, 4, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Close-Paid");
+        createProduct(merchantSession, categoryId, "Payment Close Paid Tee", "PAYMENT-CLOSE-PAID", "ON_SHELF", 176.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSE-PAID-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -458,7 +458,7 @@ class PaymentIntegrationTest {
             "update orders set payment_deadline_at = date_sub(now(3), interval 5 minute) where id = ?",
             orderId);
 
-        mockMvc.perform(post("/api/payments/close-expired").session(salesSession))
+        mockMvc.perform(post("/api/payments/close-expired").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.closedOrderCount").value(0));
 
@@ -477,11 +477,11 @@ class PaymentIntegrationTest {
 
     @Test
     void closedOrderCannotBePaidByStaleAttempt() throws Exception {
-        MockHttpSession salesSession = loginAsSales("payment-closed-pay-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("payment-closed-pay-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-closed-pay-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Payment-Closed-Pay");
-        createProduct(salesSession, categoryId, "Payment Closed Tee", "PAYMENT-CLOSED-PAY", "ON_SHELF", 198.00, 4, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Payment-Closed-Pay");
+        createProduct(merchantSession, categoryId, "Payment Closed Tee", "PAYMENT-CLOSED-PAY", "ON_SHELF", 198.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSED-PAY-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -497,7 +497,7 @@ class PaymentIntegrationTest {
             "update orders set payment_deadline_at = date_sub(now(3), interval 5 minute) where id = ?",
             orderId);
 
-        mockMvc.perform(post("/api/payments/close-expired").session(salesSession))
+        mockMvc.perform(post("/api/payments/close-expired").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.closedOrderCount").value(1));
 
@@ -535,8 +535,8 @@ class PaymentIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "payment-sales", "SALES");
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedUser(email, rawPassword, "payment-merchant", "MERCHANT");
         return login(email, rawPassword);
     }
 

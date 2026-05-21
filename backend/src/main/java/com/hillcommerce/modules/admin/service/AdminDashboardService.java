@@ -74,7 +74,7 @@ public class AdminDashboardService {
             join user_roles ur on ur.user_id = u.id
             join roles r on r.id = ur.role_id
             where osh.to_status = 'SHIPPED'
-              and r.code = 'SALES'
+              and r.code = 'MERCHANT'
             group by u.id, u.nickname
             order by order_count desc, u.id asc
             limit 10

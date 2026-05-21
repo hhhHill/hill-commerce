@@ -99,11 +99,11 @@ class CartPreparationIntegrationTest {
 
     @Test
     void loggedInUserCanAddAndMergeSameSkuInCart() throws Exception {
-        MockHttpSession salesSession = loginAsSales("cart-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("cart-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Cart-Shirts");
-        createProduct(salesSession, categoryId, "Cart Cotton Tee", "CART-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Cart-Shirts");
+        createProduct(merchantSession, categoryId, "Cart Cotton Tee", "CART-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
         Long skuId = readSkuId("CART-TEE-001");
 
         mockMvc.perform(post("/api/cart")
@@ -141,11 +141,11 @@ class CartPreparationIntegrationTest {
 
     @Test
     void loggedInUserCanUpdateSelectionAndDeleteCartItem() throws Exception {
-        MockHttpSession salesSession = loginAsSales("cart-update-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("cart-update-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-update-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Cart-Update");
-        createProduct(salesSession, categoryId, "Cart Update Tee", "CART-UPDATE", "ON_SHELF", 109.00, 8, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Cart-Update");
+        createProduct(merchantSession, categoryId, "Cart Update Tee", "CART-UPDATE", "ON_SHELF", 109.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("CART-UPDATE-001");
 
         MvcResult addResult = mockMvc.perform(post("/api/cart")
@@ -236,11 +236,11 @@ class CartPreparationIntegrationTest {
 
     @Test
     void checkoutSummaryBlocksWithoutAddressAndWithOffShelfItem() throws Exception {
-        MockHttpSession salesSession = loginAsSales("cart-summary-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("cart-summary-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-summary-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Cart-Summary");
-        Long productId = createProduct(salesSession, categoryId, "Cart Summary Tee", "CART-SUMMARY", "ON_SHELF", 139.00, 9, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Cart-Summary");
+        Long productId = createProduct(merchantSession, categoryId, "Cart Summary Tee", "CART-SUMMARY", "ON_SHELF", 139.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("CART-SUMMARY-001");
 
         mockMvc.perform(post("/api/cart")
@@ -280,11 +280,11 @@ class CartPreparationIntegrationTest {
 
     @Test
     void cartPageResponseAlsoMarksOffShelfItemAnomaly() throws Exception {
-        MockHttpSession salesSession = loginAsSales("cart-anomaly-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("cart-anomaly-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-anomaly-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Cart-Anomaly");
-        Long productId = createProduct(salesSession, categoryId, "Cart Anomaly Tee", "CART-ANOMALY", "ON_SHELF", 149.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Cart-Anomaly");
+        Long productId = createProduct(merchantSession, categoryId, "Cart Anomaly Tee", "CART-ANOMALY", "ON_SHELF", 149.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("CART-ANOMALY-001");
 
         mockMvc.perform(post("/api/cart")
@@ -307,8 +307,8 @@ class CartPreparationIntegrationTest {
             .andExpect(jsonPath("$.items[0].canCheckout").value(false));
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "cart-sales", "SALES");
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedUser(email, rawPassword, "cart-merchant", "MERCHANT");
         return login(email, rawPassword);
     }
 

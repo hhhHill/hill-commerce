@@ -102,11 +102,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void loggedInUserCanReadCheckoutDataFromSelectedCartItemsAndDefaultAddress() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Shirts");
-        createProduct(salesSession, categoryId, "Order Checkout Tee", "ORDER-CHECKOUT-TEE", "ON_SHELF", 129.00, 9, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Shirts");
+        createProduct(merchantSession, categoryId, "Order Checkout Tee", "ORDER-CHECKOUT-TEE", "ON_SHELF", 129.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-TEE-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -127,11 +127,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void checkoutDataBlocksWhenDefaultAddressIsMissing() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-noaddr-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-noaddr-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-noaddr-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-NoAddr");
-        createProduct(salesSession, categoryId, "Order Checkout NoAddr Tee", "ORDER-CHECKOUT-NOADDR", "ON_SHELF", 119.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-NoAddr");
+        createProduct(merchantSession, categoryId, "Order Checkout NoAddr Tee", "ORDER-CHECKOUT-NOADDR", "ON_SHELF", 119.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-NOADDR-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -145,11 +145,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void checkoutDataBlocksWhenSelectedItemHasAnomaly() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-anomaly-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-anomaly-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-anomaly-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Anomaly");
-        Long productId = createProduct(salesSession, categoryId, "Order Checkout Anomaly Tee", "ORDER-CHECKOUT-ANOMALY", "ON_SHELF", 149.00, 5, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Anomaly");
+        Long productId = createProduct(merchantSession, categoryId, "Order Checkout Anomaly Tee", "ORDER-CHECKOUT-ANOMALY", "ON_SHELF", 149.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-ANOMALY-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -167,11 +167,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void loggedInUserCanCreateOrderFromSelectedCartItems() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-create-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-create-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-create-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Create");
-        createProduct(salesSession, categoryId, "Order Checkout Create Tee", "ORDER-CHECKOUT-CREATE", "ON_SHELF", 169.00, 10, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Create");
+        createProduct(merchantSession, categoryId, "Order Checkout Create Tee", "ORDER-CHECKOUT-CREATE", "ON_SHELF", 169.00, 10, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-CREATE-001");
 
         addCartItem(customerSession, skuId, 3);
@@ -217,11 +217,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void orderCreationFailsWhenSelectedItemBecomesInvalid() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-fail-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-fail-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-fail-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Fail");
-        Long productId = createProduct(salesSession, categoryId, "Order Checkout Fail Tee", "ORDER-CHECKOUT-FAIL", "ON_SHELF", 159.00, 4, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Fail");
+        Long productId = createProduct(merchantSession, categoryId, "Order Checkout Fail Tee", "ORDER-CHECKOUT-FAIL", "ON_SHELF", 159.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-FAIL-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -246,11 +246,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void pendingPaymentOrderCanBeCancelledAndRestocksInventory() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-cancel-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-cancel-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-cancel-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Cancel");
-        createProduct(salesSession, categoryId, "Order Checkout Cancel Tee", "ORDER-CHECKOUT-CANCEL", "ON_SHELF", 139.00, 8, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Cancel");
+        createProduct(merchantSession, categoryId, "Order Checkout Cancel Tee", "ORDER-CHECKOUT-CANCEL", "ON_SHELF", 139.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-CANCEL-001");
 
         addCartItem(customerSession, skuId, 2);
@@ -275,11 +275,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void repeatCancellationIsIdempotentAndDoesNotRestockTwice() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-repeat-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-repeat-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-repeat-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Repeat");
-        createProduct(salesSession, categoryId, "Order Checkout Repeat Tee", "ORDER-CHECKOUT-REPEAT", "ON_SHELF", 149.00, 9, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Repeat");
+        createProduct(merchantSession, categoryId, "Order Checkout Repeat Tee", "ORDER-CHECKOUT-REPEAT", "ON_SHELF", 149.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-REPEAT-001");
 
         addCartItem(customerSession, skuId, 3);
@@ -303,11 +303,11 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void nonPendingPaymentOrderCannotBeCancelled() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-paid-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-paid-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-paid-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Paid");
-        createProduct(salesSession, categoryId, "Order Checkout Paid Tee", "ORDER-CHECKOUT-PAID", "ON_SHELF", 159.00, 6, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Paid");
+        createProduct(merchantSession, categoryId, "Order Checkout Paid Tee", "ORDER-CHECKOUT-PAID", "ON_SHELF", 159.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-PAID-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -325,12 +325,12 @@ class OrderCheckoutIntegrationTest {
 
     @Test
     void userCannotCancelAnotherUsersOrder() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-checkout-owner-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-checkout-owner-sales@example.com", "Sales@123456");
         MockHttpSession ownerSession = loginAsCustomer("order-checkout-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("order-checkout-other@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(salesSession, "Order Checkout-Owner");
-        createProduct(salesSession, categoryId, "Order Checkout Owner Tee", "ORDER-CHECKOUT-OWNER", "ON_SHELF", 129.00, 7, 2, "ENABLED");
+        Long categoryId = createCategory(merchantSession, "Order Checkout-Owner");
+        createProduct(merchantSession, categoryId, "Order Checkout Owner Tee", "ORDER-CHECKOUT-OWNER", "ON_SHELF", 129.00, 7, 2, "ENABLED");
         readSkuId("ORDER-CHECKOUT-OWNER-001");
 
         addCartItem(ownerSession, readSkuId("ORDER-CHECKOUT-OWNER-001"), 1);
@@ -371,8 +371,8 @@ class OrderCheckoutIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "order-checkout-sales", "SALES");
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedUser(email, rawPassword, "order-checkout-merchant", "MERCHANT");
         return login(email, rawPassword);
     }
 

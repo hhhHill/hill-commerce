@@ -15,7 +15,7 @@ public enum ErrorCode {
     AUTHENTICATION_REQUIRED(2003, HttpStatus.UNAUTHORIZED),
     ROLE_NOT_FOUND(2004, HttpStatus.INTERNAL_SERVER_ERROR),
     ADDRESS_NOT_FOUND(2005, HttpStatus.NOT_FOUND),
-    SALES_USER_NOT_FOUND(2006, HttpStatus.NOT_FOUND),
+    MERCHANT_USER_NOT_FOUND(2006, HttpStatus.NOT_FOUND),
     CANNOT_DISABLE_SELF(2007, HttpStatus.BAD_REQUEST),
 
     // ── 3xxx 商品 ────────────────────────────────────────────

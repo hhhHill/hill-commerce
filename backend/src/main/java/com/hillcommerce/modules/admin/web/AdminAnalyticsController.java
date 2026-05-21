@@ -56,7 +56,7 @@ public class AdminAnalyticsController {
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         AuthenticatedUserPrincipal principal = requireAny(authentication);
-        return salesTrendService.getTrends(granularity, from, to, principal.id(), isSales(principal));
+        return salesTrendService.getTrends(granularity, from, to, principal.id(), isMerchant(principal));
     }
 
     @GetMapping("/anomalies")
@@ -85,7 +85,7 @@ public class AdminAnalyticsController {
         @RequestParam(defaultValue = "10") int limit
     ) {
         AuthenticatedUserPrincipal principal = requireAny(authentication);
-        return productRankingService.getRankings(range, limit, principal.id(), isSales(principal));
+        return productRankingService.getRankings(range, limit, principal.id(), isMerchant(principal));
     }
 
     @GetMapping("/profiles/aggregate")
@@ -108,7 +108,7 @@ public class AdminAnalyticsController {
 
     private AuthenticatedUserPrincipal requireAny(Authentication authentication) {
         AuthenticatedUserPrincipal principal = principal(authentication);
-        if (!principal.roles().contains("ADMIN") && !principal.roles().contains("SALES")) {
+        if (!principal.roles().contains("ADMIN") && !principal.roles().contains("MERCHANT")) {
             throw new AccessDeniedException("forbidden");
         }
         return principal;
@@ -128,7 +128,7 @@ public class AdminAnalyticsController {
         return principal;
     }
 
-    private boolean isSales(AuthenticatedUserPrincipal principal) {
-        return principal.roles().contains("SALES") && !principal.roles().contains("ADMIN");
+    private boolean isMerchant(AuthenticatedUserPrincipal principal) {
+        return principal.roles().contains("MERCHANT") && !principal.roles().contains("ADMIN");
     }
 }

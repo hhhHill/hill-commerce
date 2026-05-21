@@ -98,10 +98,10 @@ class AdminAccountManagementIntegrationTest {
     }
 
     @Test
-    void adminCanListCreateDisableAndResetSalesUsers() throws Exception {
+    void adminCanListCreateDisableAndResetMerchantUsers() throws Exception {
         MockHttpSession adminSession = loginAsRole(PREFIX + "admin@example.com", "Admin@123456", "ADMIN", "aam-admin");
-        seedUserWithRole(PREFIX + "sales-one@example.com", "Sales@123456", "SALES", "sales-one", "ACTIVE");
-        seedUserWithRole(PREFIX + "sales-two@example.com", "Sales@123456", "SALES", "sales-two", "DISABLED");
+        seedUserWithRole(PREFIX + "merchant-one@example.com", "Sales@123456", "MERCHANT", "merchant-one", "ACTIVE");
+        seedUserWithRole(PREFIX + "merchant-two@example.com", "Sales@123456", "MERCHANT", "merchant-two", "DISABLED");
         seedUserWithRole(PREFIX + "customer@example.com", "Pass@123456", "CUSTOMER", "aam-customer", "ACTIVE");
 
         MvcResult listResult = mockMvc.perform(get("/api/admin/users").session(adminSession))
@@ -110,7 +110,7 @@ class AdminAccountManagementIntegrationTest {
         List<Map<String, Object>> users = readUsers(listResult);
         assertThat(users)
             .extracting(user -> String.valueOf(user.get("email")))
-            .contains(PREFIX + "sales-one@example.com", PREFIX + "sales-two@example.com")
+            .contains(PREFIX + "merchant-one@example.com", PREFIX + "merchant-two@example.com")
             .doesNotContain(PREFIX + "customer@example.com", PREFIX + "admin@example.com");
 
         mockMvc.perform(post("/api/admin/users")
@@ -119,7 +119,7 @@ class AdminAccountManagementIntegrationTest {
                 .content("""
                     {
                       "email": "%s",
-                      "nickname": "created-sales",
+                      "nickname": "created-merchant",
                       "password": "Sales@654321"
                     }
                     """.formatted(PREFIX + "created@example.com")))
@@ -139,7 +139,7 @@ class AdminAccountManagementIntegrationTest {
                 .content("""
                     {
                       "email": "%s",
-                      "nickname": "dup-sales",
+                      "nickname": "dup-merchant",
                       "password": "Sales@654321"
                     }
                     """.formatted(PREFIX + "created@example.com")))
@@ -157,8 +157,8 @@ class AdminAccountManagementIntegrationTest {
                     """.formatted(PREFIX + "short-pass@example.com")))
             .andExpect(status().isBadRequest());
 
-        Long targetSalesUserId = findUserIdByEmail(PREFIX + "sales-one@example.com");
-        mockMvc.perform(post("/api/admin/users/{id}/reset-password", targetSalesUserId)
+        Long targetMerchantUserId = findUserIdByEmail(PREFIX + "merchant-one@example.com");
+        mockMvc.perform(post("/api/admin/users/{id}/reset-password", targetMerchantUserId)
                 .session(adminSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -167,36 +167,36 @@ class AdminAccountManagementIntegrationTest {
                     }
                     """))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(targetSalesUserId))
+            .andExpect(jsonPath("$.userId").value(targetMerchantUserId))
             .andExpect(jsonPath("$.enabled").value(true));
 
-        assertThat(loginFails(PREFIX + "sales-one@example.com", "Sales@123456")).isTrue();
-        MockHttpSession resetSession = login(PREFIX + "sales-one@example.com", "Reset@123456");
+        assertThat(loginFails(PREFIX + "merchant-one@example.com", "Sales@123456")).isTrue();
+        MockHttpSession resetSession = login(PREFIX + "merchant-one@example.com", "Reset@123456");
         assertThat(resetSession).isNotNull();
 
-        mockMvc.perform(post("/api/admin/users/{id}/disable", targetSalesUserId).session(adminSession))
+        mockMvc.perform(post("/api/admin/users/{id}/disable", targetMerchantUserId).session(adminSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(targetSalesUserId))
+            .andExpect(jsonPath("$.userId").value(targetMerchantUserId))
             .andExpect(jsonPath("$.enabled").value(false));
 
-        mockMvc.perform(post("/api/admin/users/{id}/disable", targetSalesUserId).session(adminSession))
+        mockMvc.perform(post("/api/admin/users/{id}/disable", targetMerchantUserId).session(adminSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(targetSalesUserId))
+            .andExpect(jsonPath("$.userId").value(targetMerchantUserId))
             .andExpect(jsonPath("$.enabled").value(false));
 
-        assertThat(loginFails(PREFIX + "sales-one@example.com", "Reset@123456")).isTrue();
+        assertThat(loginFails(PREFIX + "merchant-one@example.com", "Reset@123456")).isTrue();
 
-        mockMvc.perform(post("/api/admin/users/{id}/enable", targetSalesUserId).session(adminSession))
+        mockMvc.perform(post("/api/admin/users/{id}/enable", targetMerchantUserId).session(adminSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(targetSalesUserId))
+            .andExpect(jsonPath("$.userId").value(targetMerchantUserId))
             .andExpect(jsonPath("$.enabled").value(true));
 
-        mockMvc.perform(post("/api/admin/users/{id}/enable", targetSalesUserId).session(adminSession))
+        mockMvc.perform(post("/api/admin/users/{id}/enable", targetMerchantUserId).session(adminSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(targetSalesUserId))
+            .andExpect(jsonPath("$.userId").value(targetMerchantUserId))
             .andExpect(jsonPath("$.enabled").value(true));
 
-        MockHttpSession enabledSession = login(PREFIX + "sales-one@example.com", "Reset@123456");
+        MockHttpSession enabledSession = login(PREFIX + "merchant-one@example.com", "Reset@123456");
         assertThat(enabledSession).isNotNull();
 
         Long adminUserId = findUserIdByEmail(PREFIX + "admin@example.com");
@@ -205,13 +205,13 @@ class AdminAccountManagementIntegrationTest {
     }
 
     @Test
-    void salesCannotAccessAdminAccountManagementApis() throws Exception {
-        MockHttpSession salesSession = loginAsRole(PREFIX + "sales-api@example.com", "Sales@123456", "SALES", "sales-api");
+    void merchantCannotAccessAdminAccountManagementApis() throws Exception {
+        MockHttpSession merchantSession = loginAsRole(PREFIX + "merchant-api@example.com", "Sales@123456", "MERCHANT", "merchant-api");
 
-        mockMvc.perform(get("/api/admin/users").session(salesSession))
+        mockMvc.perform(get("/api/admin/users").session(merchantSession))
             .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/admin/dashboard/summary").session(salesSession))
+        mockMvc.perform(get("/api/admin/dashboard/summary").session(merchantSession))
             .andExpect(status().isForbidden());
     }
 
@@ -219,8 +219,8 @@ class AdminAccountManagementIntegrationTest {
     void dashboardSummaryAggregatesOrdersAndSalesRanking() throws Exception {
         MockHttpSession adminSession = loginAsRole(PREFIX + "dash-admin@example.com", "Admin@123456", "ADMIN", "dash-admin");
         Long customerId = seedUserWithRole(PREFIX + "dash-customer@example.com", "Pass@123456", "CUSTOMER", "dash-customer", "ACTIVE");
-        Long salesOneId = seedUserWithRole(PREFIX + "dash-sales-one@example.com", "Sales@123456", "SALES", "dash-sales-one", "ACTIVE");
-        Long salesTwoId = seedUserWithRole(PREFIX + "dash-sales-two@example.com", "Sales@123456", "SALES", "dash-sales-two", "ACTIVE");
+        Long merchantOneId = seedUserWithRole(PREFIX + "dash-merchant-one@example.com", "Sales@123456", "MERCHANT", "dash-merchant-one", "ACTIVE");
+        Long merchantTwoId = seedUserWithRole(PREFIX + "dash-merchant-two@example.com", "Sales@123456", "MERCHANT", "dash-merchant-two", "ACTIVE");
         Map<String, Long> baselineCounts = currentOrderStatusCounts();
         double baselineTotalSales = currentTotalSalesAmount();
         int currentMaxShippedRank = currentMaxShippedRankCount();
@@ -232,13 +232,13 @@ class AdminAccountManagementIntegrationTest {
         Long cancelledOrderId = seedOrder("AAM-CANCELLED", customerId, "CANCELLED", 500.00, now().minusHours(2));
         Long closedOrderId = seedOrder("AAM-CLOSED", customerId, "CLOSED", 600.00, now().minusHours(1));
 
-        seedHistory(shippedOrderId, "PAID", "SHIPPED", salesOneId, now().minusHours(4));
-        seedHistory(completedOrderId, "PAID", "SHIPPED", salesOneId, now().minusHours(3));
-        seedHistory(cancelledOrderId, "PAID", "SHIPPED", salesTwoId, now().minusHours(2));
+        seedHistory(shippedOrderId, "PAID", "SHIPPED", merchantOneId, now().minusHours(4));
+        seedHistory(completedOrderId, "PAID", "SHIPPED", merchantOneId, now().minusHours(3));
+        seedHistory(cancelledOrderId, "PAID", "SHIPPED", merchantTwoId, now().minusHours(2));
         seedHistory(pendingOrderId, null, "PENDING_PAYMENT", null, now().minusHours(6));
         seedHistory(paidOrderId, "PENDING_PAYMENT", "PAID", null, now().minusHours(5));
         seedHistory(closedOrderId, "CANCELLED", "CLOSED", null, now().minusHours(1));
-        seedShippedRankingOrders(customerId, salesOneId, salesTwoId, currentMaxShippedRank);
+        seedShippedRankingOrders(customerId, merchantOneId, merchantTwoId, currentMaxShippedRank);
 
         MvcResult summaryResult = mockMvc.perform(get("/api/admin/dashboard/summary").session(adminSession))
             .andExpect(status().isOk())
@@ -263,12 +263,12 @@ class AdminAccountManagementIntegrationTest {
         assertThat(orderStatusCounts.get("CLOSED")).isEqualTo(baselineCounts.getOrDefault("CLOSED", 0L).intValue() + 1);
         assertThat(objectMapper.convertValue(summary.get("totalSalesAmount"), Double.class)).isEqualTo(baselineTotalSales + 900.0);
         assertThat(salesRanking)
-            .filteredOn(item -> "dash-sales-one".equals(item.get("nickname")))
+            .filteredOn(item -> "dash-merchant-one".equals(item.get("nickname")))
             .singleElement()
             .extracting(item -> ((Number) item.get("orderCount")).intValue())
             .isEqualTo(currentMaxShippedRank + 4);
         assertThat(salesRanking)
-            .filteredOn(item -> "dash-sales-two".equals(item.get("nickname")))
+            .filteredOn(item -> "dash-merchant-two".equals(item.get("nickname")))
             .singleElement()
             .extracting(item -> ((Number) item.get("orderCount")).intValue())
             .isEqualTo(currentMaxShippedRank + 2);
@@ -463,7 +463,7 @@ class AdminAccountManagementIntegrationTest {
               join user_roles ur on ur.user_id = osh.changed_by
               join roles r on r.id = ur.role_id
               where osh.to_status = 'SHIPPED'
-                and r.code = 'SALES'
+                and r.code = 'MERCHANT'
               group by osh.changed_by
             ) ranked
             """,
@@ -471,14 +471,14 @@ class AdminAccountManagementIntegrationTest {
         return max == null ? 0 : max;
     }
 
-    private void seedShippedRankingOrders(Long customerId, Long salesOneId, Long salesTwoId, int currentMaxShippedRank) {
+    private void seedShippedRankingOrders(Long customerId, Long merchantOneId, Long merchantTwoId, int currentMaxShippedRank) {
         for (int index = 0; index < currentMaxShippedRank + 2; index++) {
             Long orderId = seedOrder("AAM-RANK-S1-" + index, customerId, "SHIPPED", 0.00, now().minusMinutes(30 + index));
-            seedHistory(orderId, "PAID", "SHIPPED", salesOneId, now().minusMinutes(30 + index));
+            seedHistory(orderId, "PAID", "SHIPPED", merchantOneId, now().minusMinutes(30 + index));
         }
         for (int index = 0; index < currentMaxShippedRank + 1; index++) {
             Long orderId = seedOrder("AAM-RANK-S2-" + index, customerId, "SHIPPED", 0.00, now().minusMinutes(90 + index));
-            seedHistory(orderId, "PAID", "SHIPPED", salesTwoId, now().minusMinutes(90 + index));
+            seedHistory(orderId, "PAID", "SHIPPED", merchantTwoId, now().minusMinutes(90 + index));
         }
     }
 }

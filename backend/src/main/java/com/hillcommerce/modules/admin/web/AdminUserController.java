@@ -1,9 +1,9 @@
 package com.hillcommerce.modules.admin.web;
 
-import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateSalesRequest;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateMerchantRequest;
 import static com.hillcommerce.modules.admin.dto.AdminUserDtos.ResetPasswordRequest;
-import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserListResponse;
-import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.MerchantUserListResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.MerchantUserResponse;
 import static com.hillcommerce.modules.admin.dto.AdminUserDtos.UserActionResponse;
 
 import jakarta.validation.Valid;
@@ -34,34 +34,34 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public SalesUserListResponse listUsers(Authentication authentication) {
+    public MerchantUserListResponse listUsers(Authentication authentication) {
         requireAdmin(authentication);
-        return new SalesUserListResponse(adminUserService.listSalesUsers());
+        return new MerchantUserListResponse(adminUserService.listMerchantUsers());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @OperationLog(action = "CREATE_USER", targetType = "USER", targetIdExpr = "#result.id")
-    public SalesUserResponse createUser(
+    public MerchantUserResponse createUser(
         Authentication authentication,
-        @Valid @RequestBody CreateSalesRequest request
+        @Valid @RequestBody CreateMerchantRequest request
     ) {
         requireAdmin(authentication);
-        return adminUserService.createSalesUser(request);
+        return adminUserService.createMerchantUser(request);
     }
 
     @PostMapping("/{id}/disable")
     @OperationLog(action = "DISABLE_USER", targetType = "USER", targetIdExpr = "#id")
     public UserActionResponse disableUser(@PathVariable Long id, Authentication authentication) {
         AuthenticatedUserPrincipal principal = requireAdmin(authentication);
-        return adminUserService.disableSalesUser(id, principal.id());
+        return adminUserService.disableMerchantUser(id, principal.id());
     }
 
     @PostMapping("/{id}/enable")
     @OperationLog(action = "ENABLE_USER", targetType = "USER", targetIdExpr = "#id")
     public UserActionResponse enableUser(@PathVariable Long id, Authentication authentication) {
         requireAdmin(authentication);
-        return adminUserService.enableSalesUser(id);
+        return adminUserService.enableMerchantUser(id);
     }
 
     @PostMapping("/{id}/reset-password")

@@ -1,7 +1,7 @@
 package com.hillcommerce.modules.admin.service;
 
-import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateSalesRequest;
-import static com.hillcommerce.modules.admin.dto.AdminUserDtos.SalesUserResponse;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.CreateMerchantRequest;
+import static com.hillcommerce.modules.admin.dto.AdminUserDtos.MerchantUserResponse;
 import static com.hillcommerce.modules.admin.dto.AdminUserDtos.UserActionResponse;
 
 import java.sql.Timestamp;
@@ -26,7 +26,7 @@ import com.hillcommerce.modules.user.service.PasswordService;
 @Service
 public class AdminUserService {
 
-    private static final String ROLE_SALES = "SALES";
+    private static final String ROLE_MERCHANT = "MERCHANT";
     private static final String STATUS_ACTIVE = "ACTIVE";
     private static final String STATUS_DISABLED = "DISABLED";
 
@@ -50,7 +50,7 @@ public class AdminUserService {
         this.passwordService = passwordService;
     }
 
-    public List<SalesUserResponse> listSalesUsers() {
+    public List<MerchantUserResponse> listMerchantUsers() {
         return jdbcTemplate.query(
             """
             select u.id, u.email, u.nickname, u.status, u.created_at
@@ -60,17 +60,17 @@ public class AdminUserService {
             where r.code = ?
             order by u.created_at desc, u.id desc
             """,
-            (rs, rowNum) -> new SalesUserResponse(
+            (rs, rowNum) -> new MerchantUserResponse(
                 rs.getLong("id"),
                 rs.getString("email"),
                 rs.getString("nickname"),
                 STATUS_ACTIVE.equals(rs.getString("status")),
                 rs.getTimestamp("created_at").toLocalDateTime()),
-            ROLE_SALES);
+            ROLE_MERCHANT);
     }
 
     @Transactional
-    public SalesUserResponse createSalesUser(CreateSalesRequest request) {
+    public MerchantUserResponse createMerchantUser(CreateMerchantRequest request) {
         String email = request.email().trim();
         if (existsByEmail(email)) {
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "Email already exists");
@@ -83,49 +83,49 @@ public class AdminUserService {
         user.setStatus(STATUS_ACTIVE);
         userMapper.insert(user);
 
-        RoleEntity salesRole = requireRole(ROLE_SALES);
+        RoleEntity merchantRole = requireRole(ROLE_MERCHANT);
         UserRoleEntity userRole = new UserRoleEntity();
         userRole.setUserId(user.getId());
-        userRole.setRoleId(salesRole.getId());
+        userRole.setRoleId(merchantRole.getId());
         userRoleMapper.insert(userRole);
 
-        return toSalesUserResponse(requireSalesUser(user.getId()));
+        return toMerchantUserResponse(requireMerchantUser(user.getId()));
     }
 
     @Transactional
-    public UserActionResponse disableSalesUser(Long targetUserId, Long operatorUserId) {
+    public UserActionResponse disableMerchantUser(Long targetUserId, Long operatorUserId) {
         if (targetUserId.equals(operatorUserId)) {
             throw new BusinessException(ErrorCode.CANNOT_DISABLE_SELF, "Admin cannot disable current user");
         }
 
-        UserEntity salesUser = requireSalesUser(targetUserId);
-        if (!STATUS_ACTIVE.equals(salesUser.getStatus())) {
-            return new UserActionResponse(salesUser.getId(), false);
+        UserEntity merchantUser = requireMerchantUser(targetUserId);
+        if (!STATUS_ACTIVE.equals(merchantUser.getStatus())) {
+            return new UserActionResponse(merchantUser.getId(), false);
         }
 
-        salesUser.setStatus(STATUS_DISABLED);
-        userMapper.updateById(salesUser);
-        return new UserActionResponse(salesUser.getId(), false);
+        merchantUser.setStatus(STATUS_DISABLED);
+        userMapper.updateById(merchantUser);
+        return new UserActionResponse(merchantUser.getId(), false);
     }
 
     @Transactional
-    public UserActionResponse enableSalesUser(Long targetUserId) {
-        UserEntity salesUser = requireSalesUser(targetUserId);
-        if (STATUS_ACTIVE.equals(salesUser.getStatus())) {
-            return new UserActionResponse(salesUser.getId(), true);
+    public UserActionResponse enableMerchantUser(Long targetUserId) {
+        UserEntity merchantUser = requireMerchantUser(targetUserId);
+        if (STATUS_ACTIVE.equals(merchantUser.getStatus())) {
+            return new UserActionResponse(merchantUser.getId(), true);
         }
 
-        salesUser.setStatus(STATUS_ACTIVE);
-        userMapper.updateById(salesUser);
-        return new UserActionResponse(salesUser.getId(), true);
+        merchantUser.setStatus(STATUS_ACTIVE);
+        userMapper.updateById(merchantUser);
+        return new UserActionResponse(merchantUser.getId(), true);
     }
 
     @Transactional
     public UserActionResponse resetPassword(Long targetUserId, String rawPassword) {
-        UserEntity salesUser = requireSalesUser(targetUserId);
-        salesUser.setPasswordHash(passwordService.encode(rawPassword));
-        userMapper.updateById(salesUser);
-        return new UserActionResponse(salesUser.getId(), STATUS_ACTIVE.equals(salesUser.getStatus()));
+        UserEntity merchantUser = requireMerchantUser(targetUserId);
+        merchantUser.setPasswordHash(passwordService.encode(rawPassword));
+        userMapper.updateById(merchantUser);
+        return new UserActionResponse(merchantUser.getId(), STATUS_ACTIVE.equals(merchantUser.getStatus()));
     }
 
     private boolean existsByEmail(String email) {
@@ -145,20 +145,20 @@ public class AdminUserService {
         return role;
     }
 
-    private UserEntity requireSalesUser(Long userId) {
+    private UserEntity requireMerchantUser(Long userId) {
         List<String> roles = userMapper.findRoleCodesByUserId(userId);
-        if (!roles.contains(ROLE_SALES) || roles.contains("ADMIN")) {
-            throw new BusinessException(ErrorCode.SALES_USER_NOT_FOUND, "Sales user not found");
+        if (!roles.contains(ROLE_MERCHANT) || roles.contains("ADMIN")) {
+            throw new BusinessException(ErrorCode.MERCHANT_USER_NOT_FOUND, "Merchant user not found");
         }
 
         UserEntity user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BusinessException(ErrorCode.SALES_USER_NOT_FOUND, "Sales user not found");
+            throw new BusinessException(ErrorCode.MERCHANT_USER_NOT_FOUND, "Merchant user not found");
         }
         return user;
     }
 
-    private SalesUserResponse toSalesUserResponse(UserEntity user) {
+    private MerchantUserResponse toMerchantUserResponse(UserEntity user) {
         LocalDateTime createdAt = user.getCreatedAt();
         if (createdAt == null) {
             Timestamp dbCreatedAt = jdbcTemplate.queryForObject(
@@ -167,7 +167,7 @@ public class AdminUserService {
                 user.getId());
             createdAt = dbCreatedAt.toLocalDateTime();
         }
-        return new SalesUserResponse(
+        return new MerchantUserResponse(
             user.getId(),
             user.getEmail(),
             user.getNickname(),

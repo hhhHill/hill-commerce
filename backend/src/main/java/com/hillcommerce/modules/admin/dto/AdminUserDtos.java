@@ -12,7 +12,7 @@ public final class AdminUserDtos {
     private AdminUserDtos() {
     }
 
-    public record SalesUserResponse(
+    public record MerchantUserResponse(
         Long id,
         String email,
         String nickname,
@@ -21,12 +21,12 @@ public final class AdminUserDtos {
     ) {
     }
 
-    public record SalesUserListResponse(
-        List<SalesUserResponse> users
+    public record MerchantUserListResponse(
+        List<MerchantUserResponse> users
     ) {
     }
 
-    public record CreateSalesRequest(
+    public record CreateMerchantRequest(
         @NotBlank @Email @Size(max = 128) String email,
         @NotBlank @Size(max = 64) String nickname,
         @NotBlank @Size(min = 6, max = 255) String password

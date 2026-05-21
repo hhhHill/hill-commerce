@@ -45,7 +45,7 @@ public class SecurityConfig {
                     "/api/storefront/recommendations",
                     "/api/storefront/view-log")
                 .permitAll()
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SALES")
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "MERCHANT")
                 .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
                 .anyRequest().authenticated())
             .build();

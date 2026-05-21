@@ -80,11 +80,11 @@ class OssControllerWebMvcTest {
     }
 
     @Test
-    void securityConfigAllowsAdminAndSalesForAdminApis() throws Exception {
+    void securityConfigAllowsAdminAndMerchantForAdminApis() throws Exception {
         String securityConfig = Files.readString(Path.of("src/main/java/com/hillcommerce/framework/security/SecurityConfig.java"));
 
         org.assertj.core.api.Assertions.assertThat(securityConfig)
-            .contains(".requestMatchers(\"/api/admin/**\").hasAnyRole(\"ADMIN\", \"SALES\")");
+            .contains(".requestMatchers(\"/api/admin/**\").hasAnyRole(\"ADMIN\", \"MERCHANT\")");
     }
 
     @Test
@@ -102,7 +102,7 @@ class OssControllerWebMvcTest {
         org.assertj.core.api.Assertions.assertThat(securityConfig)
             .contains("writeJson(response, 401, ");
         org.assertj.core.api.Assertions.assertThat(securityConfig)
-            .contains(".requestMatchers(\"/api/admin/**\").hasAnyRole(\"ADMIN\", \"SALES\")")
+            .contains(".requestMatchers(\"/api/admin/**\").hasAnyRole(\"ADMIN\", \"MERCHANT\")")
             .doesNotContain(".requestMatchers(\"/api/admin/**\").permitAll()");
     }
 }

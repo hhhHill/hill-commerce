@@ -235,10 +235,10 @@ class AuthFlowIntegrationTest {
     }
 
     @Test
-    void salesCanAccessAdminEndpoint() throws Exception {
-        seedSalesUser("sales1@example.com", "Sales@123456");
+    void merchantCanAccessAdminEndpoint() throws Exception {
+        seedMerchantUser("merchant1@example.com", "Sales@123456");
 
-        MockHttpSession session = login("sales1@example.com", "Sales@123456");
+        MockHttpSession session = login("merchant1@example.com", "Sales@123456");
 
         mockMvc.perform(get("/api/admin/auth/ping").session(session))
             .andExpect(status().isOk())
@@ -286,18 +286,18 @@ class AuthFlowIntegrationTest {
         return (MockHttpSession) result.getRequest().getSession(false);
     }
 
-    private void seedSalesUser(String email, String rawPassword) {
+    private void seedMerchantUser(String email, String rawPassword) {
         jdbcTemplate.update(
             "insert into users (email, password_hash, nickname, status) values (?, ?, ?, 'ACTIVE')",
             email,
             passwordService.encode(rawPassword),
-            "sales-user");
+            "merchant-user");
         jdbcTemplate.update(
             """
             insert into user_roles (user_id, role_id)
             select u.id, r.id
             from users u
-            join roles r on r.code = 'SALES'
+            join roles r on r.code = 'MERCHANT'
             where u.email = ?
             """,
             email);

@@ -158,11 +158,11 @@ class LoggingIntegrationTest {
     @Test
     void adminWriteActionCreatesOperationLogAndAdminCanQueryIt() throws Exception {
         MockHttpSession adminSession = loginAsRole(PREFIX + "admin2@example.com", "Admin@123456", "ADMIN", "ops-admin-2");
-        Long salesUserId = seedUserWithRole(PREFIX + "sales@example.com", "Sales@123456", "SALES", "ops-sales", "ACTIVE");
+        Long merchantUserId = seedUserWithRole(PREFIX + "merchant@example.com", "Sales@123456", "MERCHANT", "ops-merchant", "ACTIVE");
 
-        mockMvc.perform(post("/api/admin/users/{id}/disable", salesUserId).session(adminSession))
+        mockMvc.perform(post("/api/admin/users/{id}/disable", merchantUserId).session(adminSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(salesUserId));
+            .andExpect(jsonPath("$.userId").value(merchantUserId));
 
         Integer count = jdbcTemplate.queryForObject(
             """
@@ -173,7 +173,7 @@ class LoggingIntegrationTest {
               and target_id = ?
             """,
             Integer.class,
-            String.valueOf(salesUserId));
+            String.valueOf(merchantUserId));
         assertThat(count).isEqualTo(1);
 
         MvcResult result = mockMvc.perform(get("/api/admin/operation-logs")
@@ -188,14 +188,14 @@ class LoggingIntegrationTest {
         });
         assertThat(items)
             .extracting(item -> String.valueOf(item.get("targetId")))
-            .contains(String.valueOf(salesUserId));
+            .contains(String.valueOf(merchantUserId));
     }
 
     @Test
-    void salesCanQueryViewLogsButCannotQueryLoginOrOperationLogs() throws Exception {
+    void merchantCanQueryViewLogsButCannotQueryLoginOrOperationLogs() throws Exception {
         Long categoryId = seedCategory(PREFIX + "category-2");
         Long productId = seedProduct(categoryId, PREFIX + "spu-2");
-        MockHttpSession salesSession = loginAsRole(PREFIX + "sales2@example.com", "Sales@123456", "SALES", "ops-sales-2");
+        MockHttpSession merchantSession = loginAsRole(PREFIX + "merchant2@example.com", "Sales@123456", "MERCHANT", "ops-merchant-2");
 
         jdbcTemplate.update(
             """
@@ -208,14 +208,14 @@ class LoggingIntegrationTest {
 
         mockMvc.perform(get("/api/admin/view-logs")
                 .queryParam("productId", String.valueOf(productId))
-                .session(salesSession))
+                .session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.items[0].productId").value(productId));
 
-        mockMvc.perform(get("/api/admin/login-logs").session(salesSession))
+        mockMvc.perform(get("/api/admin/login-logs").session(merchantSession))
             .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/admin/operation-logs").session(salesSession))
+        mockMvc.perform(get("/api/admin/operation-logs").session(merchantSession))
             .andExpect(status().isForbidden());
     }
 

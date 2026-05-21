@@ -107,18 +107,18 @@ class FulfillmentIntegrationTest {
 
     @Test
     void paidOrderCanBeShippedAndCustomerCanReadShipmentInfo() throws Exception {
-        MockHttpSession salesSession = loginAsSales("fulfillment-ship-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("fulfillment-ship-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("fulfillment-ship-customer@example.com", "Customer@123456");
 
-        Long orderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-SHIP");
+        Long orderId = createPaidOrder(merchantSession, customerSession, "FULFILLMENT-SHIP");
 
-        mockMvc.perform(get("/api/admin/orders/{orderId}/ship", orderId).session(salesSession))
+        mockMvc.perform(get("/api/admin/orders/{orderId}/ship", orderId).session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(orderId))
             .andExpect(jsonPath("$.orderStatus").value("PAID"));
 
         mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
-                .session(salesSession)
+                .session(merchantSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -141,13 +141,13 @@ class FulfillmentIntegrationTest {
 
     @Test
     void nonPaidOrderCannotBeShippedAndShipmentRemainsNull() throws Exception {
-        MockHttpSession salesSession = loginAsSales("fulfillment-not-paid-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("fulfillment-not-paid-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("fulfillment-not-paid-customer@example.com", "Customer@123456");
 
-        Long orderId = createPendingOrder(salesSession, customerSession, "FULFILLMENT-PENDING");
+        Long orderId = createPendingOrder(merchantSession, customerSession, "FULFILLMENT-PENDING");
 
         mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
-                .session(salesSession)
+                .session(merchantSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -165,11 +165,11 @@ class FulfillmentIntegrationTest {
 
     @Test
     void confirmReceiptCompletesOrderAndRepeatRequestIsIdempotent() throws Exception {
-        MockHttpSession salesSession = loginAsSales("fulfillment-receive-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("fulfillment-receive-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("fulfillment-receive-customer@example.com", "Customer@123456");
 
-        Long orderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-RECEIVE");
-        shipOrder(salesSession, orderId, "YTO", "YTO123456");
+        Long orderId = createPaidOrder(merchantSession, customerSession, "FULFILLMENT-RECEIVE");
+        shipOrder(merchantSession, orderId, "YTO", "YTO123456");
 
         mockMvc.perform(post("/api/orders/{orderId}/receive", orderId).session(customerSession))
             .andExpect(status().isOk())
@@ -191,12 +191,12 @@ class FulfillmentIntegrationTest {
 
     @Test
     void otherCustomerCannotConfirmReceiptForForeignOrder() throws Exception {
-        MockHttpSession salesSession = loginAsSales("fulfillment-owner-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("fulfillment-owner-merchant@example.com", "Sales@123456");
         MockHttpSession ownerSession = loginAsCustomer("fulfillment-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("fulfillment-other@example.com", "Customer@123456");
 
-        Long orderId = createPaidOrder(salesSession, ownerSession, "FULFILLMENT-OWNER");
-        shipOrder(salesSession, orderId, "ZTO", "ZTO998877");
+        Long orderId = createPaidOrder(merchantSession, ownerSession, "FULFILLMENT-OWNER");
+        shipOrder(merchantSession, orderId, "ZTO", "ZTO998877");
 
         mockMvc.perform(post("/api/orders/{orderId}/receive", orderId).session(otherSession))
             .andExpect(status().isNotFound());
@@ -204,18 +204,18 @@ class FulfillmentIntegrationTest {
 
     @Test
     void manualAutoCompleteOnlyCompletesExpiredShippedOrders() throws Exception {
-        MockHttpSession salesSession = loginAsSales("fulfillment-auto-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("fulfillment-auto-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("fulfillment-auto-customer@example.com", "Customer@123456");
 
-        Long expiredOrderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-AUTO-OLD");
-        Long freshOrderId = createPaidOrder(salesSession, customerSession, "FULFILLMENT-AUTO-NEW");
-        shipOrder(salesSession, expiredOrderId, "STO", "STO001");
-        shipOrder(salesSession, freshOrderId, "STO", "STO002");
+        Long expiredOrderId = createPaidOrder(merchantSession, customerSession, "FULFILLMENT-AUTO-OLD");
+        Long freshOrderId = createPaidOrder(merchantSession, customerSession, "FULFILLMENT-AUTO-NEW");
+        shipOrder(merchantSession, expiredOrderId, "STO", "STO001");
+        shipOrder(merchantSession, freshOrderId, "STO", "STO002");
         jdbcTemplate.update(
             "update orders set shipped_at = date_sub(now(3), interval 11 day) where id = ?",
             expiredOrderId);
 
-        mockMvc.perform(post("/api/admin/orders/auto-complete").session(salesSession))
+        mockMvc.perform(post("/api/admin/orders/auto-complete").session(merchantSession))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.completedCount").value(1));
 
@@ -231,10 +231,10 @@ class FulfillmentIntegrationTest {
             .andExpect(jsonPath("$.orderStatus").value("SHIPPED"));
     }
 
-    private Long createPendingOrder(MockHttpSession salesSession, MockHttpSession customerSession, String spuCode)
+    private Long createPendingOrder(MockHttpSession merchantSession, MockHttpSession customerSession, String spuCode)
         throws Exception {
-        Long categoryId = createCategory(salesSession, "Fulfillment-" + spuCode);
-        createProduct(salesSession, categoryId, "Fulfillment Tee " + spuCode, spuCode, 129.00, 10);
+        Long categoryId = createCategory(merchantSession, "Fulfillment-" + spuCode);
+        createProduct(merchantSession, categoryId, "Fulfillment Tee " + spuCode, spuCode, 129.00, 10);
         Long skuId = readSkuId(spuCode + "-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -242,9 +242,9 @@ class FulfillmentIntegrationTest {
         return createOrder(customerSession);
     }
 
-    private Long createPaidOrder(MockHttpSession salesSession, MockHttpSession customerSession, String spuCode)
+    private Long createPaidOrder(MockHttpSession merchantSession, MockHttpSession customerSession, String spuCode)
         throws Exception {
-        Long orderId = createPendingOrder(salesSession, customerSession, spuCode);
+        Long orderId = createPendingOrder(merchantSession, customerSession, spuCode);
         MvcResult attempt = mockMvc.perform(post("/api/payments/orders/{orderId}/attempts", orderId).session(customerSession))
             .andExpect(status().isCreated())
             .andReturn();
@@ -255,9 +255,9 @@ class FulfillmentIntegrationTest {
         return orderId;
     }
 
-    private void shipOrder(MockHttpSession salesSession, Long orderId, String carrierName, String trackingNo) throws Exception {
+    private void shipOrder(MockHttpSession merchantSession, Long orderId, String carrierName, String trackingNo) throws Exception {
         mockMvc.perform(post("/api/admin/orders/{orderId}/ship", orderId)
-                .session(salesSession)
+                .session(merchantSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -299,8 +299,8 @@ class FulfillmentIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "fulfillment-sales", "SALES");
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedUser(email, rawPassword, "fulfillment-merchant", "MERCHANT");
         return login(email, rawPassword);
     }
 

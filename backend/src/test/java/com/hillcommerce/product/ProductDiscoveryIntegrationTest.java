@@ -97,13 +97,13 @@ class ProductDiscoveryIntegrationTest {
 
     @Test
     void anonymousUserCanBrowseVisibleCategoriesAndProducts() throws Exception {
-        MockHttpSession salesSession = loginAsSales("discovery-browse-sales@example.com", "Sales@123456");
-        Long visibleCategoryId = createCategory(salesSession, "Discovery-Shirts");
-        Long hiddenCategoryId = createCategory(salesSession, "Discovery-Hidden");
+        MockHttpSession merchantSession = loginAsMerchant("discovery-browse-sales@example.com", "Sales@123456");
+        Long visibleCategoryId = createCategory(merchantSession, "Discovery-Shirts");
+        Long hiddenCategoryId = createCategory(merchantSession, "Discovery-Hidden");
 
-        createProduct(salesSession, visibleCategoryId, "Discovery Cotton Tee", "DISCOVERY-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
-        createProduct(salesSession, hiddenCategoryId, "Discovery Hidden Tee", "DISCOVERY-HIDDEN", "ON_SHELF", 119.00, 9, 2, "ENABLED");
-        updateCategoryStatus(salesSession, hiddenCategoryId, "Discovery-Hidden", "DISABLED");
+        createProduct(merchantSession, visibleCategoryId, "Discovery Cotton Tee", "DISCOVERY-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
+        createProduct(merchantSession, hiddenCategoryId, "Discovery Hidden Tee", "DISCOVERY-HIDDEN", "ON_SHELF", 119.00, 9, 2, "ENABLED");
+        updateCategoryStatus(merchantSession, hiddenCategoryId, "Discovery-Hidden", "DISABLED");
 
         mockMvc.perform(get("/api/categories"))
             .andExpect(status().isOk())
@@ -124,11 +124,11 @@ class ProductDiscoveryIntegrationTest {
 
     @Test
     void anonymousUserCanSearchProductsByName() throws Exception {
-        MockHttpSession salesSession = loginAsSales("discovery-search-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(salesSession, "Discovery-Search");
+        MockHttpSession merchantSession = loginAsMerchant("discovery-search-sales@example.com", "Sales@123456");
+        Long categoryId = createCategory(merchantSession, "Discovery-Search");
 
-        createProduct(salesSession, categoryId, "Discovery Cotton Tee", "DISCOVERY-SEARCH-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
-        createProduct(salesSession, categoryId, "Discovery Hoodie", "DISCOVERY-SEARCH-HOODIE", "ON_SHELF", 129.00, 8, 2, "ENABLED");
+        createProduct(merchantSession, categoryId, "Discovery Cotton Tee", "DISCOVERY-SEARCH-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
+        createProduct(merchantSession, categoryId, "Discovery Hoodie", "DISCOVERY-SEARCH-HOODIE", "ON_SHELF", 129.00, 8, 2, "ENABLED");
 
         mockMvc.perform(get("/api/search").param("keyword", "Cotton"))
             .andExpect(status().isOk())
@@ -138,11 +138,11 @@ class ProductDiscoveryIntegrationTest {
 
     @Test
     void anonymousUserCanViewOffShelfDetailButDraftProductIsNotAccessible() throws Exception {
-        MockHttpSession salesSession = loginAsSales("discovery-detail-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(salesSession, "Discovery-Detail");
+        MockHttpSession merchantSession = loginAsMerchant("discovery-detail-sales@example.com", "Sales@123456");
+        Long categoryId = createCategory(merchantSession, "Discovery-Detail");
 
-        Long offShelfProductId = createProduct(salesSession, categoryId, "Discovery Archive Tee", "DISCOVERY-ARCHIVE", "OFF_SHELF", 79.00, 4, 1, "ENABLED");
-        Long draftProductId = createProduct(salesSession, categoryId, "Discovery Draft Tee", "DISCOVERY-DRAFT", "DRAFT", 59.00, 6, 2, "ENABLED");
+        Long offShelfProductId = createProduct(merchantSession, categoryId, "Discovery Archive Tee", "DISCOVERY-ARCHIVE", "OFF_SHELF", 79.00, 4, 1, "ENABLED");
+        Long draftProductId = createProduct(merchantSession, categoryId, "Discovery Draft Tee", "DISCOVERY-DRAFT", "DRAFT", 59.00, 6, 2, "ENABLED");
 
         mockMvc.perform(get("/api/products/{productId}", offShelfProductId))
             .andExpect(status().isOk())
@@ -154,8 +154,8 @@ class ProductDiscoveryIntegrationTest {
             .andExpect(status().isNotFound());
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedSalesUser(email, rawPassword);
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedMerchantUser(email, rawPassword);
         return login(email, rawPassword);
     }
 
@@ -174,18 +174,18 @@ class ProductDiscoveryIntegrationTest {
         return (MockHttpSession) result.getRequest().getSession(false);
     }
 
-    private void seedSalesUser(String email, String rawPassword) {
+    private void seedMerchantUser(String email, String rawPassword) {
         jdbcTemplate.update(
             "insert into users (email, password_hash, nickname, status) values (?, ?, ?, 'ACTIVE')",
             email,
             passwordService.encode(rawPassword),
-            "discovery-sales");
+            "discovery-merchant");
         jdbcTemplate.update(
             """
             insert into user_roles (user_id, role_id)
             select u.id, r.id
             from users u
-            join roles r on r.code = 'SALES'
+            join roles r on r.code = 'MERCHANT'
             where u.email = ?
             """,
             email);

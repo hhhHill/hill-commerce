@@ -104,11 +104,11 @@ class OrderCenterIntegrationTest {
 
     @Test
     void loggedInUserCanReadOwnOrdersInCreatedAtDescPagination() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-customer@example.com", "Customer@123456");
 
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Shirts",
             "Order Center Tee A",
@@ -116,7 +116,7 @@ class OrderCenterIntegrationTest {
             "ORDCENTER-A001",
             LocalDateTime.of(2026, 5, 10, 10, 0, 0));
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Shirts",
             "Order Center Tee B",
@@ -124,7 +124,7 @@ class OrderCenterIntegrationTest {
             "ORDCENTER-B001",
             LocalDateTime.of(2026, 5, 11, 10, 0, 0));
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Shirts",
             "Order Center Tee C",
@@ -145,11 +145,11 @@ class OrderCenterIntegrationTest {
 
     @Test
     void userCanFilterOwnOrdersBySingleStatus() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-filter-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-filter-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-filter-customer@example.com", "Customer@123456");
 
         Long pendingOrderId = createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Filter",
             "Order Center Pending Tee",
@@ -157,7 +157,7 @@ class OrderCenterIntegrationTest {
             "ORDCENTER-PENDING-001",
             LocalDateTime.of(2026, 5, 10, 8, 0, 0));
         Long paidOrderId = createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Filter",
             "Order Center Paid Tee",
@@ -178,11 +178,11 @@ class OrderCenterIntegrationTest {
 
     @Test
     void userCanSearchOwnOrdersByOrderNoPrefixAndShortKeywordFallsBackToDefaultList() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-search-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-search-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-search-customer@example.com", "Customer@123456");
 
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Search",
             "Order Center Search Tee",
@@ -190,7 +190,7 @@ class OrderCenterIntegrationTest {
             "ORDCENTER-SEARCH-001",
             LocalDateTime.of(2026, 5, 10, 9, 0, 0));
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Search",
             "Order Center Other Tee",
@@ -211,12 +211,12 @@ class OrderCenterIntegrationTest {
 
     @Test
     void userCannotSeeAnotherUsersOrdersInListResults() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-isolation-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-isolation-sales@example.com", "Sales@123456");
         MockHttpSession ownerSession = loginAsCustomer("order-center-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("order-center-other@example.com", "Customer@123456");
 
         createReadyOrder(
-            salesSession,
+            merchantSession,
             ownerSession,
             "Order Center-Isolation",
             "Order Center Owner Tee",
@@ -224,7 +224,7 @@ class OrderCenterIntegrationTest {
             "ORDCENTER-OWNER-001",
             LocalDateTime.of(2026, 5, 10, 11, 0, 0));
         createReadyOrder(
-            salesSession,
+            merchantSession,
             otherSession,
             "Order Center-Isolation",
             "Order Center Other Tee",
@@ -241,13 +241,13 @@ class OrderCenterIntegrationTest {
 
     @Test
     void listProjectionUsesSmallestOrderItemAsSummaryAndCountsItems() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-summary-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-summary-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-summary-customer@example.com", "Customer@123456");
 
-        Long firstCategoryId = createCategory(salesSession, "Order Center-Summary-First");
-        Long secondCategoryId = createCategory(salesSession, "Order Center-Summary-Second");
-        createProduct(salesSession, firstCategoryId, "Order Center First Tee", "ORDER-CENTER-SUMMARY-FIRST", 88.00, 10);
-        createProduct(salesSession, secondCategoryId, "Order Center Second Tee", "ORDER-CENTER-SUMMARY-SECOND", 66.00, 10);
+        Long firstCategoryId = createCategory(merchantSession, "Order Center-Summary-First");
+        Long secondCategoryId = createCategory(merchantSession, "Order Center-Summary-Second");
+        createProduct(merchantSession, firstCategoryId, "Order Center First Tee", "ORDER-CENTER-SUMMARY-FIRST", 88.00, 10);
+        createProduct(merchantSession, secondCategoryId, "Order Center Second Tee", "ORDER-CENTER-SUMMARY-SECOND", 66.00, 10);
 
         addCartItem(customerSession, readSkuId("ORDER-CENTER-SUMMARY-FIRST-001"), 1);
         addCartItem(customerSession, readSkuId("ORDER-CENTER-SUMMARY-SECOND-001"), 1);
@@ -276,11 +276,11 @@ class OrderCenterIntegrationTest {
 
     @Test
     void unmatchedFilterReturnsEmptyPagedResult() throws Exception {
-        MockHttpSession salesSession = loginAsSales("order-center-empty-sales@example.com", "Sales@123456");
+        MockHttpSession merchantSession = loginAsMerchant("order-center-empty-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-empty-customer@example.com", "Customer@123456");
 
         createReadyOrder(
-            salesSession,
+            merchantSession,
             customerSession,
             "Order Center-Empty",
             "Order Center Empty Tee",
@@ -298,7 +298,7 @@ class OrderCenterIntegrationTest {
     }
 
     private Long createReadyOrder(
-        MockHttpSession salesSession,
+        MockHttpSession merchantSession,
         MockHttpSession customerSession,
         String categoryName,
         String productName,
@@ -306,8 +306,8 @@ class OrderCenterIntegrationTest {
         String orderNo,
         LocalDateTime createdAt
     ) throws Exception {
-        Long categoryId = createCategory(salesSession, categoryName + "-" + spuCode);
-        createProduct(salesSession, categoryId, productName, spuCode, 99.00, 12);
+        Long categoryId = createCategory(merchantSession, categoryName + "-" + spuCode);
+        createProduct(merchantSession, categoryId, productName, spuCode, 99.00, 12);
         Long skuId = readSkuId(spuCode + "-001");
 
         addCartItem(customerSession, skuId, 1);
@@ -347,8 +347,8 @@ class OrderCenterIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    private MockHttpSession loginAsSales(String email, String rawPassword) throws Exception {
-        seedUser(email, rawPassword, "order-center-sales", "SALES");
+    private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
+        seedUser(email, rawPassword, "order-center-merchant", "MERCHANT");
         return login(email, rawPassword);
     }
 

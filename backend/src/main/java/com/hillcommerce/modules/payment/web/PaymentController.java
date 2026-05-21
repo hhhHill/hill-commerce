@@ -70,7 +70,7 @@ public class PaymentController {
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
             throw new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED, "Authenticated user is required");
         }
-        boolean allowed = principal.roles().stream().anyMatch(role -> "ADMIN".equals(role) || "SALES".equals(role));
+        boolean allowed = principal.roles().stream().anyMatch(role -> "ADMIN".equals(role) || "MERCHANT".equals(role));
         if (!allowed) {
             throw new BusinessException(ErrorCode.FORBIDDEN, "Forbidden");
         }

@@ -187,7 +187,7 @@ public class LoggingController {
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
             throw new AccessDeniedException("forbidden");
         }
-        if (!principal.roles().contains("ADMIN") && !principal.roles().contains("SALES")) {
+        if (!principal.roles().contains("ADMIN") && !principal.roles().contains("MERCHANT")) {
             throw new AccessDeniedException("forbidden");
         }
         return principal;

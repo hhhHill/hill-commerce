@@ -99,9 +99,10 @@
 ## Search Rules
 
 - 前台应提供统一搜索入口
-- 搜索仅支持按商品名称进行关键词检索
-- 搜索匹配应支持商品名称的模糊匹配
-- 搜索范围仅限前台可展示商品
+- 搜索基于 MySQL FULLTEXT 索引对商品名称和副标题进行全文检索
+- 搜索匹配使用 `MATCH AGAINST (IN BOOLEAN MODE)`，支持模糊匹配和相关性排序
+- 搜索结果按全文相关性分数降序排列
+- 搜索范围仅限前台可展示商品（`deleted=0 AND status='ON_SHELF'` + 所属分类可见）
 - 搜索结果应使用与商品列表页一致的卡片展示规则
 - 搜索结果中的商品应可进入商品详情页
 - 空关键词不执行有效搜索，应返回默认状态或提示用户输入关键词
@@ -155,3 +156,23 @@
 - 商品主数据、分类、SKU、上下架等管理事实源由 `admin-product-management` 定义
 - 登录后购物准备行为由 `cart` 定义
 - 本 feature 中商品详情的展示与可见性规则，可被后续购物链路直接引用，不应在其他 feature 中重复定义
+
+## Implementation Notes
+
+### 搜索实现 (2026-05-21)
+
+搜索已从 Java 内存 `contains()` 全量扫描改为 MySQL FULLTEXT 全文索引：
+
+- **迁移**：`V9__add_fulltext_index.sql` — `ALTER TABLE products ADD FULLTEXT INDEX ft_products_search (name, subtitle)`
+- **查询**：`ProductMapper.searchByKeyword()` — `SELECT * FROM products WHERE ... AND MATCH(name, subtitle) AGAINST(? IN BOOLEAN MODE) ORDER BY MATCH ... DESC`
+- **过滤**：全文检索结果再按类别可见性过滤（`StorefrontProductService.searchProducts()`）
+- **兜底**：空关键词直接返回空结果（`total: 0`），不发起 SQL 查询
+
+与旧实现的对比：
+
+| 维度 | 旧（contains） | 新（FULLTEXT） |
+|------|---------------|----------------|
+| 查找方式 | 全量加载 → Java 内存 `contains()` | MySQL MATCH AGAINST 索引查找 |
+| 复杂度 | O(n) 线性扫描 | FULLTEXT 索引，与数据量解耦 |
+| 相关性 | 无（所有命中等权） | 全文相关性分数降序 |
+| 匹配字段 | 仅 name | name + subtitle |

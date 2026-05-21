@@ -69,7 +69,7 @@ class StorefrontProductServiceTest {
         ProductEntity visibleProduct = product(11L, 1L, "Cotton Tee", ProductAdminService.PRODUCT_STATUS_ON_SHELF, false, BigDecimal.valueOf(99));
         ProductEntity hiddenProduct = product(12L, 2L, "Cotton Hidden", ProductAdminService.PRODUCT_STATUS_ON_SHELF, false, BigDecimal.valueOf(109));
 
-        when(productMapper.selectList(any())).thenReturn(List.of(visibleProduct, hiddenProduct));
+        when(productMapper.searchByKeyword("cotton")).thenReturn(List.of(visibleProduct, hiddenProduct));
         when(productCategoryMapper.selectBatchIds(any())).thenReturn(List.of(enabledCategory, disabledCategory));
 
         PagedResponse<ProductCardResponse> response = storefrontProductService.searchProducts("  cotton  ", 1, 12);

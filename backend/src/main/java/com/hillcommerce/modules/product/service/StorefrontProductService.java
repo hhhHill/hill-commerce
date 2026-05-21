@@ -108,10 +108,14 @@ public class StorefrontProductService {
             return new PagedResponse<>(List.of(), normalizePage(page), normalizePageSize(pageSize), 0);
         }
 
-        List<ProductEntity> matchedProducts = listDiscoverableProducts(null).stream()
-            .filter(product -> product.getName() != null && product.getName().toLowerCase().contains(normalizedKeyword.toLowerCase()))
+        List<ProductEntity> fulltextMatches = productMapper.searchByKeyword(normalizedKeyword);
+        Map<Long, ProductCategoryEntity> categoryMap = loadCategoryMap(
+            fulltextMatches.stream().map(ProductEntity::getCategoryId).collect(Collectors.toSet()));
+        List<ProductEntity> visibleMatches = fulltextMatches.stream()
+            .filter(product -> isVisibleCategory(categoryMap.get(product.getCategoryId())))
             .toList();
-        PagedResponse<ProductCardResponse> result = toPagedCards(matchedProducts, normalizePage(page), normalizePageSize(pageSize));
+
+        PagedResponse<ProductCardResponse> result = toPagedCards(visibleMatches, normalizePage(page), normalizePageSize(pageSize));
 
         List<Long> topProductIds = result.items().stream()
             .limit(10)

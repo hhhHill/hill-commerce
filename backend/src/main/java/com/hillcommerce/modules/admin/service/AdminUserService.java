@@ -22,6 +22,8 @@ import com.hillcommerce.modules.user.mapper.RoleMapper;
 import com.hillcommerce.modules.user.mapper.UserMapper;
 import com.hillcommerce.modules.user.mapper.UserRoleMapper;
 import com.hillcommerce.modules.user.service.PasswordService;
+import com.hillcommerce.modules.admin.mapper.ShopMapper;
+import com.hillcommerce.modules.admin.entity.ShopEntity;
 
 @Service
 public class AdminUserService {
@@ -35,19 +37,22 @@ public class AdminUserService {
     private final UserRoleMapper userRoleMapper;
     private final RoleMapper roleMapper;
     private final PasswordService passwordService;
+    private final ShopMapper shopMapper;
 
     public AdminUserService(
         JdbcTemplate jdbcTemplate,
         UserMapper userMapper,
         UserRoleMapper userRoleMapper,
         RoleMapper roleMapper,
-        PasswordService passwordService
+        PasswordService passwordService,
+        ShopMapper shopMapper
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.userMapper = userMapper;
         this.userRoleMapper = userRoleMapper;
         this.roleMapper = roleMapper;
         this.passwordService = passwordService;
+        this.shopMapper = shopMapper;
     }
 
     public List<MerchantUserResponse> listMerchantUsers() {
@@ -89,7 +94,23 @@ public class AdminUserService {
         userRole.setRoleId(merchantRole.getId());
         userRoleMapper.insert(userRole);
 
+        // Auto-create shop for the new merchant
+        ShopEntity shop = new ShopEntity();
+        shop.setName(user.getNickname() + "的店铺");
+        shop.setSlug(generateSlug(user.getEmail()));
+        shop.setOwnerId(user.getId());
+        shop.setStatus(STATUS_ACTIVE);
+        shopMapper.insert(shop);
+
         return toMerchantUserResponse(requireMerchantUser(user.getId()));
+    }
+
+    private String generateSlug(String email) {
+        String prefix = email.split("@")[0]
+            .replaceAll("[^a-zA-Z0-9]", "-")
+            .toLowerCase();
+        String random = java.util.UUID.randomUUID().toString().substring(0, 6);
+        return prefix + "-" + random;
     }
 
     @Transactional
@@ -105,6 +126,14 @@ public class AdminUserService {
 
         merchantUser.setStatus(STATUS_DISABLED);
         userMapper.updateById(merchantUser);
+
+        // Sync shop status
+        ShopEntity shop = shopMapper.findByOwnerId(merchantUser.getId());
+        if (shop != null) {
+            shop.setStatus(STATUS_DISABLED);
+            shopMapper.updateById(shop);
+        }
+
         return new UserActionResponse(merchantUser.getId(), false);
     }
 
@@ -117,6 +146,14 @@ public class AdminUserService {
 
         merchantUser.setStatus(STATUS_ACTIVE);
         userMapper.updateById(merchantUser);
+
+        // Sync shop status
+        ShopEntity shop = shopMapper.findByOwnerId(merchantUser.getId());
+        if (shop != null) {
+            shop.setStatus(STATUS_ACTIVE);
+            shopMapper.updateById(shop);
+        }
+
         return new UserActionResponse(merchantUser.getId(), true);
     }
 

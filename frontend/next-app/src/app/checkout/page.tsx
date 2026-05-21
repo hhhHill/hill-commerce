@@ -11,23 +11,21 @@ export default async function CheckoutPage() {
   const checkout = await getServerOrderCheckout();
 
   return (
-    <main className="page-shell pb-32">
-      <div className="page-stack">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-3">
+    <main className="min-h-screen bg-white pb-28">
+      <div className="mx-auto max-w-[800px] px-4">
+        {/* top bar */}
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-3">
             <HomeShortcut />
-            <Link className="btn-secondary px-4 py-2" href="/checkout-summary">
-              返回结算前汇总
+            <Link className="text-sm text-[var(--text-secondary)]" href="/cart">
+              返回购物车
             </Link>
           </div>
           <SearchForm />
         </div>
 
-        <section className="space-y-3">
-          <span className="chip-badge">下单确认</span>
-          <h1 className="text-3xl font-semibold tracking-tight">最终结算确认</h1>
-          <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">这一步会消费当前已勾选购物车项与默认地址。点击提交订单后，服务端会再次校验库存、SKU 状态、商品状态和地址有效性。</p>
-        </section>
+        {/* title */}
+        <h1 className="py-2 text-lg font-semibold">确认订单</h1>
 
         <CheckoutPanel checkout={checkout} />
       </div>

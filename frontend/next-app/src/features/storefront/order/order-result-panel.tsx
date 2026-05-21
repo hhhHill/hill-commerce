@@ -19,91 +19,113 @@ export function OrderResultPanel({ order }: OrderResultPanelProps) {
   const canPay = order.orderStatus === "PENDING_PAYMENT";
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-      <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
-        <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
-          Order Created
-        </span>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">{renderHeadline(order.orderStatus)}</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-black/65">{renderDescription(order.orderStatus)}</p>
-
-        <dl className="mt-6 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
-          <Metric label="订单号" value={order.orderNo} />
-          <Metric label="订单状态" value={renderStatus(order.orderStatus)} />
-          <Metric label="应付金额" value={formatPrice(order.payableAmount)} />
-          <Metric label="支付截止" value={formatDateTime(order.paymentDeadlineAt)} />
-        </dl>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white" href={`/orders/${order.id}`}>
-            查看订单详情
-          </Link>
-          <Link className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium" href="/orders">
-            返回我的订单
-          </Link>
-          <Link className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium" href="/cart">
-            返回购物车
-          </Link>
+    <section className="mx-auto w-full max-w-lg px-4">
+      {/* Centered success icon */}
+      <div className="flex flex-col items-center pt-6">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
+          <svg className="h-7 w-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-      </article>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight">{renderHeadline(order.orderStatus)}</h1>
+        <p className="mt-2 text-center text-sm leading-6 text-black/65">{renderDescription(order.orderStatus)}</p>
+      </div>
 
-      <aside className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
-        <h2 className="text-2xl font-semibold tracking-tight">后续动作</h2>
-        <p className="mt-2 text-sm leading-7 text-black/65">本阶段先把订单创建稳定下来。支付能力尚未接入，但这里已经保留了结果页和未支付取消入口，便于下一阶段继续串联。</p>
+      {/* Compact metrics with bottom border dividers */}
+      <dl className="mt-8 divide-y divide-black/6 border-t border-black/6">
+        <Metric label="订单号" value={order.orderNo} />
+        <Metric label="订单状态" value={renderStatus(order.orderStatus)} />
+        <Metric label="应付金额" value={formatPrice(order.payableAmount)} />
+        <Metric label="支付截止" value={formatDateTime(order.paymentDeadlineAt)} />
+      </dl>
 
-        <div className="mt-6 rounded-[22px] bg-[var(--surface)] px-4 py-4 text-sm text-black/70">
-          <p className="font-semibold text-black">收货地址</p>
-          <p className="mt-2 leading-7">
-            {order.address.receiverName} · {order.address.receiverPhone}
-          </p>
-          <p className="leading-7">
-            {order.address.province}
-            {order.address.city}
-            {order.address.district}
-            {order.address.detailAddress}
-          </p>
-        </div>
+      {/* Address */}
+      <div className="border-b border-black/6 py-4">
+        <p className="text-sm font-semibold text-black">收货地址</p>
+        <p className="mt-2 text-sm leading-7 text-black/70">
+          {order.address.receiverName} · {order.address.receiverPhone}
+        </p>
+        <p className="text-sm leading-7 text-black/70">
+          {order.address.province}
+          {order.address.city}
+          {order.address.district}
+          {order.address.detailAddress}
+        </p>
+      </div>
 
-        <div className="mt-6 flex flex-col gap-3">
-          {canPay ? (
-            <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-center text-sm font-semibold text-white" href={`/pay/${order.id}`}>
-              去支付
-            </Link>
-          ) : (
-            <div className="rounded-[22px] bg-black/5 px-4 py-4 text-sm font-medium text-black/60">{renderPaymentHint(order.orderStatus)}</div>
-          )}
-          {canCancel ? (
-            <button
-              className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700"
-              disabled={isPending}
-              type="button"
-              onClick={() => {
-                setMessage("");
-                startTransition(async () => {
-                  try {
-                    await cancelOrder(order.id);
-                    router.refresh();
-                  } catch (error) {
-                    setMessage(error instanceof Error ? error.message : "取消订单失败");
-                  }
-                });
-              }}
-            >
-              {isPending ? "取消中..." : "取消未支付订单"}
-            </button>
-          ) : (
-            <div className="rounded-[22px] bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再显示未支付取消入口。</div>
-          )}
-          {message ? <p className="text-sm text-red-700">{message}</p> : null}
-        </div>
-      </aside>
+      {/* Info hint */}
+      <div className="border-b border-black/6 py-4">
+        <p className="text-sm leading-6 text-black/60">
+          本阶段先把订单创建稳定下来。支付能力尚未接入，但这里已经保留了结果页和未支付取消入口，便于下一阶段继续串联。
+        </p>
+      </div>
+
+      {/* Action buttons */}
+      <div className="mt-6 flex flex-col gap-3">
+        {canPay ? (
+          <Link
+            className="flex w-full items-center justify-center rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
+            href={`/pay/${order.id}`}
+          >
+            去支付
+          </Link>
+        ) : (
+          <div className="rounded-xl bg-black/5 px-4 py-3 text-center text-sm font-medium text-black/60">
+            {renderPaymentHint(order.orderStatus)}
+          </div>
+        )}
+        {canCancel ? (
+          <button
+            className="flex w-full items-center justify-center rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700"
+            disabled={isPending}
+            type="button"
+            onClick={() => {
+              setMessage("");
+              startTransition(async () => {
+                try {
+                  await cancelOrder(order.id);
+                  router.refresh();
+                } catch (error) {
+                  setMessage(error instanceof Error ? error.message : "取消订单失败");
+                }
+              });
+            }}
+          >
+            {isPending ? "取消中..." : "取消未支付订单"}
+          </button>
+        ) : (
+          <div className="rounded-xl bg-emerald-50 px-4 py-3 text-center text-sm font-medium text-emerald-700">
+            当前订单状态为 {renderStatus(order.orderStatus)}，不再显示未支付取消入口。
+          </div>
+        )}
+        {message ? <p className="text-sm text-red-700">{message}</p> : null}
+
+        <Link
+          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          href={`/orders/${order.id}`}
+        >
+          查看订单详情
+        </Link>
+        <Link
+          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          href="/orders"
+        >
+          返回我的订单
+        </Link>
+        <Link
+          className="flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          href="/cart"
+        >
+          返回购物车
+        </Link>
+      </div>
     </section>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-black/6 pb-3 last:border-b-0 last:pb-0">
+    <div className="flex items-center justify-between gap-4 py-3">
       <dt className="text-sm text-black/50">{label}</dt>
       <dd className="text-right text-lg font-semibold">{value}</dd>
     </div>
@@ -120,7 +142,7 @@ function formatDateTime(value: string | null) {
   }
 
   return new Date(value).toLocaleString("zh-CN", {
-    hour12: false
+    hour12: false,
   });
 }
 

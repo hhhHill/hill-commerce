@@ -43,7 +43,7 @@ services:
     command: >
       -c /etc/gorse/config.toml
       --log-path /var/log/gorse/master.log
-      --cache-path /var/lib/gorse/master
+      --cache-path /var/lib/gorse/master_cache.data
     volumes:
       - ./ops/gorse/config.toml:/etc/gorse/config.toml:ro
       - gorse-data:/var/lib/gorse
@@ -81,6 +81,8 @@ services:
       OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID:-}
       OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET:-}
       OSS_BASE_DIR: ${OSS_BASE_DIR:-uploads/}
+      GORSE_ENABLED: "true"
+      GORSE_ENDPOINT: http://gorse:8088
     ports:
       - "8080:8080"
 

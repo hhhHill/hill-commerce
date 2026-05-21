@@ -64,7 +64,25 @@ public class RecommendationService {
         if (ids.size() < limit) {
             ids.addAll(parseItemIds(gorseClient.getPopular(fetchSize)));
         }
+        // Fallback: if Gorse is disabled/empty, return popular products from DB
+        if (ids.isEmpty()) {
+            ids.addAll(loadPopularProductIds(limit));
+        }
         return new ArrayList<>(ids);
+    }
+
+    private List<Long> loadPopularProductIds(int limit) {
+        return jdbcTemplate.queryForList(
+            """
+            select p.id
+            from products p
+            where p.deleted = 0
+              and p.status = 'ON_SHELF'
+            order by p.created_at desc
+            limit ?
+            """,
+            Long.class,
+            limit);
     }
 
     protected List<Long> loadPurchasedProductIds(Long userId) {

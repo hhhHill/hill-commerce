@@ -2,10 +2,12 @@ import Link from "next/link";
 
 import { CategoryDirectory } from "@/features/storefront/catalog/category-list";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
+import { RecommendationSection } from "@/features/storefront/catalog/recommendation-section";
 import { getSessionUser } from "@/lib/auth/server";
 import {
   getServerStorefrontCategories,
   getServerStorefrontProducts,
+  getServerStorefrontRecommendations,
 } from "@/lib/storefront/server";
 
 const ACTIVITY_CARDS = [
@@ -17,9 +19,10 @@ const ACTIVITY_CARDS = [
 
 export default async function HomePage() {
   const user = await getSessionUser();
-  const [categories, products] = await Promise.all([
+  const [categories, products, recommendations] = await Promise.all([
     getServerStorefrontCategories(),
     getServerStorefrontProducts({ pageSize: 24 }),
+    getServerStorefrontRecommendations({ type: "home", n: 10 }),
   ]);
 
   return (
@@ -59,6 +62,16 @@ export default async function HomePage() {
           <UserPanel user={user} />
         </aside>
       </div>
+
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <section className="mx-auto max-w-[1600px] px-2 pb-3">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">为你推荐</h2>
+          </div>
+          <RecommendationSection products={recommendations} />
+        </section>
+      )}
 
       {/* Bottom: full-width product grid */}
       <div className="mx-auto max-w-[1600px] px-2 pb-3">

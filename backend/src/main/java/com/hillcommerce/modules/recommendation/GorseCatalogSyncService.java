@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,16 @@ public class GorseCatalogSyncService {
     public GorseCatalogSyncService(GorseClient gorseClient, ProductMapper productMapper) {
         this.gorseClient = gorseClient;
         this.productMapper = productMapper;
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            backfillActiveProducts();
+            log.info("Gorse product backfill completed");
+        } catch (RuntimeException exception) {
+            log.warn("Gorse product backfill failed (gorse may not be running yet)", exception);
+        }
     }
 
     public void backfillActiveProducts() {

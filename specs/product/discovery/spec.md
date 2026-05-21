@@ -153,5 +153,5 @@
 
 - 本 feature 仅定义访客商品发现链路，不定义购物车、加购、地址或结算前校验规则
 - 商品主数据、分类、SKU、上下架等管理事实源由 `admin-product-management` 定义
-- 登录后购物准备行为由 `shopping-journey` 定义
+- 登录后购物准备行为由 `cart` 定义
 - 本 feature 中商品详情的展示与可见性规则，可被后续购物链路直接引用，不应在其他 feature 中重复定义

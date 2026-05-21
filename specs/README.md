@@ -65,7 +65,6 @@ specs/
 │   ├── scheduler-separation/    # 调度器拆分
 │   └── observability/           # 运维可观测性
 └── storefront/                  # 前台体验（前端为主）
-    ├── shopping-journey/        # 购物旅程
     └── ux-transformation/       # UX 改造
 ```
 

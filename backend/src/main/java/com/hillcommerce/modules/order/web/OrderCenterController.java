@@ -32,7 +32,7 @@ public class OrderCenterController {
         @RequestParam(required = false) String orderNo,
         Authentication authentication
     ) {
-        return orderCenterService.listOrders(requireUserId(authentication), new OrderListQuery(page, size, status, orderNo));
+        return orderCenterService.listOrders(requireUserId(authentication), new OrderListQuery(page, size, status, orderNo, null));
     }
 
     private Long requireUserId(Authentication authentication) {

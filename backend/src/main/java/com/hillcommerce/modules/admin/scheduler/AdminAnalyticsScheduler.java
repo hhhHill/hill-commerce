@@ -84,6 +84,6 @@ public class AdminAnalyticsScheduler {
 
     @Scheduled(cron = "${hill.analytics.anomaly-check-cron:0 10 * * * *}")
     public void detectAnomalies() {
-        anomalyDetectionService.detectLatest();
+        anomalyDetectionService.detectLatest(null);
     }
 }

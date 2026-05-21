@@ -8,8 +8,10 @@ import static com.hillcommerce.modules.order.dto.ShipmentDtos.ConfirmReceiptResp
 import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderRequest;
 import static com.hillcommerce.modules.order.dto.ShipmentDtos.ShipOrderResponse;
 
+import com.hillcommerce.framework.security.RequireRole;
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
+import com.hillcommerce.modules.admin.context.ShopContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,19 +35,22 @@ public class ShipmentController {
     }
 
     @GetMapping("/api/admin/orders/{orderId}/ship")
+    @RequireRole({"ADMIN", "MERCHANT"})
     public OrderDetailResponse getShipOrder(@PathVariable Long orderId, Authentication authentication) {
-        requireStaff(authentication);
-        return shipmentService.getShipOrderDetail(orderId);
+        Long shopId = ShopContext.currentShopId();
+        return shipmentService.getShipOrderDetail(orderId, shopId);
     }
 
     @PostMapping("/api/admin/orders/{orderId}/ship")
+    @RequireRole({"ADMIN", "MERCHANT"})
     @OperationLog(action = "SHIP_ORDER", targetType = "ORDER", targetIdExpr = "#orderId")
     public ShipOrderResponse shipOrder(
         @PathVariable Long orderId,
         @RequestBody ShipOrderRequest request,
         Authentication authentication
     ) {
-        return shipmentService.shipOrder(requireStaff(authentication), orderId, request.carrierName(), request.trackingNo());
+        Long shopId = ShopContext.currentShopId();
+        return shipmentService.shipOrder(requireUserId(authentication), orderId, request.carrierName(), request.trackingNo(), shopId);
     }
 
     @PostMapping("/api/orders/{orderId}/receive")
@@ -54,12 +59,14 @@ public class ShipmentController {
     }
 
     @PostMapping("/api/admin/orders/auto-complete")
+    @RequireRole({"ADMIN", "MERCHANT"})
     public AutoCompleteResponse autoComplete(Authentication authentication) {
-        requireStaff(authentication);
-        return shipmentService.autoComplete();
+        Long shopId = ShopContext.currentShopId();
+        return shipmentService.autoComplete(shopId);
     }
 
     @GetMapping("/api/admin/orders")
+    @RequireRole({"ADMIN", "MERCHANT"})
     public AdminOrderListResponse listOrders(
         @RequestParam(required = false) Integer page,
         @RequestParam(required = false) Integer size,
@@ -67,8 +74,8 @@ public class ShipmentController {
         @RequestParam(required = false) String orderNo,
         Authentication authentication
     ) {
-        requireStaff(authentication);
-        return shipmentService.listAllOrders(new OrderListQuery(page, size, status, orderNo));
+        Long shopId = ShopContext.currentShopId();
+        return shipmentService.listAllOrders(new OrderListQuery(page, size, status, orderNo, shopId));
     }
 
     private Long requireUserId(Authentication authentication) {
@@ -78,14 +85,4 @@ public class ShipmentController {
         return principal.id();
     }
 
-    private Long requireStaff(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED, "Authenticated user is required");
-        }
-        boolean allowed = principal.roles().stream().anyMatch(role -> "ADMIN".equals(role) || "MERCHANT".equals(role));
-        if (!allowed) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "Forbidden");
-        }
-        return principal.id();
-    }
 }

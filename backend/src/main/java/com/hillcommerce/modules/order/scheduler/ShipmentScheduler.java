@@ -16,6 +16,6 @@ public class ShipmentScheduler {
 
     @Scheduled(fixedDelayString = "${hill.fulfillment.auto-complete.fixed-delay-ms:300000}")
     public void scheduledAutoComplete() {
-        shipmentService.autoComplete();
+        shipmentService.autoComplete(null);
     }
 }

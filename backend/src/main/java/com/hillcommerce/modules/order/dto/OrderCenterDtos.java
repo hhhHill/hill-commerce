@@ -13,7 +13,8 @@ public final class OrderCenterDtos {
         Integer page,
         Integer size,
         String status,
-        String orderNo
+        String orderNo,
+        Long shopId
     ) {
     }
 

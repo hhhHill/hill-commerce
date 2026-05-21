@@ -59,9 +59,12 @@ public class OrderCenterService {
         String status = normalizeStatus(query.status());
         String orderNo = normalizeOrderNo(query.orderNo());
 
+        Long shopId = query.shopId();
+
         List<OrderEntity> matchedOrders = orderMapper.selectList(
             new LambdaQueryWrapper<OrderEntity>()
                 .eq(userId != null, OrderEntity::getUserId, userId)
+                .eq(shopId != null, OrderEntity::getShopId, shopId)
                 .eq(status != null, OrderEntity::getOrderStatus, status)
                 .likeRight(orderNo != null, OrderEntity::getOrderNo, orderNo)
                 .orderByDesc(OrderEntity::getCreatedAt)

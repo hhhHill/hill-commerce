@@ -61,10 +61,13 @@ public class ShipmentService {
         this.orderCenterService = orderCenterService;
     }
 
-    public OrderDetailResponse getShipOrderDetail(Long orderId) {
+    public OrderDetailResponse getShipOrderDetail(Long orderId, Long shopId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
+        }
+        if (shopId != null && !shopId.equals(order.getShopId())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "Order does not belong to your shop");
         }
         if (!OrderStatus.PAID.name().equals(order.getOrderStatus())) {
             throw new BusinessException(ErrorCode.ONLY_PAID_ORDERS_CAN_BE_SHIPPED, "Only paid orders can be shipped");
@@ -99,10 +102,13 @@ public class ShipmentService {
     }
 
     @Transactional
-    public ShipOrderResponse shipOrder(Long operatorUserId, Long orderId, String carrierName, String trackingNo) {
+    public ShipOrderResponse shipOrder(Long operatorUserId, Long orderId, String carrierName, String trackingNo, Long shopId) {
         OrderEntity order = orderMapper.selectById(orderId);
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND, "Order not found");
+        }
+        if (shopId != null && !shopId.equals(order.getShopId())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "Order does not belong to your shop");
         }
         if (!OrderStatus.PAID.name().equals(order.getOrderStatus())) {
             throw new BusinessException(ErrorCode.ONLY_PAID_ORDERS_CAN_BE_SHIPPED, "Only paid orders can be shipped");
@@ -175,11 +181,12 @@ public class ShipmentService {
     }
 
     @Transactional
-    public AutoCompleteResponse autoComplete() {
+    public AutoCompleteResponse autoComplete(Long shopId) {
         LocalDateTime threshold = LocalDateTime.now().minusDays(10);
         List<OrderEntity> candidates = orderMapper.selectList(
             new LambdaQueryWrapper<OrderEntity>()
                 .eq(OrderEntity::getOrderStatus, OrderStatus.SHIPPED.name())
+                .eq(shopId != null, OrderEntity::getShopId, shopId)
                 .isNotNull(OrderEntity::getShippedAt)
                 .lt(OrderEntity::getShippedAt, threshold)
                 .orderByAsc(OrderEntity::getId)

@@ -7,18 +7,18 @@ type PaymentStatePanelProps = {
 
 export function PaymentStatePanel({ orderId, orderStatus }: PaymentStatePanelProps) {
   return (
-    <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+    <article className="border-b border-black/10 pb-6">
       <h2 className="text-2xl font-semibold tracking-tight">当前支付状态</h2>
-      <div className="mt-5 rounded-[24px] bg-[var(--surface)] p-5">
+      <div className="mt-5">
         <p className="text-lg font-semibold">{renderStateHeadline(orderStatus)}</p>
         <p className="mt-3 text-sm leading-7 text-black/65">{renderStateDescription(orderStatus)}</p>
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
-        <Link className="rounded-full bg-[var(--accent)] px-5 py-3 text-center text-sm font-semibold text-white" href={`/orders/${orderId}`}>
+        <Link className="rounded-full bg-[#ff5000] px-6 py-2.5 text-center text-sm font-semibold text-white" href={`/orders/${orderId}`}>
           查看订单详情
         </Link>
-        <Link className="rounded-full border border-black/10 px-5 py-3 text-center text-sm font-medium" href={`/orders/${orderId}/result`}>
+        <Link className="rounded-full border border-[#ff5000] px-6 py-2.5 text-center text-sm font-semibold text-[#ff5000]" href={`/orders/${orderId}/result`}>
           返回订单结果页
         </Link>
       </div>

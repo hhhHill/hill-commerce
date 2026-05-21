@@ -6,9 +6,9 @@ type PaymentAttemptCardProps = {
 
 export function PaymentAttemptCard({ attempt }: PaymentAttemptCardProps) {
   return (
-    <article className="rounded-[30px] border border-black/10 bg-white/90 p-6 shadow-[0_18px_50px_rgba(74,42,18,0.08)]">
+    <article className="border-b border-black/10 pb-6">
       <h2 className="text-2xl font-semibold tracking-tight">当前支付尝试</h2>
-      <dl className="mt-5 grid gap-4 rounded-[24px] bg-[var(--surface)] p-4">
+      <dl className="mt-5 grid gap-4">
         <Metric label="支付流水号" value={attempt.paymentNo} />
         <Metric label="支付方式" value={attempt.paymentMethod} />
         <Metric label="尝试状态" value={renderAttemptStatus(attempt.paymentStatus)} />
@@ -18,7 +18,7 @@ export function PaymentAttemptCard({ attempt }: PaymentAttemptCardProps) {
       </dl>
 
       {attempt.failureReason ? (
-        <div className="mt-5 rounded-[22px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-800">
+        <div className="mt-5 border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-800">
           最近失败原因：{attempt.failureReason}
         </div>
       ) : null}

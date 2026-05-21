@@ -19,7 +19,7 @@ export function PaymentActions({
     return (
       <div className="flex flex-col gap-3">
         <button
-          className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
+          className="rounded-full bg-[#ff5000] px-6 py-2.5 text-sm font-semibold text-white"
           disabled={busy}
           type="button"
           onClick={onSucceed}
@@ -27,7 +27,7 @@ export function PaymentActions({
           {busy ? "处理中..." : "模拟支付成功"}
         </button>
         <button
-          className="rounded-full border border-black/10 px-5 py-3 text-sm font-medium"
+          className="rounded-full border border-[#ff5000] px-6 py-2.5 text-sm font-semibold text-[#ff5000]"
           disabled={busy}
           type="button"
           onClick={onFail}
@@ -41,7 +41,7 @@ export function PaymentActions({
   if (canCreateAttempt) {
     return (
       <button
-        className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
+        className="rounded-full bg-[#ff5000] px-6 py-2.5 text-sm font-semibold text-white"
         disabled={busy}
         type="button"
         onClick={onCreateAttempt}

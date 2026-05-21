@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class GorseClient {
+
+    private static final Logger log = LoggerFactory.getLogger(GorseClient.class);
 
     private final RestTemplate restTemplate;
     private final String endpoint;
@@ -67,20 +71,25 @@ public class GorseClient {
 
     @SuppressWarnings("unchecked")
     private List<String> readIds(String url) {
-        Object body = restTemplate.getForObject(url, Object.class);
-        if (body instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
+        try {
+            Object body = restTemplate.getForObject(url, Object.class);
+            if (body instanceof List<?> list) {
+                return list.stream().map(String::valueOf).toList();
+            }
+            if (body instanceof Map<?, ?> map && map.get("Items") instanceof List<?> list) {
+                return list.stream().map(String::valueOf).toList();
+            }
+            if (body instanceof Map<?, ?> map && map.get("items") instanceof List<?> list) {
+                return list.stream().map(String::valueOf).toList();
+            }
+            if (body instanceof Map<?, ?> map && map.get("itemIds") instanceof List<?> list) {
+                return list.stream().map(String::valueOf).toList();
+            }
+            return List.of();
+        } catch (RuntimeException exception) {
+            log.warn("Gorse API call failed: {}", url, exception);
+            return List.of();
         }
-        if (body instanceof Map<?, ?> map && map.get("Items") instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        if (body instanceof Map<?, ?> map && map.get("items") instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        if (body instanceof Map<?, ?> map && map.get("itemIds") instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        return List.of();
     }
 
     public record FeedbackPayload(String UserId, String ItemId, String FeedbackType, Instant Timestamp) {

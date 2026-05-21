@@ -44,7 +44,7 @@ export function AddressBook({ addresses }: AddressBookProps) {
         />
       ) : (
         <button
-          className="w-fit rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
+          className="w-fit rounded-[2px] bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
           type="button"
           onClick={() => setIsCreateOpen(true)}
         >
@@ -65,7 +65,7 @@ export function AddressBook({ addresses }: AddressBookProps) {
 
       <div className="grid gap-4">
         {addresses.map((address) => (
-          <article key={address.id} className="rounded-[26px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_50px_rgba(74,42,18,0.06)]">
+          <article key={address.id} className="border-b border-[#f0f0f0] py-4">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
@@ -87,7 +87,7 @@ export function AddressBook({ addresses }: AddressBookProps) {
               <div className="flex flex-wrap gap-3">
                 {!address.isDefault ? (
                   <button
-                    className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium disabled:opacity-40"
+                    className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium disabled:opacity-40"
                     disabled={isPending}
                     type="button"
                     onClick={() => {
@@ -106,14 +106,14 @@ export function AddressBook({ addresses }: AddressBookProps) {
                   </button>
                 ) : null}
                 <button
-                  className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium"
+                  className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium"
                   type="button"
                   onClick={() => setEditingId(address.id)}
                 >
                   编辑
                 </button>
                 <button
-                  className="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
+                  className="rounded-[2px] border border-red-200 px-4 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
                   disabled={isPending}
                   type="button"
                   onClick={() => {

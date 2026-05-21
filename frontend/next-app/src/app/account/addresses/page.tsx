@@ -11,12 +11,12 @@ export default async function AddressManagementPage() {
   const addresses = await getServerUserAddresses();
 
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <main className="min-h-screen bg-white px-6 py-10">
+      <div className="mx-auto flex max-w-[800px] flex-col gap-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-3">
             <HomeShortcut />
-            <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
+            <Link className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium" href="/cart">
               返回购物车
             </Link>
           </div>
@@ -24,7 +24,7 @@ export default async function AddressManagementPage() {
         </div>
 
         <section className="space-y-3">
-          <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
+          <span className="rounded-[2px] bg-[var(--surface)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
             Addresses
           </span>
           <h1 className="text-4xl font-semibold tracking-tight">收货地址管理</h1>

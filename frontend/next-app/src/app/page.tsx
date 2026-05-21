@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { CategoryDirectory } from "@/features/storefront/catalog/category-list";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
-import { RecommendationSection } from "@/features/storefront/catalog/recommendation-section";
 import { getSessionUser } from "@/lib/auth/server";
 import {
   getServerStorefrontCategories,
@@ -63,22 +62,12 @@ export default async function HomePage() {
         </aside>
       </div>
 
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <section className="mx-auto max-w-[1600px] px-2 pb-3">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">为你推荐</h2>
-          </div>
-          <RecommendationSection products={recommendations} />
-        </section>
-      )}
-
-      {/* Bottom: full-width product grid */}
+      {/* Product grid — personalized when logged in, popular otherwise */}
       <div className="mx-auto max-w-[1600px] px-2 pb-3">
         <StorefrontProductList
           emptyDescription="当前还没有可展示的首页商品。"
-          products={products.items}
-          total={products.total}
+          products={recommendations.length > 0 ? recommendations : products.items}
+          total={recommendations.length > 0 ? recommendations.length : products.total}
         />
       </div>
 

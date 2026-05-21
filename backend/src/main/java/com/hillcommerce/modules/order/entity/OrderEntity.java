@@ -14,6 +14,7 @@ public class OrderEntity {
     private Long id;
     private String orderNo;
     private Long userId;
+    private Long shopId;
     private String orderStatus;
     private BigDecimal totalAmount;
     private BigDecimal payableAmount;
@@ -55,6 +56,14 @@ public class OrderEntity {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
     }
 
     public String getOrderStatus() {

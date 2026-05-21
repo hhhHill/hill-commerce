@@ -13,6 +13,7 @@ public class ProductEntity {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long categoryId;
+    private Long shopId;
     private String name;
     private String spuCode;
     private String subtitle;
@@ -39,6 +40,14 @@ public class ProductEntity {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
     }
 
     public String getName() {

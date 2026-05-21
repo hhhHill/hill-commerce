@@ -18,7 +18,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.security.RequireRole;
+import com.hillcommerce.modules.admin.context.ShopContext;
 import com.hillcommerce.modules.logging.service.LoggingService;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 
@@ -41,13 +42,11 @@ public class LoggingController {
     }
 
     @GetMapping("/api/admin/login-logs")
+    @RequireRole("ADMIN")
     public LoginLogListResult getLoginLogs(
         @RequestParam(required = false) String email,
-        @RequestParam(required = false) String result,
-        Authentication authentication
+        @RequestParam(required = false) String result
     ) {
-        requireAdmin(authentication);
-
         StringBuilder sql = new StringBuilder("""
             select id, user_id, email_snapshot, role_snapshot, login_result, ip_address, user_agent, login_at
             from login_logs
@@ -69,13 +68,11 @@ public class LoggingController {
     }
 
     @GetMapping("/api/admin/operation-logs")
+    @RequireRole("ADMIN")
     public OperationLogListResult getOperationLogs(
         @RequestParam(required = false) Long operatorUserId,
-        @RequestParam(required = false) String actionType,
-        Authentication authentication
+        @RequestParam(required = false) String actionType
     ) {
-        requireAdmin(authentication);
-
         StringBuilder sql = new StringBuilder("""
             select id, operator_user_id, operator_role, action_type, target_type, target_id, action_detail, ip_address, created_at
             from operation_logs
@@ -97,28 +94,35 @@ public class LoggingController {
     }
 
     @GetMapping("/api/admin/view-logs")
+    @RequireRole({"ADMIN", "MERCHANT"})
     public ProductViewLogListResult getViewLogs(
         @RequestParam(required = false) Long productId,
-        @RequestParam(required = false) Long categoryId,
-        Authentication authentication
+        @RequestParam(required = false) Long categoryId
     ) {
-        requireStaff(authentication);
+        Long shopId = ShopContext.currentShopId();
 
         StringBuilder sql = new StringBuilder("""
-            select id, user_id, anonymous_id, product_id, category_id, viewed_at
-            from product_view_logs
-            where 1 = 1
+            select pvl.id, pvl.user_id, pvl.anonymous_id, pvl.product_id, pvl.category_id, pvl.viewed_at
+            from product_view_logs pvl
             """);
         List<Object> args = new ArrayList<>();
+
+        if (shopId != null) {
+            sql.append("join products p on p.id = pvl.product_id where p.shop_id = ?");
+            args.add(shopId);
+        } else {
+            sql.append("where 1 = 1");
+        }
+
         if (productId != null) {
-            sql.append(" and product_id = ?");
+            sql.append(" and pvl.product_id = ?");
             args.add(productId);
         }
         if (categoryId != null) {
-            sql.append(" and category_id = ?");
+            sql.append(" and pvl.category_id = ?");
             args.add(categoryId);
         }
-        sql.append(" order by viewed_at desc, id desc limit 100");
+        sql.append(" order by pvl.viewed_at desc, pvl.id desc limit 100");
 
         List<ProductViewLogEntry> items = jdbcTemplate.query(sql.toString(), this::mapProductViewLog, args.toArray());
         return new ProductViewLogListResult(items);
@@ -173,23 +177,4 @@ public class LoggingController {
         return rs.wasNull() ? null : value;
     }
 
-    private AuthenticatedUserPrincipal requireAdmin(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new AccessDeniedException("forbidden");
-        }
-        if (!principal.roles().contains("ADMIN")) {
-            throw new AccessDeniedException("forbidden");
-        }
-        return principal;
-    }
-
-    private AuthenticatedUserPrincipal requireStaff(Authentication authentication) {
-        if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedUserPrincipal principal)) {
-            throw new AccessDeniedException("forbidden");
-        }
-        if (!principal.roles().contains("ADMIN") && !principal.roles().contains("MERCHANT")) {
-            throw new AccessDeniedException("forbidden");
-        }
-        return principal;
-    }
 }

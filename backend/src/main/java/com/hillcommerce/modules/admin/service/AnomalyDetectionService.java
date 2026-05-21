@@ -27,33 +27,37 @@ public class AnomalyDetectionService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<AdminAnalyticsDtos.AnomalyItem> detectLatest() {
-        List<HourlySnapshot> latest = jdbcTemplate.query(
-            """
-            select snapshot_hour, order_count, total_amount
-            from hourly_sales_snapshot
-            order by snapshot_hour desc
-            limit 1
-            """,
-            this::mapHourlySnapshot);
+    public List<AdminAnalyticsDtos.AnomalyItem> detectLatest(Long shopId) {
+        String latestSql = shopId != null
+            ? "select snapshot_hour, order_count, total_amount from hourly_sales_snapshot where shop_id = ? order by snapshot_hour desc limit 1"
+            : "select snapshot_hour, order_count, total_amount from hourly_sales_snapshot order by snapshot_hour desc limit 1";
+
+        List<HourlySnapshot> latest;
+        if (shopId != null) {
+            latest = jdbcTemplate.query(latestSql, this::mapHourlySnapshot, shopId);
+        } else {
+            latest = jdbcTemplate.query(latestSql, this::mapHourlySnapshot);
+        }
+
         if (latest.isEmpty()) {
             return currentAnomalies();
         }
 
         HourlySnapshot current = latest.getFirst();
-        List<BigDecimal> baseline = jdbcTemplate.queryForList(
-            """
-            select total_amount
-            from hourly_sales_snapshot
-            where snapshot_hour < ?
-              and snapshot_hour >= ?
-              and hour(snapshot_hour) = ?
-            order by snapshot_hour
-            """,
-            BigDecimal.class,
-            current.snapshotHour(),
-            current.snapshotHour().minusDays(30),
-            current.snapshotHour().getHour());
+
+        String baselineSql = shopId != null
+            ? "select total_amount from hourly_sales_snapshot where shop_id = ? and snapshot_hour < ? and snapshot_hour >= ? and hour(snapshot_hour) = ? order by snapshot_hour"
+            : "select total_amount from hourly_sales_snapshot where snapshot_hour < ? and snapshot_hour >= ? and hour(snapshot_hour) = ? order by snapshot_hour";
+
+        List<BigDecimal> baseline;
+        if (shopId != null) {
+            baseline = jdbcTemplate.queryForList(baselineSql, BigDecimal.class,
+                shopId, current.snapshotHour(), current.snapshotHour().minusDays(30), current.snapshotHour().getHour());
+        } else {
+            baseline = jdbcTemplate.queryForList(baselineSql, BigDecimal.class,
+                current.snapshotHour(), current.snapshotHour().minusDays(30), current.snapshotHour().getHour());
+        }
+
         evaluate(current, baseline);
         return currentAnomalies();
     }

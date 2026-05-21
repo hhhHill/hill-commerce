@@ -23,12 +23,12 @@ public class SalesTrendService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public TrendResponse getTrends(String granularity, LocalDate from, LocalDate to, Long userId, boolean salesRole) {
+    public TrendResponse getTrends(String granularity, LocalDate from, LocalDate to, Long shopId) {
         String safeGranularity = normalizeGranularity(granularity);
         LocalDate safeTo = to == null ? LocalDate.now() : to;
         LocalDate safeFrom = from == null ? safeTo.minusDays(30) : from;
-        List<TrendPoint> points = salesRole
-            ? loadSalesScopedPoints(safeGranularity, safeFrom, safeTo, userId)
+        List<TrendPoint> points = shopId != null
+            ? loadShopScopedPoints(safeGranularity, safeFrom, safeTo, shopId)
             : loadAdminPoints(safeGranularity, safeFrom, safeTo);
         List<TrendPoint> withMovingAverage = withMovingAverage(points);
         return new TrendResponse(
@@ -52,21 +52,19 @@ public class SalesTrendService {
             to);
     }
 
-    private List<TrendPoint> loadSalesScopedPoints(String granularity, LocalDate from, LocalDate to, Long userId) {
+    private List<TrendPoint> loadShopScopedPoints(String granularity, LocalDate from, LocalDate to, Long shopId) {
         return jdbcTemplate.query(
             """
             select %s as period_key, coalesce(sum(o.payable_amount), 0) as amount
             from orders o
-            join order_status_histories osh on osh.order_id = o.id
-            where osh.changed_by = ?
-              and osh.to_status = 'SHIPPED'
+            where o.shop_id = ?
               and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
               and date(o.created_at) between ? and ?
             group by period_key
             order by min(o.created_at)
             """.formatted(periodExpression("date(o.created_at)", granularity)),
             this::mapTrendPoint,
-            userId,
+            shopId,
             from,
             to);
     }

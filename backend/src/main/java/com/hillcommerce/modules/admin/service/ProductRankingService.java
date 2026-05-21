@@ -20,12 +20,12 @@ public class ProductRankingService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public ProductRankingResponse getRankings(String range, int limit, Long userId, boolean salesRole) {
+    public ProductRankingResponse getRankings(String range, int limit, Long shopId) {
         String safeRange = normalizeRange(range);
         int safeLimit = Math.max(1, Math.min(limit <= 0 ? 10 : limit, 50));
         LocalDate from = fromDate(safeRange);
-        List<ProductRankItem> items = salesRole
-            ? salesScopedRankings(from, safeLimit, userId)
+        List<ProductRankItem> items = shopId != null
+            ? shopScopedRankings(from, safeLimit, shopId)
             : adminRankings(from, safeLimit);
         return new ProductRankingResponse(safeRange, items);
     }
@@ -48,7 +48,7 @@ public class ProductRankingService {
             limit);
     }
 
-    private List<ProductRankItem> salesScopedRankings(LocalDate from, int limit, Long userId) {
+    private List<ProductRankItem> shopScopedRankings(LocalDate from, int limit, Long shopId) {
         return jdbcTemplate.query(
             """
             select oi.product_id, oi.product_name_snapshot as product_name, p.category_id, pc.name as category_name,
@@ -58,9 +58,7 @@ public class ProductRankingService {
             join orders o on o.id = oi.order_id
             join products p on p.id = oi.product_id
             left join product_categories pc on pc.id = p.category_id
-            join order_status_histories osh on osh.order_id = o.id
-            where osh.changed_by = ?
-              and osh.to_status = 'SHIPPED'
+            where o.shop_id = ?
               and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
               and date(o.created_at) >= ?
             group by oi.product_id, oi.product_name_snapshot, p.category_id, pc.name
@@ -68,7 +66,7 @@ public class ProductRankingService {
             limit ?
             """,
             this::mapProductRankItem,
-            userId,
+            shopId,
             from,
             limit);
     }

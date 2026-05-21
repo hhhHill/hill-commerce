@@ -34,9 +34,9 @@ export function StorefrontProductList({
           <div className="flex min-w-0 flex-col gap-1">
             <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           </div>
-          <div className="chip-badge">
+          <span className="text-sm text-[var(--text-hint)]">
             共 {total} 件商品
-          </div>
+          </span>
         </div>
       ) : null}
 

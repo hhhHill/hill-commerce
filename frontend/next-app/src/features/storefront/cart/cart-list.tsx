@@ -14,57 +14,67 @@ export function CartList({ items }: CartListProps) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col">
       {items.map((item) => (
-        <article
+        <div
           key={item.id}
-          className="surface-card grid gap-3 rounded-lg p-3 md:grid-cols-[112px_1fr]"
+          className="flex items-start gap-3 border-b border-[#f5f5f5] py-3"
         >
+          {/* select circle */}
+          <div
+            className={`mt-4 h-5 w-5 shrink-0 rounded-full border-2 ${
+              item.canCheckout
+                ? "border-[#ff5000] bg-[#ff5000]"
+                : "border-[#e0e0e0] bg-white"
+            }`}
+          />
+
+          {/* product image */}
           <Link
-            className="overflow-hidden rounded-lg border border-[var(--border-normal)] bg-[var(--border-light)]"
+            className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded bg-[#f5f5f5]"
             href={`/products/${item.productId}`}
           >
             {item.productCoverImageUrl ? (
-              <img alt={item.productName} className="aspect-square h-full w-full object-cover" src={item.productCoverImageUrl} />
+              <img
+                alt={item.productName}
+                className="h-full w-full object-cover"
+                src={item.productCoverImageUrl}
+              />
             ) : (
-              <div className="flex aspect-square items-center justify-center text-sm font-medium text-[var(--text-hint)]">暂无图片</div>
+              <div className="flex h-full items-center justify-center text-xs text-[var(--text-hint)]">
+                暂无图片
+              </div>
             )}
           </Link>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="space-y-2">
-                <Link className="text-lg font-semibold tracking-tight" href={`/products/${item.productId}`}>
-                  {item.productName}
-                </Link>
-                <p className="text-sm text-[var(--text-secondary)]">{item.skuSpecText}</p>
-                <p className="text-xs text-[var(--text-hint)]">{item.skuCode}</p>
-              </div>
+          {/* info + actions */}
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <Link
+              className="line-clamp-2 text-sm leading-5"
+              href={`/products/${item.productId}`}
+            >
+              {item.productName}
+            </Link>
+            <p className="text-xs text-[var(--text-hint)]">{item.skuSpecText}</p>
 
-              <div className="text-right">
-                <p className="text-xs text-[var(--text-secondary)]">小计</p>
-                <p className="text-2xl font-bold text-[var(--price)]" style={{ fontFamily: "var(--font-price)" }}>
-                  {formatPrice(item.subtotalAmount)}
-                </p>
-              </div>
-            </div>
+            {/* anomaly hint — inline red text, no banner */}
+            {item.canCheckout ? null : (
+              <p className="text-xs font-medium text-red-500">
+                {item.anomalyMessage ?? "当前不可结算"}
+              </p>
+            )}
 
-            <div className="surface-subtle grid gap-3 px-3 py-3 md:grid-cols-[1fr_auto] md:items-center">
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-4 text-sm text-[var(--text-secondary)]">
-                  <span>单价：{formatPrice(item.unitPrice)}</span>
-                  <span>数量：{item.quantity}</span>
-                </div>
-                {item.canCheckout ? null : (
-                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
-                    {item.anomalyMessage ?? "当前条目暂不可结算"}
-                  </p>
-                )}
-              </div>
+            <div className="mt-1 flex items-center justify-between">
+              <span
+                className="text-sm font-semibold text-[var(--price)]"
+                style={{ fontFamily: "var(--font-price)" }}
+              >
+                {formatPrice(item.subtotalAmount)}
+              </span>
               <CartItemActions item={item} />
             </div>
           </div>
-        </article>
+        </div>
       ))}
     </div>
   );

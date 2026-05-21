@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.security.RequireRole;
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
@@ -35,12 +36,14 @@ public class UserAddressController {
     }
 
     @GetMapping
+    @RequireRole("CUSTOMER")
     public List<UserAddressResponse> listAddresses(Authentication authentication) {
         return userAddressService.listAddresses(requireUserId(authentication));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequireRole("CUSTOMER")
     public UserAddressResponse createAddress(
         Authentication authentication,
         @Valid @RequestBody UserAddressRequest request
@@ -49,6 +52,7 @@ public class UserAddressController {
     }
 
     @PutMapping("/{addressId}")
+    @RequireRole("CUSTOMER")
     public UserAddressResponse updateAddress(
         Authentication authentication,
         @PathVariable Long addressId,
@@ -59,11 +63,13 @@ public class UserAddressController {
 
     @DeleteMapping("/{addressId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequireRole("CUSTOMER")
     public void deleteAddress(Authentication authentication, @PathVariable Long addressId) {
         userAddressService.deleteAddress(requireUserId(authentication), addressId);
     }
 
     @PutMapping("/{addressId}/default")
+    @RequireRole("CUSTOMER")
     public UserAddressResponse setDefaultAddress(Authentication authentication, @PathVariable Long addressId) {
         return userAddressService.setDefaultAddress(requireUserId(authentication), addressId);
     }

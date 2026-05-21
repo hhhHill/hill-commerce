@@ -22,12 +22,18 @@ export function CartList({ items }: CartListProps) {
         >
           {/* select circle */}
           <div
-            className={`mt-4 h-5 w-5 shrink-0 rounded-full border-2 ${
-              item.canCheckout
+            className={`relative mt-4 h-5 w-5 shrink-0 overflow-hidden rounded-full border-2 ${
+              item.selected
                 ? "border-[#ff5000] bg-[#ff5000]"
                 : "border-[#e0e0e0] bg-white"
             }`}
-          />
+          >
+            {item.selected && !item.canCheckout && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-[1.5px] w-[14px] rotate-45 rounded-full bg-red-500" />
+              </div>
+            )}
+          </div>
 
           {/* product image */}
           <Link

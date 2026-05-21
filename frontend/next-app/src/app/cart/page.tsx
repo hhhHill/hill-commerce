@@ -33,7 +33,7 @@ export default async function CartPage() {
       </div>
 
       {/* bottom bar */}
-      <CartBottomBar summary={cart.summary} />
+      <CartBottomBar summary={cart.summary} items={cart.items} />
     </main>
   );
 }

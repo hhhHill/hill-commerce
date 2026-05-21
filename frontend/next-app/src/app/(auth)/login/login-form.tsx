@@ -34,11 +34,11 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-4 rounded-[28px] bg-white p-6 shadow-[0_12px_30px_rgba(29,20,13,0.08)]" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-4 rounded-[2px] bg-white border border-[#f0f0f0] p-6" onSubmit={handleSubmit}>
       <label className="flex flex-col gap-2 text-sm font-medium">
         邮箱
         <input
-          className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+          className="rounded-[2px] border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -49,7 +49,7 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
       <label className="flex flex-col gap-2 text-sm font-medium">
         密码
         <input
-          className="rounded-2xl border border-black/10 bg-[#fffaf5] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+          className="rounded-[2px] border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
@@ -57,10 +57,10 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
         />
       </label>
 
-      {error ? <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="rounded-[2px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
       <button
-        className="rounded-2xl bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-[2px] bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={isPending}
       >

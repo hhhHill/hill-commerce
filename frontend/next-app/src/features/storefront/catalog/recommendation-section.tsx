@@ -11,7 +11,7 @@ export function RecommendationSection({ products, isLoading = false }: Recommend
     return (
       <section className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
         {Array.from({ length: 5 }).map((_, index) => (
-          <div className="surface-card h-80 animate-pulse rounded-lg" key={index} />
+          <div className="bg-[#f5f5f5] h-80 animate-pulse rounded-lg" key={index} />
         ))}
       </section>
     );

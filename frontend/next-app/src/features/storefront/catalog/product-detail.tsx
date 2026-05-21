@@ -14,7 +14,7 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* 左侧：商品图片 */}
         <div className="flex flex-col gap-3">
-          <div className="surface-card overflow-hidden rounded-lg">
+          <div className="border-b border-[#f0f0f0] py-4 overflow-hidden rounded-lg">
             <div className="aspect-[4/5] bg-[var(--border-light)]">
               {product.coverImageUrl ? (
                 <img alt={product.name} className="h-full w-full object-cover" src={product.coverImageUrl} />
@@ -35,14 +35,14 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
         </div>
 
         {/* 右侧：价格与购买信息 */}
-        <div className="surface-card flex flex-col gap-5 rounded-lg px-5 py-5">
+        <div className="border-b border-[#f0f0f0] py-4 flex flex-col gap-5 rounded-lg px-5 py-5">
           <div className="flex flex-col gap-3">
-            <span className="chip-badge w-fit">{product.categoryName}</span>
+            <span className="text-sm font-medium text-[var(--brand-primary)] w-fit">{product.categoryName}</span>
             <h1 className="text-[26px] font-semibold tracking-tight">{product.name}</h1>
             {product.subtitle ? <p className="text-sm leading-6 text-[var(--text-secondary)]">{product.subtitle}</p> : null}
           </div>
 
-          <div className="surface-subtle px-4 py-4">
+          <div className="bg-white px-4 py-4">
             <p className="text-sm text-[var(--text-secondary)]">到手价</p>
             <p
               className="mt-2 text-[32px] font-bold leading-none tracking-tight text-[var(--price)]"
@@ -62,13 +62,13 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
       </div>
 
       {/* 下半部分：规格、SKU 明细、商品详情（后续商家补充内容也放这里） */}
-      <div className="surface-card flex flex-col gap-4 rounded-lg px-5 py-5">
+      <div className="border-b border-[#f0f0f0] py-4 flex flex-col gap-4 rounded-lg px-5 py-5">
         {product.salesAttributes.length > 0 ? (
           <section className="flex flex-col gap-3">
             <h2 className="text-sm font-semibold text-[var(--text-secondary)]">规格选项</h2>
             <div className="flex flex-col gap-3">
               {product.salesAttributes.map((attribute) => (
-                <div key={attribute.id} className="surface-subtle px-4 py-4">
+                <div key={attribute.id} className="bg-white px-4 py-4">
                   <p className="text-sm font-semibold">{attribute.name}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {attribute.values.map((value) => (
@@ -90,7 +90,7 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
           <h2 className="text-sm font-semibold text-[var(--text-secondary)]">SKU 明细</h2>
           <div className="flex flex-col gap-3">
             {product.skus.map((sku) => (
-              <div key={sku.id} className="surface-subtle px-4 py-4">
+              <div key={sku.id} className="bg-white px-4 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{sku.salesAttrValueText}</p>
@@ -112,7 +112,7 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
           <section className="flex flex-col gap-3">
             <h2 className="text-sm font-semibold text-[var(--text-secondary)]">商品详情</h2>
             <div
-              className="surface-subtle px-4 py-4 text-sm leading-7 text-[var(--text-secondary)]"
+              className="bg-white px-4 py-4 text-sm leading-7 text-[var(--text-secondary)]"
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
           </section>
@@ -124,7 +124,7 @@ export function ProductDetailPanel({ product, isAuthenticated, loginHref }: Prod
 
 function InfoTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="surface-subtle px-4 py-4">
+    <div className="bg-white px-4 py-4">
       <p className="text-sm text-[var(--text-secondary)]">{label}</p>
       <p className="mt-2 text-lg font-semibold">{value}</p>
     </div>

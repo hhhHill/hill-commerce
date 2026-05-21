@@ -9,40 +9,38 @@ type CheckoutAddressCardProps = {
 export function CheckoutAddressCard({ address }: CheckoutAddressCardProps) {
   if (!address) {
     return (
-      <article className="rounded-[28px] border border-dashed border-red-200 bg-red-50/80 p-5 text-red-800">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm uppercase tracking-[0.18em] text-red-700/75">Default Address</p>
-            <h2 className="mt-2 text-2xl font-semibold">缺少默认地址</h2>
-          </div>
-          <Link className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" href="/account/addresses">
-            去新增地址
-          </Link>
-        </div>
-        <p className="mt-3 text-sm leading-7">当前无法提交订单。先补充或修正收货地址，系统会自动维护唯一默认地址。</p>
-      </article>
+      <Link
+        className="mx-4 flex items-center gap-3 border-b border-[#f0f0f0] py-4"
+        href="/account/addresses"
+      >
+        <span className="text-sm font-medium">📍 收货地址</span>
+        <span className="text-sm text-red-500">请添加收货地址</span>
+        <span className="ml-auto text-[var(--text-hint)]">›</span>
+      </Link>
     );
   }
 
   return (
-    <article className="rounded-[28px] border border-black/10 bg-white/85 p-5 shadow-[0_18px_50px_rgba(74,42,18,0.06)]">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-black/45">Default Address</p>
-          <h2 className="mt-2 text-2xl font-semibold">{address.receiverName}</h2>
-          <p className="mt-1 text-sm text-black/60">{address.receiverPhone}</p>
+    <Link
+      className="mx-4 flex items-start gap-3 border-b border-[#f0f0f0] py-4"
+      href="/account/addresses"
+    >
+      <span className="mt-0.5 shrink-0 text-sm">📍</span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-3 text-sm">
+          <span className="font-semibold">{address.receiverName}</span>
+          <span className="text-[var(--text-secondary)]">
+            {address.receiverPhone}
+          </span>
         </div>
-        <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href="/account/addresses">
-          管理地址
-        </Link>
+        <p className="mt-0.5 truncate text-sm text-[var(--text-secondary)]">
+          {address.province}
+          {address.city}
+          {address.district}
+          {address.detailAddress}
+        </p>
       </div>
-      <p className="mt-4 text-sm leading-7 text-black/65">
-        {address.province}
-        {address.city}
-        {address.district}
-        {address.detailAddress}
-        {address.postalCode ? ` · ${address.postalCode}` : ""}
-      </p>
-    </article>
+      <span className="mt-0.5 shrink-0 text-[var(--text-hint)]">›</span>
+    </Link>
   );
 }

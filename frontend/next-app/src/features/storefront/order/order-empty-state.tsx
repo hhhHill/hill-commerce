@@ -18,17 +18,16 @@ export function OrderEmptyState({
   secondaryLabel
 }: OrderEmptyStateProps) {
   return (
-    <section className="surface-card border-dashed px-6 py-10 text-center">
+    <section className="border-b border-gray-100 bg-white px-6 py-10 text-center">
       <div className="mx-auto flex max-w-2xl flex-col items-center gap-4">
-        <span className="chip-badge">订单流程</span>
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         <p className="text-sm leading-7 text-[var(--text-secondary)]">{description}</p>
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link className="btn-primary px-5 py-3" href={primaryHref}>
+          <Link className="rounded-full bg-[#ff5000] px-6 py-2.5 text-sm font-medium text-white" href={primaryHref}>
             {primaryLabel}
           </Link>
           {secondaryHref && secondaryLabel ? (
-            <Link className="btn-secondary px-5 py-3" href={secondaryHref}>
+            <Link className="rounded-full border border-[#ff5000] px-6 py-2.5 text-sm font-medium text-[#ff5000]" href={secondaryHref}>
               {secondaryLabel}
             </Link>
           ) : null}

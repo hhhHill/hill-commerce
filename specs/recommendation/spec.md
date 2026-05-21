@@ -1,7 +1,7 @@
 # Feature Specification: recommendation-engine
 
 **Feature**: `recommendation-engine`  
-**Status**: draft  
+**Status**: implemented  
 
 ## Purpose
 
@@ -104,10 +104,12 @@ GET /api/storefront/recommendations?type=detail&productId={id}
        ▼
 RecommendationService
        │
-       ├─ 首页 + 未登录 → Gorse: GET /api/popular
+       ├─ 首页 + 未登录 → Gorse: GET /api/recommend/popular
        ├─ 首页 + 已登录 → Gorse: GET /api/recommend/{userId}
-       ├─ 详情页 + 未登录 → Gorse: GET /api/item/{productId}/neighbors
+       ├─ 详情页 + 未登录 → Gorse: GET /api/item/{productId}/neighbors（404→回退 popular）
        └─ 详情页 + 已登录 → 合并 GET /api/recommend/{userId} 与 GET /api/item/{productId}/neighbors
+       │
+       └─ 所有 source 皆空 → MySQL: select id from products where deleted=0 and status='ON_SHELF' order by created_at desc
 ```
 
 合并策略：保留 Gorse 返回顺序，先放个性化推荐，再补充 item-neighbor 结果；按 `itemId` 去重；过滤当前商品、已下架商品、已购买商品；不足数量时可用 `GET /api/popular` 补足。
@@ -191,7 +193,6 @@ gorse:
   command: >
     -c /etc/gorse/config.toml
     --log-path /var/log/gorse/master.log
-    --cache-path /var/lib/gorse/master_cache.data
   volumes:
     - ./ops/gorse/config.toml:/etc/gorse/config.toml:ro
     - gorse-data:/var/lib/gorse
@@ -203,7 +204,7 @@ gorse:
       condition: service_started
 ```
 
-Gorse 的 cache/data store 只在 `ops/gorse/config.toml` 中配置，避免 docker-compose 环境变量与配置文件形成双真相。
+注意：`--cache-path` 在新版 gorse-in-one 中已移除，不再需要。
 
 需要确保 MySQL 中存在 `gorse` database，并且配置的用户有权限访问。可通过 compose 初始化脚本创建，或在 README/运维脚本中明确初始化命令。当前 `docker-compose.yml` 的 MySQL 服务已定义 `healthcheck`，因此 Gorse snippet 中的 `depends_on.mysql.condition: service_healthy` 可用。
 
@@ -249,12 +250,25 @@ Gorse 的 cache/data store 只在 `ops/gorse/config.toml` 中配置，避免 doc
 
 ## Gorse Configuration
 
-首期推荐管线（`ops/gorse/config.toml`）：
+实际生效的配置（`ops/gorse/config.toml`），已验证兼容 Gorse v0.5.7：
 
 ```toml
 [database]
 cache_store = "redis://redis:6379"
 data_store = "mysql://hill:hill123@tcp(mysql:3306)/gorse?parseTime=true"
+
+[master]
+port = 8086
+host = "0.0.0.0"
+http_port = 8088
+http_host = "0.0.0.0"
+n_jobs = 1
+meta_timeout = "10s"
+
+[server]
+default_n = 10
+auto_insert_user = true
+auto_insert_item = true
 
 [recommend]
 cache_size = 100
@@ -273,7 +287,13 @@ learning_rate = 0.005
 neighbor_type = "items"
 ```
 
-具体字段名以当前 Gorse 版本的配置模板为准；实现前必须用目标镜像版本的示例配置校验。
+### Gorse v0.5.7 兼容性说明
+
+- `[blob]` 段在 v0.5.7 会导致 `fatal: out of memory (14)`，已移除
+- `--cache-path` 参数在新版 `gorse-in-one` 中不再兼容，已移除
+- `[master]` 和 `[server]` 段为 v0.5.x 必填项
+- `/api/popular` 在 v0.5.7 中已改为 `/api/recommend/popular`（GorseClient 已适配）
+- item-to-item neighbors（`/api/item/{id}/neighbors`）在 v0.5.7 中返回 404，配置 key 与旧版不兼容。`GorseClient.readIds` 已加 HTTP 错误兜底，推荐流程不会因此中断，自动回退到 popular
 
 ## Acceptance Criteria
 
@@ -297,3 +317,27 @@ neighbor_type = "items"
 - 匿名用户以 `anonymousId` 作为 Gorse 用户标识；登录后以 `userId` 标识，匿名与登录身份不合并（MVP 限制）
 - RocketMQ / 消息队列接入属于后续独立 feature，不在本 feature 中定义
 - 本 feature 不管理 Gorse 模型参数调优，调优属于后续运维迭代
+
+## Implementation Notes (2026-05-21)
+
+已实现的额外变更：
+
+### GorseClient HTTP 错误兜底
+
+`readIds()` 方法加了 try-catch，捕获 `HttpClientErrorException`（如 Gorse 返回 404）后返回空列表并记录 warn 日志，防止单个 Gorse API 调用失败中断整体推荐流程（例如 item-to-item neighbors 不可用时仍能回退到 popular）。
+
+### 商品启动回填
+
+`GorseCatalogSyncService` 新增 `@PostConstruct init()` 方法，应用启动时自动遍历 `products` 表（`deleted = false`）并全部写入 Gorse。避免只有新创建的商品才进 Gorse 的"冷启动"问题。Gorse 不可用时回填失败只记录 warn，不影响应用启动。
+
+### DB 热门商品兜底
+
+`RecommendationService.candidateIds()` 在 Gorse 所有 source 都返回空时（包括 Gorse 禁用或网络不通），回退到 `loadPopularProductIds()` —— 直接从 MySQL `products` 表查最新的上架商品。确保即使 Gorse 完全不可用，用户仍能看到推荐内容而非空白。
+
+### GORSE_ENABLED 默认值
+
+`application.yml` 中 `${GORSE_ENABLED:false}` 改为 `${GORSE_ENABLED:true}`，因为 Maven 本地运行 `spring-boot:run` 不会读取 `.env` 文件。Docker 环境通过 compose 的 `environment` 显式注入。
+
+### 首页推荐无感融合
+
+首页去掉"为你推荐"标题，推荐商品直接替换主商品网格。未登录用户展示热门商品，已登录用户展示个性化推荐。对用户来说只是"首页商品列表"，感知不到推荐的存在。

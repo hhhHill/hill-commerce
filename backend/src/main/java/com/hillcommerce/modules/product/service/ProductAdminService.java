@@ -52,6 +52,7 @@ import com.hillcommerce.modules.recommendation.GorseCatalogSyncService;
 
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
+import com.hillcommerce.modules.admin.context.ShopContext;
 
 @Service
 public class ProductAdminService {
@@ -142,7 +143,7 @@ public class ProductAdminService {
         productCategoryMapper.deleteById(categoryId);
     }
 
-    public List<ProductSummaryResponse> listProducts(String name, Long categoryId, String status) {
+    public List<ProductSummaryResponse> listProducts(String name, Long categoryId, String status, Long shopId) {
         LambdaQueryWrapper<ProductEntity> queryWrapper = new LambdaQueryWrapper<ProductEntity>()
             .eq(ProductEntity::getDeleted, false)
             .orderByDesc(ProductEntity::getUpdatedAt, ProductEntity::getId);
@@ -159,6 +160,9 @@ public class ProductAdminService {
         }
         if (status != null && !status.isBlank()) {
             queryWrapper.eq(ProductEntity::getStatus, normalizeProductStatus(status));
+        }
+        if (shopId != null) {
+            queryWrapper.eq(ProductEntity::getShopId, shopId);
         }
 
         List<ProductEntity> products = productMapper.selectList(queryWrapper);
@@ -184,14 +188,14 @@ public class ProductAdminService {
     }
 
     @Transactional
-    public ProductResponse createProduct(ProductRequest request) {
-        return saveProduct(null, request);
+    public ProductResponse createProduct(ProductRequest request, Long shopId) {
+        return saveProduct(null, request, shopId);
     }
 
     @Transactional
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
         requireActiveProduct(productId);
-        return saveProduct(productId, request);
+        return saveProduct(productId, request, null);
     }
 
     @Transactional
@@ -232,7 +236,7 @@ public class ProductAdminService {
         gorseCatalogSyncService.syncProduct(product);
     }
 
-    private ProductResponse saveProduct(Long productId, ProductRequest request) {
+    private ProductResponse saveProduct(Long productId, ProductRequest request, Long shopId) {
         validateProductRequest(productId, request);
         ProductCategoryEntity category = requireCategory(request.categoryId());
         if (!CATEGORY_STATUS_ENABLED.equals(category.getStatus())) {
@@ -258,6 +262,7 @@ public class ProductAdminService {
         product.setDeleted(false);
 
         if (productId == null) {
+            product.setShopId(shopId);
             productMapper.insert(product);
         } else {
             productMapper.updateById(product);
@@ -541,6 +546,10 @@ public class ProductAdminService {
         ProductEntity product = productMapper.selectById(productId);
         if (product == null || Boolean.TRUE.equals(product.getDeleted())) {
             throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND, "Product not found");
+        }
+        Long shopId = ShopContext.currentShopId();
+        if (shopId != null && !shopId.equals(product.getShopId())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "Product does not belong to your shop");
         }
         return product;
     }

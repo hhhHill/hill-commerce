@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.security.RequireRole;
+import com.hillcommerce.modules.admin.context.ShopContext;
 import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 
@@ -35,33 +37,38 @@ public class ProductAdminController {
     }
 
     @GetMapping
+    @RequireRole({"ADMIN", "MERCHANT"})
     public List<ProductSummaryResponse> listProducts(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Long categoryId,
         @RequestParam(required = false) String status
     ) {
-        return productAdminService.listProducts(name, categoryId, status);
+        return productAdminService.listProducts(name, categoryId, status, ShopContext.currentShopId());
     }
 
     @GetMapping("/{productId}")
+    @RequireRole({"ADMIN", "MERCHANT"})
     public ProductResponse getProduct(@PathVariable Long productId) {
         return productAdminService.getProduct(productId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequireRole({"ADMIN", "MERCHANT"})
     @OperationLog(action = "CREATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#result.id")
     public ProductResponse createProduct(@Valid @RequestBody ProductRequest request) {
-        return productAdminService.createProduct(request);
+        return productAdminService.createProduct(request, ShopContext.currentShopId());
     }
 
     @PutMapping("/{productId}")
+    @RequireRole({"ADMIN", "MERCHANT"})
     @OperationLog(action = "UPDATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public ProductResponse updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest request) {
         return productAdminService.updateProduct(productId, request);
     }
 
     @PutMapping("/{productId}/status")
+    @RequireRole({"ADMIN", "MERCHANT"})
     @OperationLog(action = "UPDATE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public ProductResponse updateProductStatus(@PathVariable Long productId, @Valid @RequestBody ProductStatusRequest request) {
         return productAdminService.updateProductStatus(productId, request);
@@ -69,6 +76,7 @@ public class ProductAdminController {
 
     @DeleteMapping("/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequireRole({"ADMIN", "MERCHANT"})
     @OperationLog(action = "DELETE_PRODUCT", targetType = "PRODUCT", targetIdExpr = "#productId")
     public void deleteProduct(@PathVariable Long productId) {
         productAdminService.deleteProduct(productId);

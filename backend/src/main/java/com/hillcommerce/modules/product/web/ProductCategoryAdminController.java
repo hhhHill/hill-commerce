@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.security.RequireRole;
 import com.hillcommerce.modules.logging.aop.OperationLog;
 import com.hillcommerce.modules.product.service.ProductAdminService;
 
@@ -32,18 +33,21 @@ public class ProductCategoryAdminController {
     }
 
     @GetMapping
+    @RequireRole("ADMIN")
     public List<CategoryResponse> listCategories() {
         return productAdminService.listCategories();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequireRole("ADMIN")
     @OperationLog(action = "CREATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#result.id")
     public CategoryResponse createCategory(@Valid @RequestBody CategoryRequest request) {
         return productAdminService.createCategory(request);
     }
 
     @PutMapping("/{categoryId}")
+    @RequireRole("ADMIN")
     @OperationLog(action = "UPDATE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public CategoryResponse updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequest request) {
         return productAdminService.updateCategory(categoryId, request);
@@ -51,6 +55,7 @@ public class ProductCategoryAdminController {
 
     @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequireRole("ADMIN")
     @OperationLog(action = "DELETE_CATEGORY", targetType = "CATEGORY", targetIdExpr = "#categoryId")
     public void deleteCategory(@PathVariable Long categoryId) {
         productAdminService.deleteCategory(categoryId);

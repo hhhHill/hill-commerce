@@ -26,7 +26,7 @@ export function CartSummary({ summary }: CartSummaryProps) {
           <Link
             aria-disabled={summary.selectedItemCount === 0}
             className={`btn-primary w-full ${summary.selectedItemCount === 0 ? "btn-disabled" : ""}`}
-            href={summary.selectedItemCount === 0 ? "/cart" : "/checkout-summary"}
+            href={summary.selectedItemCount === 0 ? "/cart" : "/cart"}
           >
             去结算前汇总
           </Link>
@@ -47,7 +47,7 @@ export function CartSummary({ summary }: CartSummaryProps) {
           <Link
             aria-disabled={summary.selectedItemCount === 0}
             className={`btn-primary shrink-0 px-5 ${summary.selectedItemCount === 0 ? "btn-disabled" : ""}`}
-            href={summary.selectedItemCount === 0 ? "/cart" : "/checkout-summary"}
+            href={summary.selectedItemCount === 0 ? "/cart" : "/cart"}
           >
             去结算
           </Link>

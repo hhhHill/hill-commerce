@@ -57,7 +57,7 @@ export function MobileBottomNav({ cartQuantity, isAuthenticated }: MobileBottomN
           })}
         </nav>
         {showCheckoutAction ? (
-          <Link className="btn-primary shrink-0 px-4 py-3 text-xs" href={pathname.startsWith("/products/") ? "/cart" : "/checkout-summary"}>
+          <Link className="btn-primary shrink-0 px-4 py-3 text-xs" href={pathname.startsWith("/products/") ? "/cart" : "/cart"}>
             {pathname.startsWith("/products/") ? "去购物车" : "去结算"}
           </Link>
         ) : null}

@@ -47,7 +47,7 @@ class AdminAnalyticsServiceTest {
             .thenReturn(List.of(new BigDecimal("100.00"), new BigDecimal("101.00"), new BigDecimal("99.00"), new BigDecimal("100.00")));
 
         AnomalyDetectionService service = new AnomalyDetectionService(jdbcTemplate);
-        List<AdminAnalyticsDtos.AnomalyItem> anomalies = service.detectLatest();
+        List<AdminAnalyticsDtos.AnomalyItem> anomalies = service.detectLatest(null);
 
         assertThat(anomalies).hasSize(1);
         assertThat(anomalies.getFirst().direction()).isEqualTo("high");
@@ -70,7 +70,7 @@ class AdminAnalyticsServiceTest {
             });
 
         TrendResponse response = new SalesTrendService(jdbcTemplate)
-            .getTrends("day", LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 3), 1L, false);
+            .getTrends("day", LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 3), null);
 
         assertThat(response.trendDirection()).isEqualTo("up");
         assertThat(response.changePercent()).isEqualByComparingTo("100.00");
@@ -95,7 +95,7 @@ class AdminAnalyticsServiceTest {
                 return List.of(mapper.mapRow(rs, 0));
             });
 
-        ProductRankingResponse response = new ProductRankingService(jdbcTemplate).getRankings("invalid", 99, 1L, false);
+        ProductRankingResponse response = new ProductRankingService(jdbcTemplate).getRankings("invalid", 99, null);
 
         assertThat(response.range()).isEqualTo("today");
         assertThat(response.items()).hasSize(1);

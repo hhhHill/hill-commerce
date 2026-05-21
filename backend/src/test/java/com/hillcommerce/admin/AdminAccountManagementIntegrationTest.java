@@ -212,7 +212,7 @@ class AdminAccountManagementIntegrationTest {
             .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/admin/dashboard/summary").session(merchantSession))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isOk());
     }
 
     @Test

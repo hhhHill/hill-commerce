@@ -49,7 +49,7 @@ class SchedulerSeparationTest {
         schedulerClass.getMethod("scheduledAutoComplete").invoke(scheduler);
 
         Object verifiedService = verify(service);
-        serviceClass.getMethod("autoComplete").invoke(verifiedService);
+        serviceClass.getMethod("autoComplete", Long.class).invoke(verifiedService, (Long) null);
     }
 
     @Test

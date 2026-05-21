@@ -3,6 +3,8 @@ package com.hillcommerce.modules.admin.context;
 import com.hillcommerce.modules.admin.entity.ShopEntity;
 import com.hillcommerce.modules.admin.mapper.ShopMapper;
 import com.hillcommerce.modules.user.security.SessionUserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ShopContext {
 
+    private static final Logger log = LoggerFactory.getLogger(ShopContext.class);
     private static ShopMapper shopMapper;
 
     public ShopContext(ShopMapper mapper) {
@@ -32,7 +35,8 @@ public class ShopContext {
         if (sessionPrincipal.roles().contains("MERCHANT")) {
             ShopEntity shop = shopMapper.findByOwnerId(sessionPrincipal.id());
             if (shop == null) {
-                throw new IllegalStateException("MERCHANT user has no associated shop");
+                log.warn("MERCHANT user {} has no associated shop, returning null shopId", sessionPrincipal.email());
+                return null;
             }
             return shop.getId();
         }

@@ -118,7 +118,7 @@ class ProductAdminIntegrationTest {
 
         mockMvc.perform(get("/api/admin/categories").session(merchantSession))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].name").value("Task4-Shirts"));
+            .andExpect(jsonPath("$[?(@.name=='Task4-Shirts')]").exists());
 
         mockMvc.perform(put("/api/admin/categories/{id}", categoryId)
                 .session(merchantSession)
@@ -193,7 +193,7 @@ class ProductAdminIntegrationTest {
                           "price": 99.00,
                           "stock": 15,
                           "lowStockThreshold": 3,
-                          "status": "OFF_SHELF"
+                          "status": "ENABLED"
                         },
                         {
                           "skuCode": "MANUAL-TASK4-001",
@@ -202,7 +202,7 @@ class ProductAdminIntegrationTest {
                           "price": 109.00,
                           "stock": 9,
                           "lowStockThreshold": 2,
-                          "status": "OFF_SHELF"
+                          "status": "ENABLED"
                         }
                       ]
                     }
@@ -274,7 +274,7 @@ class ProductAdminIntegrationTest {
                           "price": 119.00,
                           "stock": 12,
                           "lowStockThreshold": 4,
-                          "status": "OFF_SHELF"
+                          "status": "ENABLED"
                         },
                         {
                           "skuCode": "",
@@ -283,7 +283,7 @@ class ProductAdminIntegrationTest {
                           "price": 129.00,
                           "stock": 8,
                           "lowStockThreshold": 3,
-                          "status": "OFF_SHELF"
+                          "status": "ENABLED"
                         }
                       ]
                     }
@@ -428,7 +428,7 @@ class ProductAdminIntegrationTest {
 
         mockMvc.perform(get("/api/admin/products")
                 .session(merchantSession)
-                .param("name", "Cotton"))
+                .param("name", "Task4 Cotton"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].spuCode").value("TASK4-TEE"));

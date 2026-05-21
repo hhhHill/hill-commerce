@@ -64,7 +64,7 @@ class AuthFlowIntegrationTest {
             where user_id in (
               select id from users
               where email like 'customer%@example.com'
-                 or email like 'sales%@example.com'
+                 or email like 'merchant%@example.com'
                  or email like 'bcrypt-admin%@example.com'
                  or email like 'legacy-admin%@example.com'
             )
@@ -75,7 +75,7 @@ class AuthFlowIntegrationTest {
             where operator_user_id in (
               select id from users
               where email like 'customer%@example.com'
-                 or email like 'sales%@example.com'
+                 or email like 'merchant%@example.com'
                  or email like 'bcrypt-admin%@example.com'
                  or email like 'legacy-admin%@example.com'
             )
@@ -84,7 +84,7 @@ class AuthFlowIntegrationTest {
             """
             delete from login_logs
             where email_snapshot like 'customer%@example.com'
-               or email_snapshot like 'sales%@example.com'
+               or email_snapshot like 'merchant%@example.com'
                or email_snapshot like 'bcrypt-admin%@example.com'
                or email_snapshot like 'legacy-admin%@example.com'
             """);
@@ -93,7 +93,7 @@ class AuthFlowIntegrationTest {
             delete ur from user_roles ur
             join users u on u.id = ur.user_id
             where u.email like 'customer%@example.com'
-               or u.email like 'sales%@example.com'
+               or u.email like 'merchant%@example.com'
                or u.email like 'bcrypt-admin%@example.com'
                or u.email like 'legacy-admin%@example.com'
             """);
@@ -101,7 +101,7 @@ class AuthFlowIntegrationTest {
             """
             delete from users
             where email like 'customer%@example.com'
-               or email like 'sales%@example.com'
+               or email like 'merchant%@example.com'
                or email like 'bcrypt-admin%@example.com'
                or email like 'legacy-admin%@example.com'
             """);

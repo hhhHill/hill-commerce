@@ -15,9 +15,6 @@ default_n = 10
 auto_insert_user = true
 auto_insert_item = true
 
-[blob]
-uri = "/var/lib/gorse/blob"
-
 [recommend]
 cache_size = 100
 fallback_recommend = ["popular", "latest"]

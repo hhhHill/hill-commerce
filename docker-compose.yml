@@ -43,7 +43,6 @@ services:
     command: >
       -c /etc/gorse/config.toml
       --log-path /var/log/gorse/master.log
-      --cache-path /var/lib/gorse/master_cache.data
     volumes:
       - ./ops/gorse/config.toml:/etc/gorse/config.toml:ro
       - gorse-data:/var/lib/gorse

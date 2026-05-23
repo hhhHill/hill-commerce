@@ -43,7 +43,8 @@ public class SecurityConfig {
                     "/api/products/*",
                     "/api/search",
                     "/api/storefront/recommendations",
-                    "/api/storefront/view-log")
+                    "/api/storefront/view-log",
+                    "/api/storefront/activity-cards")
                 .permitAll()
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "MERCHANT")
                 .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()

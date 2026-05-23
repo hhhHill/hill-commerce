@@ -4,24 +4,26 @@ import { CategoryDirectory } from "@/features/storefront/catalog/category-list";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
 import { getSessionUser } from "@/lib/auth/server";
 import {
+  getServerActivityCards,
   getServerStorefrontCategories,
   getServerStorefrontProducts,
   getServerStorefrontRecommendations,
 } from "@/lib/storefront/server";
 
-const ACTIVITY_CARDS = [
-  { href: "/search?keyword=%E9%99%90%E6%97%B6%E7%A7%92%E6%9D%80", label: "限时秒杀", image: "" },
-  { href: "/search?keyword=%E7%99%BE%E4%BA%BF%E8%A1%A5%E8%B4%B4", label: "百亿补贴", image: "" },
-  { href: "/search?keyword=%E5%AE%98%E6%96%B9%E5%A5%BD%E8%B4%A7", label: "官方好货", image: "" },
-  { href: "/search?keyword=%E6%96%B0%E5%93%81%E9%A6%96%E5%8F%91", label: "新品首发", image: "" },
+const DEFAULT_ACTIVITY_CARDS = [
+  { title: "限时秒杀", imageUrl: null, linkUrl: "/search?keyword=限时秒杀" },
+  { title: "百亿补贴", imageUrl: null, linkUrl: "/search?keyword=百亿补贴" },
+  { title: "官方好货", imageUrl: null, linkUrl: "/search?keyword=官方好货" },
+  { title: "新品首发", imageUrl: null, linkUrl: "/search?keyword=新品首发" },
 ];
 
 export default async function HomePage() {
   const user = await getSessionUser();
-  const [categories, products, recommendations] = await Promise.all([
+  const [categories, products, recommendations, activityCards] = await Promise.all([
     getServerStorefrontCategories(),
     getServerStorefrontProducts({ pageSize: 24 }),
     getServerStorefrontRecommendations({ type: "home", n: 10 }),
+    getServerActivityCards(),
   ]);
 
   return (
@@ -36,18 +38,18 @@ export default async function HomePage() {
         {/* Center: activity cards — fill to match category height */}
         <div className="flex min-w-0 flex-1">
           <div className="grid grid-cols-2 grid-rows-2 gap-3 w-full">
-            {ACTIVITY_CARDS.map((card) => (
+            {(activityCards.length > 0 ? activityCards : DEFAULT_ACTIVITY_CARDS).map((card) => (
               <Link
                 className="group relative overflow-hidden rounded-xl bg-[var(--bg-section)]"
-                href={card.href}
-                key={card.label}
+                href={card.linkUrl}
+                key={card.title}
               >
-                {card.image ? (
-                  <img alt={card.label} className="h-full w-full object-cover" src={card.image} />
+                {card.imageUrl ? (
+                  <img alt={card.title} className="h-full w-full object-cover" src={card.imageUrl} />
                 ) : (
                   <div className="flex h-full items-center justify-center">
                     <span className="text-lg font-bold text-[var(--text-primary)]">
-                      {card.label}
+                      {card.title}
                     </span>
                   </div>
                 )}

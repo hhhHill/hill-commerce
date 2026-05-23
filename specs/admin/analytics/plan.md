@@ -25,9 +25,9 @@
 
 个体画像查询直接跑 SQL 聚合（不建用户缓存表），参数化查询避免 SQL 注入。购买力阈值硬编码为常量 `PURCHASING_POWER_THRESHOLDS`，可后续配置化。
 
-### SALES 数据隔离
+### MERCHANT 数据隔离
 
-所有需要隔离的接口通过 `order_status_histories.changed_by` 关联，SALES 只看到自己操作过的订单产生的销售数据。隔离逻辑封装在 `SalesTrendService` 内部，controller 传入当前用户 ID 和角色。
+所有需要隔离的接口通过 `ShopContext.currentShopId()` 获取当前商家店铺 ID，MERCHANT 只看到自己店铺的订单数据。ADMIN 的 `shopId` 为 null，查询全平台。隔离逻辑在 Service 层统一处理（见 `platform/merchant-platform`）。
 
 ### 前端图表库
 
@@ -39,7 +39,7 @@
 
 ### 前端导航
 
-在 `AdminShell` 的 `NAV_ITEMS` 中新增"数据分析"菜单项，指向 `/admin/analytics/overview`。
+在 `AdminShell` 的 `NAV_ITEMS` 中新增"数据分析"菜单项，指向 `/admin/analytics/overview`。导航按角色区分（见 `platform/merchant-platform` 侧边栏定义）。
 
 ## 后端设计
 
@@ -77,8 +77,8 @@ AdminAnalyticsScheduler (每小时 H+5min / 每天 00:30)
   → daily_sales_summary / product_sales_stats / hourly_sales_snapshot
 
 GET /api/admin/analytics/trends?granularity=day&from=...&to=...
-  → SalesTrendService.getTrends(granularity, from, to, userId, role)
-    → 读 daily_sales_summary (按日期聚合)
+  → SalesTrendService.getTrends(granularity, from, to, shopId)
+    → 读 daily_sales_summary（按 shop_id 过滤）
     → 计算 SMA、环比、趋势方向
     → 返回 TrendResponse
 
@@ -88,9 +88,9 @@ GET /api/admin/analytics/anomalies/status
     → 返回 {hasAlert: boolean, count: int}
 
 GET /api/admin/analytics/rankings/products?range=week&limit=10
-  → ProductRankingService.getProductRankings(range, limit, userId, role)
-    → 读 product_sales_stats (按范围过滤)
-    → SALES 角色通过 order_status_histories 过滤
+  → ProductRankingService.getProductRankings(range, limit, shopId)
+    → 读 product_sales_stats（按 shop_id 过滤）
+    → MERCHANT 通过 ShopContext 隔离，ADMIN 查全平台
     → 返回 ProductRankingResponse
 
 GET /api/admin/analytics/profiles/aggregate
@@ -138,7 +138,7 @@ GET /api/admin/analytics/profiles/users/{userId}
 
 | 文件 | 变更内容 |
 |------|---------|
-| `src/features/admin/catalog/admin-shell.tsx` | `NAV_ITEMS` 新增"数据分析" |
+| `src/features/admin/catalog/admin-shell.tsx` | `NAV_ITEMS` 新增"数据分析"，遵循 `platform/merchant-platform` 侧边栏定义 |
 | `src/lib/admin/server.ts` | 新增 3 个 analytics server-side 获取函数 |
 | `package.json` | 新增 `recharts` 依赖 |
 
@@ -192,5 +192,5 @@ GET /api/admin/analytics/profiles/users/{userId}
 | 商品排行 | 日/周/月范围正确，Top N 正确 |
 | 群体画像 | 地域/购买力/品类数据正确 |
 | 个体画像 | 单用户查询返回完整数据 |
-| SALES 隔离 | SALES 角色只能看到自己相关数据 |
-| ADMIN 全量 | ADMIN 角色看到全局数据 |
+| MERCHANT 隔离 | MERCHANT 只能看到自己店铺数据 |
+| ADMIN 全量 | ADMIN 看到全平台数据 |

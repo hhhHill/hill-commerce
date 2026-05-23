@@ -25,7 +25,7 @@
 
 ### 后台订单列表
 
-新增 `OrderCenterService.listAllOrders()` 方法（不做 userId 过滤），与现有 `listOrders()` 共享 `loadSummarySnapshots` 和分页逻辑。API 路径 `/api/admin/orders` 由 `ShipmentController` 接管。发货和自动完成等写操作仅 Sales 可执行；订单列表查看 Sales 和 Admin 均可访问。
+新增 `OrderCenterService.listAllOrders()` 方法（不做 userId 过滤，MERCHANT 按 shop_id 隔离），与现有 `listOrders()` 共享 `loadSummarySnapshots` 和分页逻辑。API 路径 `/api/admin/orders` 由 `ShipmentController` 接管。ADMIN 和 MERCHANT 均可执行发货等写操作，MERCHANT 仅作用于本店订单（通过 `ShopContext` 隔离）。
 
 ### 订单详情扩展
 
@@ -64,8 +64,8 @@
 ```
 GET /api/admin/orders/{orderId}/ship
   → ShipmentController.getShipOrder()
-    → Sales 鉴权（requireSales：仅 Sales 角色）
-    → 直接查询订单（不做 userId 过滤，因为 Sales 需要查看任意用户的订单）
+    → @RequireRole({"ADMIN", "MERCHANT"}) 鉴权
+    → 直接查询订单（MERCHANT 校验订单 shop_id 匹配）
     → 返回 OrderDetailResponse（含地址快照、商品项）
 
 POST /api/admin/orders/{orderId}/ship
@@ -123,7 +123,7 @@ POST /api/orders/{orderId}/receive
 | `src/features/storefront/order/order-detail-panel.tsx` | 新增物流信息展示区域（含运单号复制按钮）；新增确认收货按钮（含二次确认弹窗）；`renderStatus` 新增 `SHIPPED`/`COMPLETED` |
 | `src/features/storefront/order-center/order-center-toolbar.tsx` | 筛选标签新增"已发货"和"已完成" |
 | `src/features/storefront/order-center/order-center-card.tsx` | `renderStatus` 新增 `SHIPPED`/`COMPLETED` |
-| `src/features/admin/catalog/admin-shell.tsx` | `NAV_ITEMS` 新增"订单管理" |
+| `src/features/admin/catalog/admin-shell.tsx` | `NAV_ITEMS` 新增"订单管理"，遵循 `platform/merchant-platform` 侧边栏定义 |
 
 ### 组件树
 
@@ -182,7 +182,7 @@ POST /api/orders/{orderId}/receive
 ### 前端验证
 
 通过 `npm run dev` 启动后手动验证：
-1. Sales 登录 → `/admin/orders` → 筛选 `PAID` → 点击发货 → 录入物流信息 → 提交
-2. Customer 登录 → `/orders` → 筛选"已发货" → 进入订单详情 → 看到物流信息 → 复制运单号
-3. Customer → 订单详情 → 点击"确认收货" → 弹窗确认 → 订单变为已完成
-4. Sales → 触发自动完成 API → 验证超过 10 天的订单自动完成
+1. MERCHANT 登录 → `/admin/orders` → 筛选 `PAID` → 点击发货 → 录入物流信息 → 提交
+2. CUSTOMER 登录 → `/orders` → 筛选"已发货" → 进入订单详情 → 看到物流信息 → 复制运单号
+3. CUSTOMER → 订单详情 → 点击"确认收货" → 弹窗确认 → 订单变为已完成
+4. ADMIN/MERCHANT → 触发自动完成 API → 验证超过 10 天的订单自动完成

@@ -13,7 +13,7 @@
 
 - 邮箱注册、登录、注销
 - Session/Cookie 登录态
-- `CUSTOMER`、`SALES`、`ADMIN` 角色边界
+- `CUSTOMER`、`MERCHANT`、`ADMIN` 角色边界
 - 前台受保护页与后台受保护页
 - 无权限跳转
 - 登录成功与失败日志
@@ -32,7 +32,7 @@
 - 前端不保存 token，不自行推导角色真相
 - 浏览器通过 Session Cookie 维持登录态
 - 前台注册用户默认授予 `CUSTOMER`
-- 后台至少支持 `ADMIN` 与 `SALES` 边界
+- 后台至少支持 `ADMIN` 与 `MERCHANT` 边界
 - 已登录用户访问 `/login` 或 `/register` 时应被重定向离开认证页
 - 登录成功与失败必须写入应用日志，禁止记录明文密码
 - 成功登录后必须更新用户最近登录时间 `lastLoginAt`；失败登录不得更新该字段

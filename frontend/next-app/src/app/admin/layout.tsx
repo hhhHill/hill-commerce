@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { AdminSidebar } from "@/features/admin/admin-sidebar";
 import { getSessionUser } from "@/lib/auth/server";
@@ -32,7 +33,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       {/* Body: sidebar + content */}
       <div className="flex flex-1 overflow-hidden">
-        <AdminSidebar user={user} />
+        <Suspense fallback={<div className="w-[240px] shrink-0 border-r border-[var(--border-normal)] bg-white" />}>
+          <AdminSidebar user={user} />
+        </Suspense>
         <main className="flex-1 overflow-auto p-6">
           {children}
         </main>

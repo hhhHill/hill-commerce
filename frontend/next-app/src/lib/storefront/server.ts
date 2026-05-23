@@ -53,6 +53,23 @@ export async function getServerStorefrontProductDetail(productId: number): Promi
   return fetchStorefrontJson<StorefrontProductDetail>(`/api/products/${productId}`);
 }
 
+export type StorefrontActivityCard = {
+  title: string;
+  imageUrl: string | null;
+  linkUrl: string;
+};
+
+export async function getServerActivityCards(placement = "homepage"): Promise<StorefrontActivityCard[]> {
+  try {
+    const response = await fetchStorefrontJson<{ items: StorefrontActivityCard[] }>(
+      `/api/storefront/activity-cards?placement=${encodeURIComponent(placement)}`
+    );
+    return response.items;
+  } catch {
+    return [];
+  }
+}
+
 export async function getServerStorefrontRecommendations(
   params: StorefrontRecommendationParams = {}
 ): Promise<StorefrontProductCard[]> {

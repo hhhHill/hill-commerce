@@ -11,8 +11,8 @@
 
 ### In Scope
 
-- Sales 后台订单列表页（`/admin/orders`），支持全部订单状态筛选与基础分页
-- Sales 发货表单页（`/admin/orders/[orderId]/ship`），录入快递公司与运单号
+- 后台订单列表页（`/admin/orders`），ADMIN 查看全平台、MERCHANT 按 shop_id 隔离，支持状态筛选与分页
+- 后台发货表单页（`/admin/orders/[orderId]/ship`），录入快递公司与运单号
 - 前台订单详情页物流信息展示（快递公司、运单号、发货时间，运单号可复制）
 - 前台订单详情页确认收货（二次确认弹窗）
 - 发货后 10 天自动完成（应用内定时任务 + 手动触发 API）
@@ -63,9 +63,9 @@ SHIPPED → DELIVERED
 
 ## User Journeys
 
-### Journey 1: Sales 后台发货
+### Journey 1: 后台发货
 
-Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状态找到待发货订单 → 点击某订单的"发货"按钮 → 进入 `/admin/orders/[orderId]/ship` 发货表单页 → 查看订单基本信息（订单号、金额、商品摘要、收货地址） → 录入快递公司名称和运单号 → 点击"确认发货" → 服务端校验后：创建 shipment 记录（状态 `SHIPPED`），订单推进到 `SHIPPED`，记录状态历史 → 返回订单列表或订单详情，展示发货成功。
+ADMIN 或 MERCHANT 登录后台 → 进入 `/admin/orders` 订单列表（MERCHANT 仅看到本店订单） → 筛选 `PAID` 状态找到待发货订单 → 点击某订单的"发货"按钮 → 进入 `/admin/orders/[orderId]/ship` 发货表单页 → 查看订单基本信息（订单号、金额、商品摘要、收货地址） → 录入快递公司名称和运单号 → 点击"确认发货" → 服务端校验后：创建 shipment 记录（状态 `SHIPPED`），订单推进到 `SHIPPED`，记录状态历史 → 返回订单列表或订单详情，展示发货成功。
 
 ### Journey 2: 前台查看物流信息
 
@@ -84,7 +84,7 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 ### 发货条件
 
 - 只有 `PAID` 订单允许发货
-- 发货操作仅限 Sales 角色执行；Admin 可查看订单列表但不执行发货
+- 发货操作 ADMIN 和 MERCHANT 均可执行；MERCHANT 只能对本店订单发货
 - 非 `PAID` 订单在后台列表不展示"发货"操作入口，API 层也必须拒绝
 
 ### 发货校验
@@ -201,7 +201,7 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 
 ### 手动触发
 
-提供 `POST /api/admin/orders/auto-complete`，仅 Sales 可调用，便于本地验证。手动触发与定时任务共享同一执行逻辑。
+提供 `POST /api/admin/orders/auto-complete`，ADMIN 和 MERCHANT 可调用（MERCHANT 仅作用于本店订单），便于本地验证。手动触发与定时任务共享同一执行逻辑。
 
 ### 竞态保护
 
@@ -213,7 +213,7 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 
 ### 页面职责
 
-`/admin/orders` 为 Sales 提供全部订单视图与发货操作入口；Admin 可查看订单列表但不展示发货操作入口。支持按状态筛选和基础分页。
+`/admin/orders` 提供后台全部订单视图与发货操作入口。ADMIN 可查看全平台订单，MERCHANT 仅查看本店订单（按 `shop_id` 隔离）。支持按状态筛选和基础分页。
 
 ### 列表展示
 
@@ -246,11 +246,11 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 
 | 方法 | 路径 | 说明 | 角色 |
 |------|------|------|------|
-| `GET` | `/api/admin/orders` | 后台全部订单列表，支持状态筛选和分页 | Sales、Admin |
-| `GET` | `/api/admin/orders/{orderId}/ship` | 获取发货表单所需数据 | Sales |
-| `POST` | `/api/admin/orders/{orderId}/ship` | 执行发货 | Sales |
-| `POST` | `/api/orders/{orderId}/receive` | 确认收货 | Customer |
-| `POST` | `/api/admin/orders/auto-complete` | 手动触发自动完成 | Sales |
+| `GET` | `/api/admin/orders` | 后台全部订单列表，支持状态筛选和分页（MERCHANT 按 shop_id 隔离） | ADMIN、MERCHANT |
+| `GET` | `/api/admin/orders/{orderId}/ship` | 获取发货表单所需数据 | ADMIN、MERCHANT |
+| `POST` | `/api/admin/orders/{orderId}/ship` | 执行发货（MERCHANT 仅本店订单） | ADMIN、MERCHANT |
+| `POST` | `/api/orders/{orderId}/receive` | 确认收货 | CUSTOMER |
+| `POST` | `/api/admin/orders/auto-complete` | 手动触发自动完成（MERCHANT 仅本店订单） | ADMIN、MERCHANT |
 
 扩展接口：
 
@@ -263,10 +263,10 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 
 | 页面 | 路径 | 角色 |
 |------|------|------|
-| 后台订单列表 | `/admin/orders` | Sales（含发货操作）、Admin（仅查看） |
-| 后台发货表单 | `/admin/orders/[orderId]/ship` | Sales |
-| 前台订单详情（扩展） | `/orders/[orderId]` | Customer |
-| 我的订单列表（扩展筛选） | `/orders` | Customer |
+| 后台订单列表 | `/admin/orders` | ADMIN（全平台）、MERCHANT（本店） |
+| 后台发货表单 | `/admin/orders/[orderId]/ship` | ADMIN、MERCHANT |
+| 前台订单详情（扩展） | `/orders/[orderId]` | CUSTOMER |
+| 我的订单列表（扩展筛选） | `/orders` | CUSTOMER |
 
 ## Business Rules
 
@@ -282,8 +282,8 @@ Sales 登录后台 → 进入 `/admin/orders` 订单列表 → 筛选 `PAID` 状
 
 ## Acceptance Criteria
 
-- Sales 可在后台订单列表筛选 `PAID` 订单并进入发货表单
-- Sales 可录入快递公司和运单号完成发货，订单变更为 `SHIPPED`
+- ADMIN/MERCHANT 可在后台订单列表筛选 `PAID` 订单并进入发货表单
+- ADMIN/MERCHANT 可录入快递公司和运单号完成发货，订单变更为 `SHIPPED`
 - 用户在订单列表可筛选 `SHIPPED`、`COMPLETED` 订单
 - 用户在订单详情页可查看物流信息（快递公司、运单号可复制、发货时间）
 - 用户可在 `SHIPPED` 订单详情页确认收货，二次确认后订单变更为 `COMPLETED`

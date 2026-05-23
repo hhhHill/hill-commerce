@@ -41,11 +41,11 @@
 - 商品状态采用固定枚举 `DRAFT` / `ON_SHELF` / `OFF_SHELF`
 - SKU 状态采用独立枚举 `ENABLED` / `DISABLED`
 - 商品状态与 SKU 状态不得共用同一校验逻辑
-- 后台页面默认只允许 `SALES` 与 `ADMIN`
+- 后台页面默认只允许 `MERCHANT` 与 `ADMIN`
 - 前端 tooltip 采用统一静态文案，不做状态联动
 - tooltip 仅做字段解释，不承担校验逻辑
 - 分类一旦关联过商品，只允许停用，不允许删除
-- 分类管理页面只允许 `ADMIN`，`SALES` 不显示分类管理入口
+- 分类管理页面只允许 `ADMIN`，`MERCHANT` 不显示分类管理入口
 - 商品编辑页中的 SKU 区域必须使用统一表头和统一列模板，保证字段名称、问号提示和输入框对齐
 
 ## Main Delivery Areas

@@ -83,29 +83,16 @@
 
 ## Status Filter Rules
 
-首期订单状态筛选应支持：
+首期订单状态筛选应支持全部订单状态：
 
-- `PENDING_PAYMENT`
-- `PAID`
-- `CANCELLED`
-- `CLOSED`
+- `PENDING_PAYMENT`（待支付）
+- `PAID`（已支付）
+- `SHIPPED`（已发货）
+- `COMPLETED`（已完成）
+- `CANCELLED`（已取消）
+- `CLOSED`（已关闭）
 
-首期不纳入：
-
-- `SHIPPED`
-- `COMPLETED`
-
-原因：
-
-- `SHIPPED` 和 `COMPLETED` 依赖后续履约与收货完成链路稳定落地
-- 当前首期目标是先补“订单创建后到支付后”的前台查询闭环，不在本阶段扩展到物流与完结态查询
-
-前台可对应展示为：
-
-- 待支付
-- 已支付
-- 已取消
-- 已关闭
+`SHIPPED` 和 `COMPLETED` 由 `order-fulfillment` 定义，`order-center` 作为前台查询中心应覆盖全部用户可见订单状态。待 `fulfillment` 落地后启用这两个状态的筛选。
 
 状态筛选首期只支持单选，不支持多状态组合筛选。
 
@@ -144,7 +131,7 @@
 - `size`
   - 可选，默认 `10`，最大 `50`
 - `status`
-  - 可选，值域为 `PENDING_PAYMENT / PAID / CANCELLED / CLOSED`
+  - 可选，值域为 `PENDING_PAYMENT / PAID / SHIPPED / COMPLETED / CANCELLED / CLOSED`
 - `orderNo`
   - 可选，订单号前缀搜索关键词；`trim` 后长度至少为 `4`
 

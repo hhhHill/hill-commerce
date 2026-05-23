@@ -60,7 +60,7 @@ mybatis-plus:
 oss:
   endpoint: ${OSS_ENDPOINT:oss-cn-shenzhen.aliyuncs.com}
   bucket: ${OSS_BUCKET:hill-commerce}
-  region: ${OSS_REGION:cn-shenzhen}cd
+  region: ${OSS_REGION:cn-shenzhen}
   access-key-id: ${OSS_ACCESS_KEY_ID}
   access-key-secret: ${OSS_ACCESS_KEY_SECRET}
   base-dir: ${OSS_BASE_DIR:products/}

@@ -13,7 +13,11 @@ export default async function EditAdminProductPage({ params }: EditAdminProductP
   const { id } = await params;
   const user = await requireRole(["ADMIN", "MERCHANT"], `/admin/products/${id}`);
   const productId = Number(id);
-  const [categories, product] = await Promise.all([getAdminCategories(), getAdminProduct(productId)]);
+  const isAdmin = user.roles.includes("ADMIN");
+  const [categories, product] = await Promise.all([
+    isAdmin ? getAdminCategories() : Promise.resolve([]),
+    getAdminProduct(productId)
+  ]);
 
   return (
     <AdminShell

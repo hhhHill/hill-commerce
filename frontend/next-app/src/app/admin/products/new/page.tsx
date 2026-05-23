@@ -7,9 +7,10 @@ import { getAdminCategories } from "@/lib/admin/server";
 
 export default async function NewAdminProductPage() {
   const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/products/new");
-  const categories = await getAdminCategories();
+  const isAdmin = user.roles.includes("ADMIN");
+  const categories = isAdmin ? await getAdminCategories() : [];
 
-  if (categories.length === 0) {
+  if (isAdmin && categories.length === 0) {
     redirect("/admin/categories");
   }
 

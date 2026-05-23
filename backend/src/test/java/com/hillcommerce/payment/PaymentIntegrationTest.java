@@ -565,6 +565,8 @@ class PaymentIntegrationTest {
             email,
             passwordService.encode(rawPassword),
             nickname);
+        // Ensure MERCHANT role exists (Flyway V8 may not have run yet in CI)
+        jdbcTemplate.update("INSERT IGNORE INTO roles (code, name) VALUES ('MERCHANT', '商家')");
         jdbcTemplate.update(
             """
             insert into user_roles (user_id, role_id)

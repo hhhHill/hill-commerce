@@ -4,25 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
+@SpringBootTest
 class AdminAnalyticsIntegrationTest {
 
-    @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:9.4.0")
-        .withDatabaseName("hill_commerce_test")
-        .withUsername("test")
-        .withPassword("test");
-
     @DynamicPropertySource
-    static void datasourceProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", () -> "jdbc:mysql://localhost:3306/hill_commerce?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        registry.add("spring.datasource.username", () -> "hill");
+        registry.add("spring.datasource.password", () -> "hill123");
+        registry.add("spring.flyway.enabled", () -> true);
+        registry.add("spring.data.redis.host", () -> "localhost");
+        registry.add("spring.data.redis.port", () -> 6379);
         registry.add("hill.cache.enabled", () -> false);
         registry.add("hill.rocketmq.enabled", () -> false);
     }

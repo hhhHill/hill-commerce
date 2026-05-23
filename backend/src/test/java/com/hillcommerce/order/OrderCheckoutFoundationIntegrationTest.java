@@ -64,6 +64,7 @@ class OrderCheckoutFoundationIntegrationTest {
         jdbcTemplate.update("delete from shipments");
         jdbcTemplate.update("delete from order_status_histories");
         jdbcTemplate.update("delete from order_items");
+        jdbcTemplate.update("delete from payments");
         jdbcTemplate.update("delete from orders");
         jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-FOUNDATION-%'");
         jdbcTemplate.update("delete from products where spu_code like 'ORDER-FOUNDATION-%'");

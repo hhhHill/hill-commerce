@@ -74,6 +74,7 @@ class AdminAccountManagementIntegrationTest {
             where order_id in (select id from orders where order_no like ?)
             """,
             PREFIX + "%");
+        jdbcTemplate.update("delete from payments where order_id in (select id from orders where order_no like ?)", PREFIX + "%");
         jdbcTemplate.update("delete from orders where order_no like ?", PREFIX + "%");
         jdbcTemplate.update(
             """

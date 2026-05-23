@@ -1,0 +1,5 @@
+services:
+  backend:
+    image: ${ACR_REGISTRY}/${ACR_NAMESPACE}/hill-commerce-backend:latest
+  frontend:
+    image: ${ACR_REGISTRY}/${ACR_NAMESPACE}/hill-commerce-frontend:latest

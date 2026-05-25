@@ -99,6 +99,15 @@ public final class ProductAdminDtos {
     ) {
     }
 
+    public record ProductListResponse(
+        List<ProductSummaryResponse> items,
+        int page,
+        int size,
+        long total,
+        int totalPages
+    ) {
+    }
+
     public record ProductImageResponse(
         Long id,
         String imageUrl,

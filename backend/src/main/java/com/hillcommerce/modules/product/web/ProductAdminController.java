@@ -3,9 +3,7 @@ package com.hillcommerce.modules.product.web;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductRequest;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductResponse;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductStatusRequest;
-import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSummaryResponse;
-
-import java.util.List;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductListResponse;
 
 import jakarta.validation.Valid;
 
@@ -38,12 +36,14 @@ public class ProductAdminController {
 
     @GetMapping
     @RequireRole({"ADMIN", "MERCHANT"})
-    public List<ProductSummaryResponse> listProducts(
+    public ProductListResponse listProducts(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Long categoryId,
-        @RequestParam(required = false) String status
+        @RequestParam(required = false) String status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size
     ) {
-        return productAdminService.listProducts(name, categoryId, status, ShopContext.currentShopId());
+        return productAdminService.listProducts(name, categoryId, status, ShopContext.currentShopId(), page, size);
     }
 
     @GetMapping("/{productId}")

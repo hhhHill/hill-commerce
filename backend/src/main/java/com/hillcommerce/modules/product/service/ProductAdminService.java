@@ -15,6 +15,7 @@ import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSales
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSkuRequest;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSkuResponse;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductStatusRequest;
+import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductListResponse;
 import static com.hillcommerce.modules.product.dto.ProductAdminDtos.ProductSummaryResponse;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.hillcommerce.modules.product.entity.ProductAttributeValueEntity;
 import com.hillcommerce.modules.product.entity.ProductCategoryEntity;
@@ -143,7 +145,7 @@ public class ProductAdminService {
         productCategoryMapper.deleteById(categoryId);
     }
 
-    public List<ProductSummaryResponse> listProducts(String name, Long categoryId, String status, Long shopId) {
+    public ProductListResponse listProducts(String name, Long categoryId, String status, Long shopId, int page, int size) {
         LambdaQueryWrapper<ProductEntity> queryWrapper = new LambdaQueryWrapper<ProductEntity>()
             .eq(ProductEntity::getDeleted, false)
             .orderByDesc(ProductEntity::getUpdatedAt, ProductEntity::getId);
@@ -165,11 +167,13 @@ public class ProductAdminService {
             queryWrapper.eq(ProductEntity::getShopId, shopId);
         }
 
-        List<ProductEntity> products = productMapper.selectList(queryWrapper);
+        Page<ProductEntity> pageObj = new Page<>(page, size);
+        Page<ProductEntity> resultPage = productMapper.selectPage(pageObj, queryWrapper);
+        List<ProductEntity> products = resultPage.getRecords();
         Map<Long, ProductCategoryEntity> categories = loadCategoryMap(
             products.stream().map(ProductEntity::getCategoryId).collect(Collectors.toSet()));
 
-        return products.stream()
+        List<ProductSummaryResponse> summaries = products.stream()
             .map(product -> new ProductSummaryResponse(
                 product.getId(),
                 product.getCategoryId(),
@@ -179,7 +183,14 @@ public class ProductAdminService {
                 product.getStatus(),
                 product.getMinSalePrice(),
                 product.getCoverImageUrl()))
-            .toList();
+            .collect(Collectors.toList());
+
+        return new ProductListResponse(
+            summaries,
+            page,
+            size,
+            resultPage.getTotal(),
+            (int) Math.ceil((double) resultPage.getTotal() / size));
     }
 
     public ProductResponse getProduct(Long productId) {

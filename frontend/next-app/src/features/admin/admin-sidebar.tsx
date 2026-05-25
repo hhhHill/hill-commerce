@@ -35,13 +35,12 @@ const ORDER_CHILDREN: NavChild[] = [
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/admin/shop", label: "我的店铺", roles: ["MERCHANT"] },
-  { href: "/admin/homepage", label: "首页运营" },
+  { href: "/admin/homepage", label: "首页运营", roles: ["ADMIN"] },
   { href: "/admin/products", label: "商品管理" },
   { label: "订单管理", children: ORDER_CHILDREN },
   { href: "/admin/analytics/overview", label: "数据分析", roles: ["ADMIN", "MERCHANT"] },
   { href: "/admin/logs", label: "日志中心" },
   { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] },
-  { href: "/admin/categories", label: "分类管理", roles: ["ADMIN"] },
   { href: "/admin/users", label: "用户管理", roles: ["ADMIN"] },
   { href: "/admin/shops", label: "店铺管理", roles: ["ADMIN"] },
 ];

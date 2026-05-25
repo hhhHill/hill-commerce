@@ -17,6 +17,7 @@ export default async function AdminProductsPage({
 }) {
   const params = await searchParams;
   const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/products");
+  const isAdmin = user.roles.includes("ADMIN");
   const filters = {
     name: params.name,
     categoryId: params.categoryId,
@@ -27,7 +28,7 @@ export default async function AdminProductsPage({
 
   const [result, categories] = await Promise.all([
     getAdminProducts(filters, page, size),
-    getAdminCategories(),
+    isAdmin ? getAdminCategories() : [],
   ]);
 
   return (

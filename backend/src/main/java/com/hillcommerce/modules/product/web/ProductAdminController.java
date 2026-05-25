@@ -40,7 +40,7 @@ public class ProductAdminController {
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Long categoryId,
         @RequestParam(required = false) String status,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "20") int size
     ) {
         return productAdminService.listProducts(name, categoryId, status, ShopContext.currentShopId(), page, size);

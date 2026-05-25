@@ -89,7 +89,6 @@ class PaymentIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'PAYMENT-%'");
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'PAYMENT-%')");
         jdbcTemplate.update("delete from products where spu_code like 'PAYMENT-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Payment-%'");
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'payment-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'payment-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'payment-%@example.com'");
@@ -107,7 +106,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Shirts");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Tee", "PAYMENT-TEE", "ON_SHELF", 188.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-TEE-001");
 
@@ -141,7 +140,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-reuse-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-reuse-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Reuse");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Reuse Tee", "PAYMENT-REUSE", "ON_SHELF", 129.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REUSE-001");
 
@@ -169,7 +168,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-fail-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-fail-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Fail");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Fail Tee", "PAYMENT-FAIL", "ON_SHELF", 109.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-FAIL-001");
 
@@ -201,7 +200,7 @@ class PaymentIntegrationTest {
         MockHttpSession ownerSession = loginAsCustomer("payment-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("payment-other@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Owner");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Owner Tee", "PAYMENT-OWNER", "ON_SHELF", 119.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-OWNER-001");
 
@@ -221,7 +220,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-success-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-success-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Success");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Success Tee", "PAYMENT-SUCCESS", "ON_SHELF", 168.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-SUCCESS-001");
 
@@ -258,7 +257,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-failure-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-failure-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Failure");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Failure Tee", "PAYMENT-FAILURE", "ON_SHELF", 138.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-FAILURE-001");
 
@@ -292,7 +291,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-repeat-success-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-repeat-success-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Repeat-Success");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Repeat Tee", "PAYMENT-REPEAT-SUCCESS", "ON_SHELF", 128.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REPEAT-SUCCESS-001");
 
@@ -327,7 +326,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-cannot-fallback-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-cannot-fallback-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Cannot-Fallback");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Locked Tee", "PAYMENT-CANNOT-FALLBACK", "ON_SHELF", 158.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CANNOT-FALLBACK-001");
 
@@ -356,7 +355,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-close-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-close-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Close");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Close Tee", "PAYMENT-CLOSE", "ON_SHELF", 188.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSE-001");
 
@@ -398,7 +397,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-repeat-close-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-repeat-close-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Repeat-Close");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Repeat Close Tee", "PAYMENT-REPEAT-CLOSE", "ON_SHELF", 166.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-REPEAT-CLOSE-001");
 
@@ -438,7 +437,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-close-paid-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-close-paid-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Close-Paid");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Close Paid Tee", "PAYMENT-CLOSE-PAID", "ON_SHELF", 176.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSE-PAID-001");
 
@@ -480,7 +479,7 @@ class PaymentIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("payment-closed-pay-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("payment-closed-pay-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Payment-Closed-Pay");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Payment Closed Tee", "PAYMENT-CLOSED-PAY", "ON_SHELF", 198.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("PAYMENT-CLOSED-PAY-001");
 
@@ -579,20 +578,9 @@ class PaymentIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-        return readId(result.getResponse().getContentAsString(), null);
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private void createProduct(

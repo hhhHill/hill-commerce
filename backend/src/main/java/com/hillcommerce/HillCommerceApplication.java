@@ -3,6 +3,7 @@ package com.hillcommerce;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
+@EnableCaching
 @EnableScheduling
 @MapperScan("com.hillcommerce.modules.**.mapper")
 public class HillCommerceApplication {

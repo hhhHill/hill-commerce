@@ -101,6 +101,14 @@ public class UserAccountService {
             roleCodes);
     }
 
+    /** 更新当前用户的昵称。 */
+    public void updateNickname(Long userId, String nickname) {
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        user.setNickname(nickname);
+        userMapper.updateById(user);
+    }
+
     /** 成功登录后记录最近一次登录时间。 */
     public void recordSuccessfulLogin(Long userId) {
         UserEntity user = new UserEntity();

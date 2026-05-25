@@ -45,7 +45,7 @@ export default function RegisterPage() {
           <label className="flex flex-col gap-2 text-sm font-medium">
             邮箱
             <input
-              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-lg border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -56,7 +56,7 @@ export default function RegisterPage() {
           <label className="flex flex-col gap-2 text-sm font-medium">
             昵称
             <input
-              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-lg border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="text"
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
@@ -67,7 +67,7 @@ export default function RegisterPage() {
           <label className="flex flex-col gap-2 text-sm font-medium">
             密码
             <input
-              className="rounded-[2px] border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+              className="rounded-lg border border-[#f0f0f0] px-4 py-3 outline-none transition focus:border-[var(--accent)]"
               type="password"
               minLength={8}
               value={password}
@@ -76,10 +76,10 @@ export default function RegisterPage() {
             />
           </label>
 
-          {error ? <p className="rounded-[2px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+          {error ? <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
           <button
-            className="rounded-[2px] bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
             type="submit"
             disabled={isPending}
           >

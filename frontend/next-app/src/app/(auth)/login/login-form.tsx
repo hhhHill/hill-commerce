@@ -24,8 +24,12 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
 
     startTransition(async () => {
       try {
-        await loginWithEmail({ email, password });
-        router.replace(nextPath);
+        const user = await loginWithEmail({ email, password });
+        if (user.roles.includes("ADMIN") || user.roles.includes("MERCHANT")) {
+          router.replace("/admin");
+        } else {
+          router.replace(nextPath);
+        }
         router.refresh();
       } catch (submitError) {
         setError(submitError instanceof Error ? submitError.message : "登录失败");
@@ -34,11 +38,11 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-4 rounded-[2px] bg-white border border-[#f0f0f0] p-6" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-4 rounded-lg bg-white border border-[#f0f0f0] p-6" onSubmit={handleSubmit}>
       <label className="flex flex-col gap-2 text-sm font-medium">
         邮箱
         <input
-          className="rounded-[2px] border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+          className="rounded-lg border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -49,7 +53,7 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
       <label className="flex flex-col gap-2 text-sm font-medium">
         密码
         <input
-          className="rounded-[2px] border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
+          className="rounded-lg border border-black/10 bg-white px-4 py-3 outline-none transition focus:border-[var(--accent)]"
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
@@ -57,10 +61,10 @@ export default function LoginForm({ initialEmail, nextPath }: LoginFormProps) {
         />
       </label>
 
-      {error ? <p className="rounded-[2px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
       <button
-        className="rounded-[2px] bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         type="submit"
         disabled={isPending}
       >

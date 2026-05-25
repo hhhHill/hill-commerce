@@ -22,6 +22,10 @@ spring:
           auth: ${MAIL_SMTP_AUTH:false}
           starttls:
             enable: ${MAIL_SMTP_STARTTLS:false}
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterWrite=5m,maximumSize=100
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -54,6 +58,8 @@ hill:
       enabled: ${GORSE_ENABLED:true}
       endpoint: ${GORSE_ENDPOINT:http://localhost:8088}
       timeout: ${GORSE_TIMEOUT:2s}
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.ratelimit.RateLimit;
 import com.hillcommerce.framework.security.RequireRole;
 import com.hillcommerce.modules.admin.context.ShopContext;
 import com.hillcommerce.modules.logging.aop.OperationLog;
@@ -26,6 +27,7 @@ import com.hillcommerce.modules.product.service.ProductAdminService;
 
 @RestController
 @RequestMapping("/api/admin/products")
+@RateLimit(key = "admin:#{#principalKey}", capacity = 100, refillTokens = 50, refillPeriod = 30)
 public class ProductAdminController {
 
     private final ProductAdminService productAdminService;

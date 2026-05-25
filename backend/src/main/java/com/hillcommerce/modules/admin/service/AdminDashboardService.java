@@ -1,5 +1,6 @@
 package com.hillcommerce.modules.admin.service;
 
+import static com.hillcommerce.framework.analytics.AnalyticsConstants.COMPLETED_ORDER_STATUS_SQL;
 import static com.hillcommerce.modules.admin.dto.AdminDashboardDtos.DashboardSummaryResponse;
 import static com.hillcommerce.modules.admin.dto.AdminDashboardDtos.SalesRankItem;
 
@@ -10,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class AdminDashboardService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Cacheable(value = "dashboard", key = "#shopId != null ? #shopId : 0")
     public DashboardSummaryResponse getSummary(Long shopId) {
         return new DashboardSummaryResponse(loadOrderStatusCounts(shopId), loadTotalSalesAmount(shopId), loadSalesRanking(shopId));
     }
@@ -63,7 +66,7 @@ public class AdminDashboardService {
 
     private BigDecimal loadTotalSalesAmount(Long shopId) {
         String sql = "select coalesce(sum(payable_amount), 0) from orders"
-            + " where order_status in ('PAID', 'SHIPPED', 'COMPLETED')";
+            + " where order_status in (" + COMPLETED_ORDER_STATUS_SQL + ")";
         if (shopId != null) {
             sql += " and shop_id = ?";
         }
@@ -86,11 +89,11 @@ public class AdminDashboardService {
                 from order_items oi
                 join orders o on o.id = oi.order_id
                 where o.shop_id = ?
-                  and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+                  and o.order_status in (%s)
                 group by oi.product_id, oi.product_name_snapshot
                 order by order_count desc, oi.product_id asc
                 limit 10
-                """,
+                """.formatted(COMPLETED_ORDER_STATUS_SQL),
                 this::mapSalesRankItem,
                 shopId);
         }

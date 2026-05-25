@@ -84,7 +84,6 @@ class CartPreparationIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'CART-%'");
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'CART-%')");
         jdbcTemplate.update("delete from products where spu_code like 'CART-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Cart-%'");
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'cart-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'cart-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'cart-%@example.com'");
@@ -102,7 +101,7 @@ class CartPreparationIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("cart-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Cart-Shirts");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Cart Cotton Tee", "CART-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
         Long skuId = readSkuId("CART-TEE-001");
 
@@ -144,7 +143,7 @@ class CartPreparationIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("cart-update-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-update-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Cart-Update");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Cart Update Tee", "CART-UPDATE", "ON_SHELF", 109.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("CART-UPDATE-001");
 
@@ -239,7 +238,7 @@ class CartPreparationIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("cart-summary-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-summary-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Cart-Summary");
+        Long categoryId = getFixedCategoryId("手机数码");
         Long productId = createProduct(merchantSession, categoryId, "Cart Summary Tee", "CART-SUMMARY", "ON_SHELF", 139.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("CART-SUMMARY-001");
 
@@ -283,7 +282,7 @@ class CartPreparationIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("cart-anomaly-merchant@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("cart-anomaly-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Cart-Anomaly");
+        Long categoryId = getFixedCategoryId("手机数码");
         Long productId = createProduct(merchantSession, categoryId, "Cart Anomaly Tee", "CART-ANOMALY", "ON_SHELF", 149.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("CART-ANOMALY-001");
 
@@ -351,20 +350,9 @@ class CartPreparationIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-        return readId(result.getResponse().getContentAsString(), null);
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private Long createProduct(

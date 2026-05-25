@@ -23,29 +23,16 @@ import type {
   UpdateShopRequest
 } from "@/lib/admin/types";
 
-type CategoryInput = {
+type CategoryUpdateInput = {
   name: string;
   sortOrder: number;
   status: CategoryStatus;
 };
 
-export async function createCategory(input: CategoryInput): Promise<Category> {
-  return sendAdminRequest<Category>("/api/admin/categories", {
-    method: "POST",
-    body: JSON.stringify(input)
-  });
-}
-
-export async function updateCategory(categoryId: number, input: CategoryInput): Promise<Category> {
+export async function updateCategory(categoryId: number, input: CategoryUpdateInput): Promise<Category> {
   return sendAdminRequest<Category>(`/api/admin/categories/${categoryId}`, {
     method: "PUT",
     body: JSON.stringify(input)
-  });
-}
-
-export async function deleteCategory(categoryId: number): Promise<void> {
-  await sendAdminRequest(`/api/admin/categories/${categoryId}`, {
-    method: "DELETE"
   });
 }
 

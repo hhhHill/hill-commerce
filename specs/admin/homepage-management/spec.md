@@ -58,8 +58,8 @@ INSERT INTO activity_cards (placement, position, title, link_url, is_active, sor
 
 | 方法 | 路径 | 角色 | 说明 |
 |------|------|------|------|
-| `GET` | `/api/admin/activity-cards?placement=homepage` | ADMIN, MERCHANT | 查询某 placement 所有卡片 |
-| `PUT` | `/api/admin/activity-cards` | ADMIN, MERCHANT | 批量更新卡片（body 为数组） |
+| `GET` | `/api/admin/activity-cards?placement=homepage` | ADMIN | 查询某 placement 所有卡片 |
+| `PUT` | `/api/admin/activity-cards` | ADMIN | 批量更新卡片（body 为数组） |
 | `GET` | `/api/storefront/activity-cards?placement=homepage` | 公开 | 获取已启用卡片 |
 
 Admin 端不提供单条 CRUD，表内已有初始化数据，Admin 只做修改。
@@ -67,7 +67,7 @@ Admin 端不提供单条 CRUD，表内已有初始化数据，Admin 只做修改
 ## Admin Page
 
 - 路由：`/admin/homepage`
-- 侧边栏："首页运营"，ADMIN 和 MERCHANT 均可见
+- 侧边栏："首页运营"，仅 ADMIN 可见
 - 页面内容：4 张卡片表单（标题 input + 图片上传 + 链接 input + 启用 switch），底部"保存"按钮
 - 批量 PUT 提交，保存成功后 toast 提示
 - 图片上传复用现有 OSS 上传组件
@@ -80,7 +80,7 @@ Admin 端不提供单条 CRUD，表内已有初始化数据，Admin 只做修改
 
 ## Acceptance Criteria
 
-- Admin 侧边栏出现"首页运营"入口（ADMIN 和 MERCHANT 可见）
+- Admin 侧边栏出现"首页运营"入口（仅 ADMIN 可见）
 - `/admin/homepage` 页面可编辑 4 张活动卡片的标题、图片、链接、启用状态
 - 保存后前台首页立即反映变更
 - 前台首页 API 仅返回 `is_active = TRUE` 的卡片
@@ -93,4 +93,4 @@ Admin 端不提供单条 CRUD，表内已有初始化数据，Admin 只做修改
 - 图片上传依赖现有 OSS 模块（`/api/admin/oss/upload`）
 - Admin 页面依赖现有 admin layout 和 AdminSidebar
 - 前台首页改动范围限定 `app/page.tsx`，不改变页面布局结构
-- 权限依赖现有 `merchant-platform` 的 ADMIN/MERCHANT 角色体系
+- 权限依赖现有 ADMIN 角色，仅管理员可操作

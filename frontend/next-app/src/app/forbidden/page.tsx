@@ -12,10 +12,10 @@ export default function ForbiddenPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link className="rounded-[2px] bg-[var(--accent)] px-5 py-2 font-semibold text-white" href="/">
+          <Link className="rounded-full bg-[var(--accent)] px-5 py-2 font-semibold text-white" href="/">
             返回首页
           </Link>
-          <Link className="rounded-[2px] border border-black/10 px-5 py-2 font-medium" href="/account">
+          <Link className="rounded-full border border-black/10 px-5 py-2 font-medium" href="/account">
             前往账户页
           </Link>
         </div>

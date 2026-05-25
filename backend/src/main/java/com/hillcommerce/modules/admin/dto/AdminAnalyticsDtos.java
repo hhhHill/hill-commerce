@@ -1,6 +1,7 @@
 package com.hillcommerce.modules.admin.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public final class AdminAnalyticsDtos {
@@ -84,4 +85,35 @@ public final class AdminAnalyticsDtos {
         int orderCountLast90Days
     ) {
     }
+
+    public record AnomalyListResponse(
+        List<AnomalyItem> items, int page, int size, long totalItems, boolean hasAlert
+    ) {
+    }
+
+    public record TodaySnapshotResponse(
+        TodayMetrics today,
+        ComparisonMetrics comparison,
+        List<HourlyBreakdown> hourlyBreakdown,
+        List<TopProduct> topProducts
+    ) {}
+
+    public record TodayMetrics(BigDecimal revenue, int orders, BigDecimal avgOrder) {}
+    public record ComparisonMetrics(BigDecimal revenueChange, BigDecimal orderChange) {}
+    public record HourlyBreakdown(String hour, int orders, BigDecimal revenue) {}
+    public record TopProduct(long productId, String productName, int quantity, BigDecimal revenue) {}
+
+    public record ProductFunnelResponse(
+        DateRange period,
+        long totalViews,
+        long totalOrders,
+        BigDecimal viewToOrderRate,
+        List<FunnelProduct> topByViews,
+        List<FunnelProduct> topByConversion,
+        List<FunnelProduct> lowConversion
+    ) {}
+
+    public record DateRange(LocalDate from, LocalDate to) {}
+    public record FunnelProduct(long productId, String productName, long views, long orders,
+                                BigDecimal conversionRate) {}
 }

@@ -28,7 +28,7 @@ export function AddressForm({ address, onCancel, onSaved }: AddressFormProps) {
 
   return (
     <form
-      className="grid gap-4 rounded-[2px] border border-black/10 bg-white p-4"
+      className="grid gap-4 rounded-lg border border-black/10 bg-white p-4"
       onSubmit={(event) => {
         event.preventDefault();
         setError("");
@@ -74,7 +74,7 @@ export function AddressForm({ address, onCancel, onSaved }: AddressFormProps) {
       <label className="flex flex-col gap-2">
         <span className="text-sm font-medium text-black/65">详细地址</span>
         <textarea
-          className="min-h-24 rounded-[2px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
+          className="min-h-24 rounded-lg border border-black/10 bg-white px-4 py-3 text-sm outline-none"
           value={form.detailAddress}
           onChange={(event) => setForm((current) => ({ ...current, detailAddress: event.target.value }))}
         />
@@ -82,14 +82,14 @@ export function AddressForm({ address, onCancel, onSaved }: AddressFormProps) {
 
       <div className="flex flex-wrap gap-3">
         <button
-          className="rounded-[2px] bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-white disabled:opacity-40"
+          className="rounded-full bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-white disabled:opacity-40"
           disabled={isPending}
           type="submit"
         >
           {isPending ? "保存中..." : submitLabel}
         </button>
         {onCancel ? (
-          <button className="rounded-[2px] border border-black/10 px-5 py-2 text-sm font-medium" type="button" onClick={onCancel}>
+          <button className="rounded-full border border-black/10 px-5 py-2 text-sm font-medium" type="button" onClick={onCancel}>
             取消
           </button>
         ) : null}
@@ -105,7 +105,7 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
     <label className="flex flex-col gap-2">
       <span className="text-sm font-medium text-black/65">{label}</span>
       <input
-        className="rounded-[2px] border border-black/10 bg-white px-4 py-3 text-sm outline-none"
+        className="rounded-lg border border-black/10 bg-white px-4 py-3 text-sm outline-none"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex min-h-5 flex-wrap gap-1 overflow-hidden">
           {view.tags.slice(0, 3).map((tag) => (
             <span
-              className="rounded-[2px] bg-[#fff2ec] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--brand-primary)]"
+              className="rounded-[4px] bg-[#fff2ec] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--brand-primary)]"
               key={tag}
             >
               {tag}

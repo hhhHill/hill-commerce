@@ -70,7 +70,7 @@ a {
   }
 
   .chip-badge {
-    @apply inline-flex items-center rounded-[2px] px-1.5 py-0.5 text-[10px] font-semibold;
+    @apply inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold;
     background: #fff2ec;
     color: var(--brand-deep);
   }
@@ -79,7 +79,7 @@ a {
   .btn-secondary,
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold;
-    border-radius: 2px;
+    border-radius: 24px;
     transition: background-color 160ms ease, opacity 160ms ease;
   }
 

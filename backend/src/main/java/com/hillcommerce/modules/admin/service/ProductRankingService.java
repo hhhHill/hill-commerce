@@ -48,27 +48,20 @@ public class ProductRankingService {
             limit);
     }
 
-    private List<ProductRankItem> shopScopedRankings(LocalDate from, int limit, Long shopId) {
-        return jdbcTemplate.query(
-            """
-            select oi.product_id, oi.product_name_snapshot as product_name, p.category_id, pc.name as category_name,
-                   coalesce(sum(oi.quantity), 0) as total_quantity,
-                   coalesce(sum(oi.subtotal_amount), 0) as total_amount
-            from order_items oi
-            join orders o on o.id = oi.order_id
-            join products p on p.id = oi.product_id
-            left join product_categories pc on pc.id = p.category_id
-            where o.shop_id = ?
-              and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
-              and date(o.created_at) >= ?
-            group by oi.product_id, oi.product_name_snapshot, p.category_id, pc.name
-            order by total_quantity desc, total_amount desc, oi.product_id asc
-            limit ?
-            """,
-            this::mapProductRankItem,
-            shopId,
-            from,
-            limit);
+    private List<ProductRankItem> shopScopedRankings(LocalDate from, int limit, long shopId) {
+        String sql = """
+            SELECT pss.product_id, pss.product_name, pss.category_id,
+                   pc.name AS category_name,
+                   SUM(pss.total_quantity) AS total_quantity,
+                   SUM(pss.total_amount) AS total_amount
+            FROM product_sales_stats pss
+            LEFT JOIN product_categories pc ON pc.id = pss.category_id
+            WHERE pss.shop_id = ? AND pss.stat_date >= ?
+            GROUP BY pss.product_id, pss.product_name, pss.category_id, pc.name
+            ORDER BY total_quantity DESC, total_amount DESC
+            LIMIT ?
+            """;
+        return jdbcTemplate.query(sql, this::mapProductRankItem, shopId, from, limit);
     }
 
     private ProductRankItem mapProductRankItem(ResultSet rs, int rowNum) throws SQLException {

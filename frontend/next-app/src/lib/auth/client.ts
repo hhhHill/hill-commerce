@@ -33,6 +33,13 @@ export async function logoutCurrentUser(): Promise<void> {
   });
 }
 
+export async function updateProfile(nickname: string): Promise<SessionUser> {
+  return sendAuthRequest<SessionUser>("/api/auth/profile", {
+    method: "PUT",
+    body: JSON.stringify({ nickname })
+  });
+}
+
 async function sendAuthRequest<T>(input: RequestInfo, init: RequestInit): Promise<T> {
   const response = await fetch(input, {
     ...init,

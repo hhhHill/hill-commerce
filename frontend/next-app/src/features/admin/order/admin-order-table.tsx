@@ -34,7 +34,7 @@ export function AdminOrderTable({ result, currentStatus }: AdminOrderTableProps)
             <p className="text-sm text-[var(--text-secondary)]">{message}</p>
           ) : null}
           <button
-            className="rounded-[2px] border border-[#f0f0f0] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+            className="rounded-full border border-[#f0f0f0] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
             disabled={isPending}
             type="button"
             onClick={() => {
@@ -97,7 +97,7 @@ export function AdminOrderTable({ result, currentStatus }: AdminOrderTableProps)
                 </td>
                 <td className="px-4 py-2.5">
                   <span
-                    className={`inline-flex rounded-[2px] px-1.5 py-0.5 text-xs font-medium ${
+                    className={`inline-flex rounded-[4px] px-1.5 py-0.5 text-xs font-medium ${
                       order.orderStatus === "PAID"
                         ? "bg-orange-50 text-orange-700"
                         : order.orderStatus === "SHIPPED"
@@ -118,7 +118,7 @@ export function AdminOrderTable({ result, currentStatus }: AdminOrderTableProps)
                 <td className="px-4 py-2.5 text-right">
                   {order.orderStatus === "PAID" ? (
                     <Link
-                      className="rounded-[2px] bg-[var(--brand-primary)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--brand-deep)]"
+                      className="rounded-full bg-[var(--brand-primary)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--brand-deep)]"
                       href={`/admin/orders/${order.orderId}/ship`}
                     >
                       发货
@@ -154,7 +154,7 @@ export function AdminOrderTable({ result, currentStatus }: AdminOrderTableProps)
           <div className="flex gap-2">
             {result.page > 1 ? (
               <Link
-                className="rounded-[2px] border border-[#f0f0f0] px-3 py-1 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                className="rounded-full border border-[#f0f0f0] px-3 py-1 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
                 href={`/admin/orders?${buildPageQuery(currentStatus, result.page - 1)}`}
               >
                 上一页
@@ -162,7 +162,7 @@ export function AdminOrderTable({ result, currentStatus }: AdminOrderTableProps)
             ) : null}
             {result.page < result.totalPages ? (
               <Link
-                className="rounded-[2px] border border-[#f0f0f0] px-3 py-1 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                className="rounded-full border border-[#f0f0f0] px-3 py-1 text-xs text-[var(--text-secondary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
                 href={`/admin/orders?${buildPageQuery(currentStatus, result.page + 1)}`}
               >
                 下一页

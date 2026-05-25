@@ -1,5 +1,6 @@
 package com.hillcommerce.modules.admin.service;
 
+import static com.hillcommerce.framework.analytics.AnalyticsConstants.COMPLETED_ORDER_STATUS_SQL;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AggregateProfileResponse;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.CategoryPreference;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.PurchasingPowerTier;
@@ -13,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class UserProfileService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Cacheable(value = "aggregateProfiles")
     public AggregateProfileResponse getAggregateProfiles() {
         long totalUsers = countTotalUsers();
         long repeatPurchaseUsers = countRepeatPurchaseUsers();
@@ -64,8 +67,8 @@ public class UserProfileService {
             """
             select coalesce(sum(payable_amount), 0)
             from orders
-            where user_id = ? and order_status in ('PAID', 'SHIPPED', 'COMPLETED')
-            """,
+            where user_id = ? and order_status in (%s)
+            """.formatted(COMPLETED_ORDER_STATUS_SQL),
             BigDecimal.class,
             userId));
         Integer last90 = jdbcTemplate.queryForObject(
@@ -119,13 +122,13 @@ public class UserProfileService {
               from (
                 select u.id as user_id, coalesce(sum(o.payable_amount), 0) as total_spent
                 from users u
-                left join orders o on o.user_id = u.id and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+                left join orders o on o.user_id = u.id and o.order_status in (%s)
                 group by u.id
               ) spending
             ) tiered
             group by tier
             order by field(tier, 'low', 'mid', 'high')
-            """,
+            """.formatted(COMPLETED_ORDER_STATUS_SQL),
             (rs, rowNum) -> new PurchasingPowerTier(rs.getString("tier"), rs.getLong("user_count"), rs.getBigDecimal("total_amount")));
     }
 
@@ -137,11 +140,11 @@ public class UserProfileService {
             join order_items oi on oi.order_id = o.id
             join products p on p.id = oi.product_id
             left join product_categories pc on pc.id = p.category_id
-            where o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+            where o.order_status in (%s)
             group by p.category_id, pc.name
             order by order_count desc
             limit 10
-            """,
+            """.formatted(COMPLETED_ORDER_STATUS_SQL),
             this::mapCategoryPreference);
     }
 
@@ -154,11 +157,11 @@ public class UserProfileService {
             join products p on p.id = oi.product_id
             left join product_categories pc on pc.id = p.category_id
             where o.user_id = ?
-              and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+              and o.order_status in (%s)
             group by pc.id, pc.name
             order by count(*) desc
             limit 3
-            """,
+            """.formatted(COMPLETED_ORDER_STATUS_SQL),
             (rs, rowNum) -> rs.getString("category_name"),
             userId);
     }
@@ -206,11 +209,11 @@ public class UserProfileService {
             from (
               select user_id
               from orders
-              where order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+              where order_status in (%s)
               group by user_id
               having count(*) >= 2
             ) repeat_users
-            """,
+            """.formatted(COMPLETED_ORDER_STATUS_SQL),
             Long.class);
         return count == null ? 0 : count;
     }

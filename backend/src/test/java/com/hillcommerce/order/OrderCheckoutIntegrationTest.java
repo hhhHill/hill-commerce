@@ -88,7 +88,6 @@ class OrderCheckoutIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-CHECKOUT-%'");
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'ORDER-CHECKOUT-%')");
         jdbcTemplate.update("delete from products where spu_code like 'ORDER-CHECKOUT-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Order Checkout-%'");
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'order-checkout-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'order-checkout-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'order-checkout-%@example.com'");
@@ -106,7 +105,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Shirts");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Tee", "ORDER-CHECKOUT-TEE", "ON_SHELF", 129.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-TEE-001");
 
@@ -131,7 +130,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-noaddr-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-noaddr-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-NoAddr");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout NoAddr Tee", "ORDER-CHECKOUT-NOADDR", "ON_SHELF", 119.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-NOADDR-001");
 
@@ -149,7 +148,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-anomaly-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-anomaly-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Anomaly");
+        Long categoryId = getFixedCategoryId("手机数码");
         Long productId = createProduct(merchantSession, categoryId, "Order Checkout Anomaly Tee", "ORDER-CHECKOUT-ANOMALY", "ON_SHELF", 149.00, 5, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-ANOMALY-001");
 
@@ -171,7 +170,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-create-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-create-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Create");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Create Tee", "ORDER-CHECKOUT-CREATE", "ON_SHELF", 169.00, 10, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-CREATE-001");
 
@@ -221,7 +220,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-fail-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-fail-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Fail");
+        Long categoryId = getFixedCategoryId("手机数码");
         Long productId = createProduct(merchantSession, categoryId, "Order Checkout Fail Tee", "ORDER-CHECKOUT-FAIL", "ON_SHELF", 159.00, 4, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-FAIL-001");
 
@@ -250,7 +249,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-cancel-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-cancel-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Cancel");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Cancel Tee", "ORDER-CHECKOUT-CANCEL", "ON_SHELF", 139.00, 8, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-CANCEL-001");
 
@@ -279,7 +278,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-repeat-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-repeat-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Repeat");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Repeat Tee", "ORDER-CHECKOUT-REPEAT", "ON_SHELF", 149.00, 9, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-REPEAT-001");
 
@@ -307,7 +306,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-checkout-paid-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-checkout-paid-customer@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Paid");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Paid Tee", "ORDER-CHECKOUT-PAID", "ON_SHELF", 159.00, 6, 2, "ENABLED");
         Long skuId = readSkuId("ORDER-CHECKOUT-PAID-001");
 
@@ -330,7 +329,7 @@ class OrderCheckoutIntegrationTest {
         MockHttpSession ownerSession = loginAsCustomer("order-checkout-owner@example.com", "Customer@123456");
         MockHttpSession otherSession = loginAsCustomer("order-checkout-other@example.com", "Customer@123456");
 
-        Long categoryId = createCategory(merchantSession, "Order Checkout-Owner");
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Order Checkout Owner Tee", "ORDER-CHECKOUT-OWNER", "ON_SHELF", 129.00, 7, 2, "ENABLED");
         readSkuId("ORDER-CHECKOUT-OWNER-001");
 
@@ -416,20 +415,9 @@ class OrderCheckoutIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-        return readId(result.getResponse().getContentAsString(), null);
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private Long createProduct(

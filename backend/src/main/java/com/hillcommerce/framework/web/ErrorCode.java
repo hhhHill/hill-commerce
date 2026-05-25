@@ -78,7 +78,10 @@ public enum ErrorCode {
     ACCESS_DENIED(8001, HttpStatus.FORBIDDEN),
     ANONYMOUS_ID_REQUIRED(8002, HttpStatus.BAD_REQUEST),
     UNSUPPORTED_RECOMMENDATION_TYPE(8003, HttpStatus.BAD_REQUEST),
-    PRODUCT_ID_REQUIRED_FOR_DETAIL_RECOMMENDATION(8004, HttpStatus.BAD_REQUEST);
+    PRODUCT_ID_REQUIRED_FOR_DETAIL_RECOMMENDATION(8004, HttpStatus.BAD_REQUEST),
+
+    // ── 9xxx 限流 ────────────────────────────────────────────
+    RATE_LIMIT_EXCEEDED(9001, HttpStatus.TOO_MANY_REQUESTS);
 
     private final int code;
     private final HttpStatus httpStatus;

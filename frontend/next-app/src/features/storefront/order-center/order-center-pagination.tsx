@@ -21,12 +21,12 @@ export function OrderCenterPagination({ page, totalPages, status, orderNo }: Ord
       </p>
       <div className="flex gap-3">
         {page > 1 ? (
-          <Link className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium" href={`/orders${buildQueryString(status, orderNo, page - 1)}`}>
+          <Link className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium" href={`/orders${buildQueryString(status, orderNo, page - 1)}`}>
             上一页
           </Link>
         ) : null}
         {page < totalPages ? (
-          <Link className="rounded-[2px] bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" href={`/orders${buildQueryString(status, orderNo, page + 1)}`}>
+          <Link className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white" href={`/orders${buildQueryString(status, orderNo, page + 1)}`}>
             下一页
           </Link>
         ) : null}

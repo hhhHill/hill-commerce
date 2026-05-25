@@ -21,6 +21,7 @@
         <java.version>21</java.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <testcontainers.version>1.21.3</testcontainers.version>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
     </properties>
 
     <dependencies>
@@ -52,6 +53,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Caffeine 本地缓存（Dashboard + 聚合画像） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
@@ -59,6 +70,13 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
+        </dependency>
+
+        <!-- Bucket4j 令牌桶核心（单实例本地桶，不含 Redis 分布式模块） -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
+            <version>8.11.0</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>

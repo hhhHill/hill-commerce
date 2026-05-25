@@ -59,7 +59,7 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
           return (
             <button
               key={sku.id}
-              className={`min-h-11 rounded-[2px] border px-3 py-2 text-sm ${
+              className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${
                 active
                   ? "border-[var(--brand-primary)] bg-[#fff2ec] font-semibold text-[var(--brand-primary)]"
                   : "border-[var(--border-normal)] bg-white text-[var(--text-secondary)]"
@@ -75,7 +75,7 @@ export function AddToCartPanel({ product, isAuthenticated, loginHref }: AddToCar
       </div>
 
       <div className="mt-4 flex flex-col gap-3">
-        <div className="flex items-center rounded-[2px] border border-[var(--border-normal)] bg-white">
+        <div className="flex items-center rounded-lg border border-[var(--border-normal)] bg-white">
           <button
             className="min-h-11 px-4 text-sm font-semibold disabled:opacity-40"
             disabled={quantity <= 1 || isPending}

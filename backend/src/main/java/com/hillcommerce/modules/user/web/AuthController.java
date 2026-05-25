@@ -3,6 +3,7 @@ package com.hillcommerce.modules.user.web;
 import static com.hillcommerce.modules.user.dto.AuthDtos.AuthUserResponse;
 import static com.hillcommerce.modules.user.dto.AuthDtos.LoginRequest;
 import static com.hillcommerce.modules.user.dto.AuthDtos.RegisterRequest;
+import static com.hillcommerce.modules.user.dto.AuthDtos.UpdateProfileRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,12 +26,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.ratelimit.RateLimit;
 import com.hillcommerce.modules.user.model.AuthUser;
 import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
+import com.hillcommerce.modules.user.security.SessionUserPrincipal;
 import com.hillcommerce.modules.logging.service.LoggingService;
 import com.hillcommerce.modules.user.service.UserAccountService;
 
@@ -67,6 +71,8 @@ public class AuthController {
 
     /** 注册成功后返回 201 + 用户信息，前端自行跳转至登录页完成首次登录 */
     @PostMapping("/register")
+    @RateLimit(key = "register:#{#clientIp}", capacity = 3, refillTokens = 3,
+        refillPeriod = 60, message = "注册过于频繁，请稍后再试")
     public ResponseEntity<AuthUserResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthUser authUser = userAccountService.register(request.email(), request.password(), request.nickname());
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(authUser));
@@ -78,6 +84,10 @@ public class AuthController {
      * 由 SecurityConfig 的 jsonAuthenticationEntryPoint 返回 401 JSON。
      */
     @PostMapping("/login")
+    @RateLimit(key = "login:ip:#{#clientIp}", capacity = 5, refillTokens = 5,
+        refillPeriod = 60, message = "登录尝试过于频繁，请1分钟后再试")
+    @RateLimit(key = "login:account:#{#request.email}", capacity = 5, refillTokens = 5,
+        refillPeriod = 60, message = "该账号登录尝试过于频繁，请1分钟后再试")
     public AuthUserResponse login(
         @Valid @RequestBody LoginRequest request,
         HttpServletRequest httpServletRequest,
@@ -140,6 +150,32 @@ public class AuthController {
             throw new AuthenticationCredentialsNotFoundException("No authenticated user");
         }
         return toResponse(principal);
+    }
+
+    /** 更新当前登录用户的个人资料（昵称），同步更新会话 principal。 */
+    @PutMapping("/profile")
+    public AuthUserResponse updateProfile(
+        @Valid @RequestBody UpdateProfileRequest request,
+        Authentication authentication,
+        HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse
+    ) {
+        AuthenticatedUserPrincipal principal = (AuthenticatedUserPrincipal) authentication.getPrincipal();
+        userAccountService.updateNickname(principal.id(), request.nickname());
+
+        SessionUserPrincipal updatedPrincipal = new SessionUserPrincipal(
+            principal.id(),
+            principal.email(),
+            request.nickname(),
+            "ACTIVE",
+            principal.roles());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(
+            new UsernamePasswordAuthenticationToken(updatedPrincipal, null, updatedPrincipal.getAuthorities()));
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
+
+        return toResponse(updatedPrincipal);
     }
 
     /**

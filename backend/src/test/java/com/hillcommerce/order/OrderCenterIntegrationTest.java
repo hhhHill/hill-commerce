@@ -89,7 +89,7 @@ class OrderCenterIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-CENTER-%'");
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'ORDER-CENTER-%')");
         jdbcTemplate.update("delete from products where spu_code like 'ORDER-CENTER-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Order Center-%'");
+        // categories are seeded by V11 migration, not deleted
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'order-center-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'order-center-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'order-center-%@example.com'");
@@ -244,8 +244,8 @@ class OrderCenterIntegrationTest {
         MockHttpSession merchantSession = loginAsMerchant("order-center-summary-sales@example.com", "Sales@123456");
         MockHttpSession customerSession = loginAsCustomer("order-center-summary-customer@example.com", "Customer@123456");
 
-        Long firstCategoryId = createCategory(merchantSession, "Order Center-Summary-First");
-        Long secondCategoryId = createCategory(merchantSession, "Order Center-Summary-Second");
+        Long firstCategoryId = getFixedCategoryId("手机数码");
+        Long secondCategoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, firstCategoryId, "Order Center First Tee", "ORDER-CENTER-SUMMARY-FIRST", 88.00, 10);
         createProduct(merchantSession, secondCategoryId, "Order Center Second Tee", "ORDER-CENTER-SUMMARY-SECOND", 66.00, 10);
 
@@ -306,7 +306,7 @@ class OrderCenterIntegrationTest {
         String orderNo,
         LocalDateTime createdAt
     ) throws Exception {
-        Long categoryId = createCategory(merchantSession, categoryName + "-" + spuCode);
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, productName, spuCode, 99.00, 12);
         Long skuId = readSkuId(spuCode + "-001");
 
@@ -391,20 +391,9 @@ class OrderCenterIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-        return readId(result.getResponse().getContentAsString());
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private void createProduct(

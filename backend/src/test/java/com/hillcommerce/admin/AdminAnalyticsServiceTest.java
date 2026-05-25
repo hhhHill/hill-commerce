@@ -2,9 +2,15 @@ package com.hillcommerce.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.AnomalyListResponse;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.ProductRankingResponse;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.UserProfileDetail;
@@ -14,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos;
@@ -33,7 +40,9 @@ class AdminAnalyticsServiceTest {
     void anomalyDetectionFlagsCurrentHourOutsideTwoStandardDeviations() throws Exception {
         JdbcTemplate jdbcTemplate = Mockito.mock(JdbcTemplate.class);
         LocalDateTime currentHour = LocalDateTime.of(2026, 5, 16, 10, 0);
-        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
+
+        // Mock: 取最近一小时快照（shopId=0 → query(sql, mapper) 2 参数版本）
+        when(jdbcTemplate.query(contains("hourly_sales_snapshot"), any(RowMapper.class)))
             .thenAnswer(invocation -> {
                 @SuppressWarnings("unchecked")
                 RowMapper<AnomalyDetectionService.HourlySnapshot> mapper = invocation.getArgument(1);
@@ -41,19 +50,64 @@ class AdminAnalyticsServiceTest {
                 when(rs.getTimestamp("snapshot_hour")).thenReturn(Timestamp.valueOf(currentHour));
                 when(rs.getBigDecimal("total_amount")).thenReturn(new BigDecimal("200.00"));
                 when(rs.getInt("order_count")).thenReturn(5);
+                when(rs.getLong("shop_id")).thenReturn(0L);
                 return List.of(mapper.mapRow(rs, 0));
             });
-        when(jdbcTemplate.queryForList(anyString(), Mockito.eq(BigDecimal.class), any(), any(), any()))
-            .thenReturn(List.of(new BigDecimal("100.00"), new BigDecimal("101.00"), new BigDecimal("99.00"), new BigDecimal("100.00")));
+
+        // Mock: baseline 查询（shopId=0 → query(sql, mapper, arg, arg, arg) 5 参数版本）
+        when(jdbcTemplate.query(contains("hour(snapshot_hour)"), any(RowMapper.class), any(), any(), any()))
+            .thenAnswer(invocation -> {
+                @SuppressWarnings("unchecked")
+                RowMapper<BigDecimal> mapper = invocation.getArgument(1);
+                List<BigDecimal> values = List.of(new BigDecimal("100.00"), new BigDecimal("101.00"),
+                    new BigDecimal("99.00"), new BigDecimal("100.00"));
+                List<BigDecimal> result = new ArrayList<>();
+                for (BigDecimal v : values) {
+                    ResultSet rs = Mockito.mock(ResultSet.class);
+                    when(rs.getBigDecimal("total_amount")).thenReturn(v);
+                    result.add(mapper.mapRow(rs, 0));
+                }
+                return result;
+            });
 
         AnomalyDetectionService service = new AnomalyDetectionService(jdbcTemplate);
-        List<AdminAnalyticsDtos.AnomalyItem> anomalies = service.detectLatest(null);
+        service.detectLatest(0);
 
-        assertThat(anomalies).hasSize(1);
-        assertThat(anomalies.getFirst().direction()).isEqualTo("high");
-        assertThat(service.getStatus().hasAlert()).isTrue();
-        service.acknowledge(anomalies.getFirst().id());
-        assertThat(service.getStatus().hasAlert()).isFalse();
+        // 验证检测到异常 → update 被调用（INSERT INTO anomaly_alerts）
+        verify(jdbcTemplate, atLeastOnce()).update(anyString(), any(), any(), any(), any(), any(), any(), any(), any());
+
+        // Mock: anomaly_alerts 列表查询（currentAnomalies）
+        when(jdbcTemplate.query(contains("anomaly_alerts"), any(RowMapper.class), anyLong(), anyInt(), anyInt()))
+            .thenAnswer(invocation -> {
+                @SuppressWarnings("unchecked")
+                RowMapper<AdminAnalyticsDtos.AnomalyItem> mapper = invocation.getArgument(1);
+                ResultSet rs = Mockito.mock(ResultSet.class);
+                when(rs.getLong("id")).thenReturn(1L);
+                when(rs.getString("snapshot_hour")).thenReturn(currentHour.toString());
+                when(rs.getBigDecimal("total_amount")).thenReturn(new BigDecimal("200.00"));
+                when(rs.getBigDecimal("baseline_mean")).thenReturn(new BigDecimal("100.00"));
+                when(rs.getBigDecimal("baseline_std")).thenReturn(new BigDecimal("0.71"));
+                when(rs.getString("direction")).thenReturn("high");
+                when(rs.getBigDecimal("deviation_pct")).thenReturn(new BigDecimal("100.00"));
+                return List.of(mapper.mapRow(rs, 0));
+            });
+        when(jdbcTemplate.queryForObject(contains("count(*) from anomaly_alerts"), eq(Long.class), anyLong()))
+            .thenReturn(1L);
+
+        AnomalyListResponse response = service.currentAnomalies(0, 1, 10);
+        assertThat(response.items()).hasSize(1);
+        assertThat(response.items().getFirst().direction()).isEqualTo("high");
+        assertThat(response.hasAlert()).isTrue();
+
+        // getStatus
+        assertThat(service.getStatus(0).hasAlert()).isTrue();
+        assertThat(service.getStatus(0).count()).isEqualTo(1);
+
+        // acknowledge → 重新 mock count 为 0 验证已清空
+        service.acknowledge(1, "testOperator");
+        when(jdbcTemplate.queryForObject(contains("count(*) from anomaly_alerts"), eq(Long.class), anyLong()))
+            .thenReturn(0L);
+        assertThat(service.getStatus(0).hasAlert()).isFalse();
     }
 
     @Test

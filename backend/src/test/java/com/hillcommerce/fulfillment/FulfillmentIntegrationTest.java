@@ -92,7 +92,7 @@ class FulfillmentIntegrationTest {
         jdbcTemplate.update(
             "delete from product_sales_attributes where product_id in (select id from products where spu_code like 'FULFILLMENT-%')");
         jdbcTemplate.update("delete from products where spu_code like 'FULFILLMENT-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Fulfillment-%'");
+        // categories are seeded by V11 migration, not deleted
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'fulfillment-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'fulfillment-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'fulfillment-%@example.com'");
@@ -233,7 +233,7 @@ class FulfillmentIntegrationTest {
 
     private Long createPendingOrder(MockHttpSession merchantSession, MockHttpSession customerSession, String spuCode)
         throws Exception {
-        Long categoryId = createCategory(merchantSession, "Fulfillment-" + spuCode);
+        Long categoryId = getFixedCategoryId("手机数码");
         createProduct(merchantSession, categoryId, "Fulfillment Tee " + spuCode, spuCode, 129.00, 10);
         Long skuId = readSkuId(spuCode + "-001");
 
@@ -343,20 +343,9 @@ class FulfillmentIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-        return readId(result.getResponse().getContentAsString());
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private void createProduct(

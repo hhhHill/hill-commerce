@@ -68,7 +68,6 @@ class OrderCheckoutFoundationIntegrationTest {
         jdbcTemplate.update("delete from orders");
         jdbcTemplate.update("delete from product_skus where sku_code like 'ORDER-FOUNDATION-%'");
         jdbcTemplate.update("delete from products where spu_code like 'ORDER-FOUNDATION-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Order Foundation-%'");
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'order-foundation-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'order-foundation-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'order-foundation-%@example.com'");
@@ -84,7 +83,7 @@ class OrderCheckoutFoundationIntegrationTest {
     @Test
     void orderAggregateCanPersistThroughMappers() {
         Long userId = createUser("order-foundation-customer@example.com", "Customer@123456");
-        Long categoryId = createCategory("Order Foundation-Shirts");
+        Long categoryId = getFixedCategoryId("手机数码");
         Long productId = createProduct(categoryId, "Order Foundation Tee", "ORDER-FOUNDATION-TEE");
         Long skuId = createSku(productId, "ORDER-FOUNDATION-001");
         String orderNo = businessIdGenerator.next(NumberPrefix.ORDER);
@@ -166,14 +165,9 @@ class OrderCheckoutFoundationIntegrationTest {
         return userId;
     }
 
-    private Long createCategory(String name) {
-        jdbcTemplate.update(
-            """
-            insert into product_categories (name, sort_order, status)
-            values (?, 0, 'ENABLED')
-            """,
-            name);
-        return jdbcTemplate.queryForObject("select id from product_categories where name = ?", Long.class, name);
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private Long createProduct(Long categoryId, String name, String spuCode) {

@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type { SessionUserRole } from "@/lib/auth/types";
+
 import { SearchForm } from "../catalog/search-form";
 
 type StorefrontNavProps = {
-  user: { nickname: string } | null;
+  user: { nickname: string; roles: SessionUserRole[] } | null;
   cartQuantity: number;
 };
 
@@ -58,21 +60,30 @@ export function StorefrontNav({ user, cartQuantity }: StorefrontNavProps) {
             {/* Right: user links — 260px on lg+, compact on md */}
             <div className="hidden w-[260px] shrink-0 items-center justify-end gap-4 text-xs lg:flex">
               {user ? (
-                <>
-                  <span className="text-[var(--text-secondary)]">
-                    Hi, <span className="font-semibold text-[var(--text-primary)]">{user.nickname}</span>
-                  </span>
-                  <Link className="nav-link" href="/account">我的账户</Link>
-                  <Link className="nav-link" href="/orders">我的订单</Link>
-                  <Link className="nav-link relative" href="/cart">
-                    购物车
-                    {cartQuantity > 0 ? (
-                      <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-primary)] px-1 text-[10px] font-bold text-white">
-                        {cartQuantity > 99 ? "99+" : cartQuantity}
-                      </span>
-                    ) : null}
-                  </Link>
-                </>
+                (user.roles.includes("ADMIN") || user.roles.includes("MERCHANT")) ? (
+                  <>
+                    <Link className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)]" href="/account">
+                      Hi, <span className="font-semibold text-[var(--text-primary)]">{user.nickname}</span>
+                    </Link>
+                    <Link className="font-semibold text-[var(--brand-primary)]" href="/admin">我的后台</Link>
+                  </>
+                ) : (
+                  <>
+                    <Link className="text-[var(--text-secondary)] hover:text-[var(--brand-primary)]" href="/account">
+                      Hi, <span className="font-semibold text-[var(--text-primary)]">{user.nickname}</span>
+                    </Link>
+                    <Link className="nav-link" href="/account">我的账户</Link>
+                    <Link className="nav-link" href="/orders">我的订单</Link>
+                    <Link className="nav-link relative" href="/cart">
+                      购物车
+                      {cartQuantity > 0 ? (
+                        <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-primary)] px-1 text-[10px] font-bold text-white">
+                          {cartQuantity > 99 ? "99+" : cartQuantity}
+                        </span>
+                      ) : null}
+                    </Link>
+                  </>
+                )
               ) : (
                 <>
                   <Link className="nav-link" href="/login">登录</Link>
@@ -91,17 +102,23 @@ export function StorefrontNav({ user, cartQuantity }: StorefrontNavProps) {
 
             {/* Right: compact links for md screens */}
             <div className="hidden shrink-0 items-center gap-3 text-xs md:flex lg:hidden">
-              <Link className="nav-link" href={user ? "/account" : "/login"}>
-                {user ? "账户" : "登录"}
-              </Link>
-              <Link className="nav-link relative" href="/cart">
-                购物车
-                {cartQuantity > 0 ? (
-                  <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-primary)] px-1 text-[10px] font-bold text-white">
-                    {cartQuantity > 99 ? "99+" : cartQuantity}
-                  </span>
-                ) : null}
-              </Link>
+              {user && (user.roles.includes("ADMIN") || user.roles.includes("MERCHANT")) ? (
+                <Link className="font-semibold text-[var(--brand-primary)]" href="/admin">后台</Link>
+              ) : (
+                <>
+                  <Link className="nav-link" href={user ? "/account" : "/login"}>
+                    {user ? "账户" : "登录"}
+                  </Link>
+                  <Link className="nav-link relative" href="/cart">
+                    购物车
+                    {cartQuantity > 0 ? (
+                      <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-primary)] px-1 text-[10px] font-bold text-white">
+                        {cartQuantity > 99 ? "99+" : cartQuantity}
+                      </span>
+                    ) : null}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

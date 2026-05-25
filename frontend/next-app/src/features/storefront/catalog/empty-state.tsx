@@ -14,7 +14,7 @@ export function EmptyState({ title, description, actionHref = "/categories", act
         <span className="text-sm text-[var(--text-hint)]">空状态</span>
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
         <p className="text-sm leading-7 text-[var(--text-secondary)]">{description}</p>
-        <Link className="rounded-[2px] bg-[#ff5000] text-white px-5 py-2 text-sm font-semibold" href={actionHref}>
+        <Link className="rounded-full bg-[#ff5000] text-white px-5 py-2 text-sm font-semibold" href={actionHref}>
           {actionLabel}
         </Link>
       </div>

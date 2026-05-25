@@ -29,7 +29,7 @@ public class AdminActivityCardController {
     }
 
     @GetMapping
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole({"ADMIN"})
     public ActivityCardListResponse list(@RequestParam(defaultValue = "homepage") String placement) {
         List<ActivityCardEntity> cards = activityCardService.listByPlacement(placement);
         List<ActivityCardResponse> items = cards.stream()
@@ -39,7 +39,7 @@ public class AdminActivityCardController {
     }
 
     @PutMapping
-    @RequireRole({"ADMIN", "MERCHANT"})
+    @RequireRole({"ADMIN"})
     public ActivityCardListResponse batchUpdate(@Valid @RequestBody BatchUpdateRequest request) {
         activityCardService.batchUpdate(request.cards());
         List<ActivityCardEntity> cards = activityCardService.listByPlacement("homepage");

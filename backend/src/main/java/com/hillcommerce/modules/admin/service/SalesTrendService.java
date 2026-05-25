@@ -1,5 +1,6 @@
 package com.hillcommerce.modules.admin.service;
 
+import static com.hillcommerce.framework.analytics.AnalyticsConstants.COMPLETED_ORDER_STATUS_SQL;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendPoint;
 import static com.hillcommerce.modules.admin.dto.AdminAnalyticsDtos.TrendResponse;
 
@@ -30,7 +31,7 @@ public class SalesTrendService {
         List<TrendPoint> points = shopId != null
             ? loadShopScopedPoints(safeGranularity, safeFrom, safeTo, shopId)
             : loadAdminPoints(safeGranularity, safeFrom, safeTo);
-        List<TrendPoint> withMovingAverage = withMovingAverage(points);
+        List<TrendPoint> withMovingAverage = withMovingAverage(points, safeGranularity);
         return new TrendResponse(
             safeGranularity,
             withMovingAverage,
@@ -58,11 +59,11 @@ public class SalesTrendService {
             select %s as period_key, coalesce(sum(o.payable_amount), 0) as amount
             from orders o
             where o.shop_id = ?
-              and o.order_status in ('PAID', 'SHIPPED', 'COMPLETED')
+              and o.order_status in (%s)
               and date(o.created_at) between ? and ?
             group by period_key
             order by min(o.created_at)
-            """.formatted(periodExpression("date(o.created_at)", granularity)),
+            """.formatted(periodExpression("date(o.created_at)", granularity), COMPLETED_ORDER_STATUS_SQL),
             this::mapTrendPoint,
             shopId,
             from,
@@ -81,10 +82,20 @@ public class SalesTrendService {
         return new TrendPoint(rs.getString("period_key"), rs.getBigDecimal("amount"), BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
-    private List<TrendPoint> withMovingAverage(List<TrendPoint> points) {
+    private int windowSize(String granularity) {
+        return switch (granularity) {
+            case "day"   -> 7;
+            case "week"  -> 4;
+            case "month" -> 3;
+            default      -> 7;
+        };
+    }
+
+    private List<TrendPoint> withMovingAverage(List<TrendPoint> points, String granularity) {
+        int window = windowSize(granularity);
         List<TrendPoint> result = new ArrayList<>(points.size());
         for (int index = 0; index < points.size(); index++) {
-            int start = Math.max(0, index - 6);
+            int start = Math.max(0, index - window + 1);
             BigDecimal sum = BigDecimal.ZERO;
             for (int i = start; i <= index; i++) {
                 sum = sum.add(points.get(i).amount());

@@ -44,7 +44,7 @@ export function AddressBook({ addresses }: AddressBookProps) {
         />
       ) : (
         <button
-          className="w-fit rounded-[2px] bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
+          className="w-fit rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white"
           type="button"
           onClick={() => setIsCreateOpen(true)}
         >
@@ -87,7 +87,7 @@ export function AddressBook({ addresses }: AddressBookProps) {
               <div className="flex flex-wrap gap-3">
                 {!address.isDefault ? (
                   <button
-                    className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium disabled:opacity-40"
+                    className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium disabled:opacity-40"
                     disabled={isPending}
                     type="button"
                     onClick={() => {
@@ -106,14 +106,14 @@ export function AddressBook({ addresses }: AddressBookProps) {
                   </button>
                 ) : null}
                 <button
-                  className="rounded-[2px] border border-black/10 px-4 py-2 text-sm font-medium"
+                  className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium"
                   type="button"
                   onClick={() => setEditingId(address.id)}
                 >
                   编辑
                 </button>
                 <button
-                  className="rounded-[2px] border border-red-200 px-4 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
+                  className="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
                   disabled={isPending}
                   type="button"
                   onClick={() => {

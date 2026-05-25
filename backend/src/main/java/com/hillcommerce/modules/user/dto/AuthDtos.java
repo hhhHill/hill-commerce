@@ -29,6 +29,12 @@ public final class AuthDtos {
     ) {
     }
 
+    /** 更新个人资料请求 */
+    public record UpdateProfileRequest(
+        @NotBlank @Size(max = 64) String nickname
+    ) {
+    }
+
     /** 认证成功后的用户信息响应，roles 为纯角色编码列表（不含 ROLE_ 前缀） */
     public record AuthUserResponse(
         String email,

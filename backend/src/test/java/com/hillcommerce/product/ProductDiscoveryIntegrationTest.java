@@ -82,7 +82,6 @@ class ProductDiscoveryIntegrationTest {
         jdbcTemplate.update("delete from product_skus where sku_code like 'DISCOVERY-%'");
         jdbcTemplate.update("delete from product_sales_attributes where product_id in (select id from products where spu_code like 'DISCOVERY-%')");
         jdbcTemplate.update("delete from products where spu_code like 'DISCOVERY-%'");
-        jdbcTemplate.update("delete from product_categories where name like 'Discovery-%'");
         jdbcTemplate.update("delete from product_view_logs where user_id in (select id from users where email like 'discovery-%@example.com')");
         jdbcTemplate.update("delete from operation_logs where operator_user_id in (select id from users where email like 'discovery-%@example.com')");
         jdbcTemplate.update("delete from login_logs where email_snapshot like 'discovery-%@example.com'");
@@ -98,18 +97,18 @@ class ProductDiscoveryIntegrationTest {
     @Test
     void anonymousUserCanBrowseVisibleCategoriesAndProducts() throws Exception {
         MockHttpSession merchantSession = loginAsMerchant("discovery-browse-sales@example.com", "Sales@123456");
-        Long visibleCategoryId = createCategory(merchantSession, "Discovery-Shirts");
-        Long hiddenCategoryId = createCategory(merchantSession, "Discovery-Hidden");
+        Long visibleCategoryId = getFixedCategoryId("手机数码");
+        Long hiddenCategoryId = getFixedCategoryId("服饰鞋包");
 
         createProduct(merchantSession, visibleCategoryId, "Discovery Cotton Tee", "DISCOVERY-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
         createProduct(merchantSession, hiddenCategoryId, "Discovery Hidden Tee", "DISCOVERY-HIDDEN", "ON_SHELF", 119.00, 9, 2, "ENABLED");
-        updateCategoryStatus(merchantSession, hiddenCategoryId, "Discovery-Hidden", "DISABLED");
+        updateCategoryStatus(merchantSession, hiddenCategoryId, "服饰鞋包", "DISABLED");
 
         mockMvc.perform(get("/api/categories"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[*].id", hasItem(visibleCategoryId.intValue())))
-            .andExpect(jsonPath("$[*].name", hasItem("Discovery-Shirts")))
-            .andExpect(jsonPath("$[*].name", not(hasItem("Discovery-Hidden"))));
+            .andExpect(jsonPath("$[*].name", hasItem("手机数码")))
+            .andExpect(jsonPath("$[*].name", not(hasItem("服饰鞋包"))));
 
         mockMvc.perform(get("/api/products"))
             .andExpect(status().isOk())
@@ -120,12 +119,15 @@ class ProductDiscoveryIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.items.length()").value(1))
             .andExpect(jsonPath("$.items[0].name").value("Discovery Cotton Tee"));
+
+        // restore the disabled fixed category
+        updateCategoryStatus(merchantSession, hiddenCategoryId, "服饰鞋包", "ENABLED");
     }
 
     @Test
     void anonymousUserCanSearchProductsByName() throws Exception {
         MockHttpSession merchantSession = loginAsMerchant("discovery-search-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Discovery-Search");
+        Long categoryId = getFixedCategoryId("手机数码");
 
         createProduct(merchantSession, categoryId, "Discovery Cotton Tee", "DISCOVERY-SEARCH-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
         createProduct(merchantSession, categoryId, "Discovery Hoodie", "DISCOVERY-SEARCH-HOODIE", "ON_SHELF", 129.00, 8, 2, "ENABLED");
@@ -139,7 +141,7 @@ class ProductDiscoveryIntegrationTest {
     @Test
     void anonymousUserCanViewOffShelfDetailButDraftProductIsNotAccessible() throws Exception {
         MockHttpSession merchantSession = loginAsMerchant("discovery-detail-sales@example.com", "Sales@123456");
-        Long categoryId = createCategory(merchantSession, "Discovery-Detail");
+        Long categoryId = getFixedCategoryId("手机数码");
 
         Long offShelfProductId = createProduct(merchantSession, categoryId, "Discovery Archive Tee", "DISCOVERY-ARCHIVE", "OFF_SHELF", 79.00, 4, 1, "ENABLED");
         Long draftProductId = createProduct(merchantSession, categoryId, "Discovery Draft Tee", "DISCOVERY-DRAFT", "DRAFT", 59.00, 6, 2, "ENABLED");
@@ -193,21 +195,9 @@ class ProductDiscoveryIntegrationTest {
             email);
     }
 
-    private Long createCategory(MockHttpSession session, String name) throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/admin/categories")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                      "name": "%s",
-                      "sortOrder": 1,
-                      "status": "ENABLED"
-                    }
-                    """.formatted(name)))
-            .andExpect(status().isCreated())
-            .andReturn();
-
-        return readId(result);
+    private Long getFixedCategoryId(String name) {
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM product_categories WHERE name = ?", Long.class, name);
     }
 
     private void updateCategoryStatus(MockHttpSession session, Long categoryId, String name, String status) throws Exception {

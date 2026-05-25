@@ -44,7 +44,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
           {order.items.map((item) => (
             <div key={item.id} className="flex gap-3">
               <Link
-                className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-[2px] border border-[var(--border-normal)] bg-[var(--border-light)]"
+                className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-[var(--border-normal)] bg-[var(--border-light)]"
                 href={`/products/${item.productId}`}
               >
                 {item.productImageUrl ? (
@@ -146,7 +146,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
               去支付
             </Link>
           ) : (
-            <div className="rounded-[2px] bg-black/5 px-4 py-3 text-sm font-medium text-[var(--text-secondary)]">{renderPaymentHint(order.orderStatus)}</div>
+            <div className="rounded-lg bg-black/5 px-4 py-3 text-sm font-medium text-[var(--text-secondary)]">{renderPaymentHint(order.orderStatus)}</div>
           )}
           {canCancel ? (
             <button
@@ -168,7 +168,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
               {isPending ? "取消中..." : "取消未支付订单"}
             </button>
           ) : (
-            <div className="rounded-[2px] bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再支持未支付取消。</div>
+            <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">当前订单状态为 {renderStatus(order.orderStatus)}，不再支持未支付取消。</div>
           )}
           {canConfirmReceipt ? (
             <button

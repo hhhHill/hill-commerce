@@ -1,4 +1,5 @@
 import LoginForm from "@/app/(auth)/login/login-form";
+import { TestCredentials } from "@/features/storefront/auth/test-credentials";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -9,7 +10,7 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const nextPath = resolvedSearchParams.next ?? "/account";
+  const nextPath = resolvedSearchParams.next ?? "/";
   const initialEmail = resolvedSearchParams.email ?? "";
 
   return (
@@ -25,10 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               当前版本采用基于 Session 的登录态。登录成功后，你可以访问受保护的账户页和后台示例页。
             </p>
           </div>
-          <div className="border-b border-[#f0f0f0] bg-white p-5 text-sm leading-6 text-black/65">
-            <p>管理员测试账号：</p>
-            <p className="font-medium text-[var(--foreground)]">admin@hill-commerce.local / Admin@123456</p>
-          </div>
+          <TestCredentials />
         </div>
 
         <LoginForm initialEmail={initialEmail} nextPath={nextPath} />

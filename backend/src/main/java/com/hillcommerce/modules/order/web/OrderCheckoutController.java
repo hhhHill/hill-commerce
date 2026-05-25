@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hillcommerce.framework.ratelimit.RateLimit;
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
 import com.hillcommerce.modules.order.service.OrderCheckoutService;
@@ -33,6 +34,8 @@ public class OrderCheckoutController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RateLimit(key = "order-create:#{#principalKey}", capacity = 10, refillTokens = 5,
+        refillPeriod = 60, message = "下单过于频繁，请稍后再试")
     public CreateOrderResponse createOrder(Authentication authentication) {
         return orderCheckoutService.createOrder(requireUserId(authentication));
     }

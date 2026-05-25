@@ -3,30 +3,44 @@ import { ProductList } from "@/features/admin/catalog/product-list";
 import { requireRole } from "@/lib/auth/server";
 import { getAdminCategories, getAdminProducts } from "@/lib/admin/server";
 
-type ProductListPageProps = {
-  searchParams: Promise<{
-    name?: string;
-    categoryId?: string;
-    status?: string;
-  }>;
+type SearchParams = {
+  name?: string;
+  categoryId?: string;
+  status?: string;
+  page?: string;
 };
 
-export default async function AdminProductsPage({ searchParams }: ProductListPageProps) {
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
   const user = await requireRole(["ADMIN", "MERCHANT"], "/admin/products");
-  const filters = await searchParams;
-  const isAdmin = user.roles.includes("ADMIN");
-  const [categories, products] = await Promise.all([
-    isAdmin ? getAdminCategories() : Promise.resolve([]),
-    getAdminProducts(filters)
+  const filters = {
+    name: params.name,
+    categoryId: params.categoryId,
+    status: params.status,
+  };
+  const page = Number(params.page) || 1;
+  const size = 20;
+
+  const [result, categories] = await Promise.all([
+    getAdminProducts(filters, page, size),
+    getAdminCategories(),
   ]);
 
   return (
     <AdminShell
-      description="商品列表支持按名称、分类、状态过滤，并可直接执行上下架和逻辑删除。"
+      description="管理所有商品，支持搜索、筛选和上下架操作。"
       title="商品管理"
       user={user}
     >
-      <ProductList categories={categories} filters={filters} products={products} />
+      <ProductList
+        categories={categories}
+        filters={{ ...filters, page: params.page }}
+        result={result}
+      />
     </AdminShell>
   );
 }

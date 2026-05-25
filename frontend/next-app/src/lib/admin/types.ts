@@ -94,6 +94,14 @@ export type ProductListFilters = {
   status?: string;
 };
 
+export type ProductListResult = {
+  items: ProductSummary[];
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+};
+
 export type ApiErrorResponse = {
   message?: string;
 };

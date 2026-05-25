@@ -14,6 +14,7 @@ import type {
   OperationLogListResult,
   ProductDetail,
   ProductListFilters,
+  ProductListResult,
   ProductSummary,
   ProductViewLogListResult,
   MerchantUserListResult,
@@ -25,7 +26,11 @@ export async function getAdminCategories(): Promise<Category[]> {
   return fetchAdminJson<Category[]>("/api/admin/categories");
 }
 
-export async function getAdminProducts(filters: ProductListFilters = {}): Promise<ProductSummary[]> {
+export async function getAdminProducts(
+  filters: ProductListFilters = {},
+  page = 1,
+  size = 20
+): Promise<ProductListResult> {
   const search = new URLSearchParams();
   if (filters.name) {
     search.set("name", filters.name);
@@ -36,9 +41,11 @@ export async function getAdminProducts(filters: ProductListFilters = {}): Promis
   if (filters.status) {
     search.set("status", filters.status);
   }
+  search.set("page", String(page));
+  search.set("size", String(size));
 
   const query = search.toString();
-  return fetchAdminJson<ProductSummary[]>(`/api/admin/products${query ? `?${query}` : ""}`);
+  return fetchAdminJson<ProductListResult>(`/api/admin/products?${query}`);
 }
 
 export async function getAdminProduct(productId: number): Promise<ProductDetail> {

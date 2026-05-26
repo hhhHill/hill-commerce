@@ -1,11 +1,26 @@
+import { Suspense } from "react";
+
 import { AdminShell } from "@/features/admin/catalog/admin-shell";
 import { AdminUserList } from "@/features/admin/user/admin-user-list";
 import { requireRole } from "@/lib/auth/server";
-import { getServerMerchantUsers } from "@/lib/admin/server";
+import { getServerMerchantUsers, getServerLoginLogs } from "@/lib/admin/server";
 
-export default async function AdminUsersPage() {
+type AdminUsersPageProps = {
+  searchParams: Promise<{
+    tab?: string;
+    email?: string;
+    result?: string;
+  }>;
+};
+
+export default async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   const user = await requireRole(["ADMIN"], "/admin/users");
-  const users = await getServerMerchantUsers();
+  const { email, result } = await searchParams;
+
+  const [users, loginLogs] = await Promise.all([
+    getServerMerchantUsers(),
+    getServerLoginLogs({ email, result }),
+  ]);
 
   return (
     <AdminShell
@@ -13,7 +28,13 @@ export default async function AdminUsersPage() {
       title="用户管理"
       user={user}
     >
-      <AdminUserList users={users} />
+      <Suspense fallback={null}>
+        <AdminUserList
+          users={users}
+          loginLogs={loginLogs}
+          loginFilters={{ email, result }}
+        />
+      </Suspense>
     </AdminShell>
   );
 }

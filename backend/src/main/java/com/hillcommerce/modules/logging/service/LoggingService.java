@@ -64,10 +64,18 @@ public class LoggingService {
         String actionDetail,
         String ipAddress
     ) {
+        recordOperation(operatorUserId, operatorRole, actionType, targetType,
+            targetId, actionDetail, ipAddress, null, null, null);
+    }
+
+    public void recordOperation(
+        Long operatorUserId, String operatorRole, String actionType,
+        String targetType, String targetId, String actionDetail, String ipAddress,
+        String targetName, String targetSpuCode, String fieldChanges
+    ) {
         if (operatorUserId == null || targetId == null || targetId.isBlank()) {
             return;
         }
-
         OperationLogEntity entity = new OperationLogEntity();
         entity.setOperatorUserId(operatorUserId);
         entity.setOperatorRole(operatorRole);
@@ -76,6 +84,9 @@ public class LoggingService {
         entity.setTargetId(targetId);
         entity.setActionDetail(actionDetail == null || actionDetail.isBlank() ? actionType : actionDetail);
         entity.setIpAddress(ipAddress);
+        entity.setTargetName(targetName);
+        entity.setTargetSpuCode(targetSpuCode);
+        entity.setFieldChanges(fieldChanges);
         operationLogMapper.insert(entity);
     }
 

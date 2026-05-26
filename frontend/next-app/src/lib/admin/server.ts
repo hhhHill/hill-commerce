@@ -15,6 +15,7 @@ import type {
   ProductDetail,
   ProductListFilters,
   ProductListResult,
+  ProductLogListResult,
   ProductSummary,
   ProductViewLogListResult,
   MerchantUserListResult,
@@ -151,6 +152,37 @@ export async function getServerViewLogs(params: { productId?: number; categoryId
   }
   const query = search.toString();
   return fetchAdminJson<ProductViewLogListResult>(`/api/admin/view-logs${query ? `?${query}` : ""}`);
+}
+
+export async function getServerProductLogs(params: {
+  actionType?: string;
+  productName?: string;
+  spuCode?: string;
+  operatorUserId?: string;
+  page?: number;
+  size?: number;
+} = {}): Promise<ProductLogListResult> {
+  const search = new URLSearchParams();
+  if (params.actionType) {
+    search.set("actionType", params.actionType);
+  }
+  if (params.productName) {
+    search.set("productName", params.productName);
+  }
+  if (params.spuCode) {
+    search.set("spuCode", params.spuCode);
+  }
+  if (params.operatorUserId) {
+    search.set("operatorUserId", params.operatorUserId);
+  }
+  if (params.page) {
+    search.set("page", String(params.page));
+  }
+  if (params.size) {
+    search.set("size", String(params.size));
+  }
+  const query = search.toString();
+  return fetchAdminJson<ProductLogListResult>(`/api/admin/product-logs${query ? `?${query}` : ""}`);
 }
 
 async function fetchAdminJson<T>(pathname: string): Promise<T> {

@@ -2,6 +2,7 @@ package com.hillcommerce.modules.logging.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public final class LoggingDtos {
 
@@ -56,6 +57,30 @@ public final class LoggingDtos {
         Long productId,
         Long categoryId,
         String anonymousId
+    ) {
+    }
+
+    public record ProductLogEntry(
+        Long id,
+        String actionType,
+        String targetType,
+        String targetId,
+        String targetName,
+        String targetSpuCode,
+        Long operatorUserId,
+        String operatorRole,
+        String actionDetail,
+        Map<String, Map<String, Object>> fieldChanges,
+        String ipAddress,
+        LocalDateTime createdAt
+    ) {
+    }
+
+    public record ProductLogListResult(
+        List<ProductLogEntry> items,
+        long total,
+        int page,
+        int totalPages
     ) {
     }
 }

@@ -30,8 +30,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -51,6 +56,8 @@ import com.hillcommerce.modules.product.mapper.ProductSalesAttributeMapper;
 import com.hillcommerce.modules.product.mapper.ProductSalesAttributeValueMapper;
 import com.hillcommerce.modules.product.mapper.ProductSkuMapper;
 import com.hillcommerce.modules.recommendation.GorseCatalogSyncService;
+import com.hillcommerce.modules.logging.service.LoggingService;
+import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 
 import com.hillcommerce.framework.web.BusinessException;
 import com.hillcommerce.framework.web.ErrorCode;
@@ -75,6 +82,9 @@ public class ProductAdminService {
     private final ProductSalesAttributeValueMapper productSalesAttributeValueMapper;
     private final ProductSkuMapper productSkuMapper;
     private final GorseCatalogSyncService gorseCatalogSyncService;
+    private final LoggingService loggingService;
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public ProductAdminService(
         ProductCategoryMapper productCategoryMapper,
@@ -84,7 +94,8 @@ public class ProductAdminService {
         ProductSalesAttributeMapper productSalesAttributeMapper,
         ProductSalesAttributeValueMapper productSalesAttributeValueMapper,
         ProductSkuMapper productSkuMapper,
-        GorseCatalogSyncService gorseCatalogSyncService
+        GorseCatalogSyncService gorseCatalogSyncService,
+        LoggingService loggingService
     ) {
         this.productCategoryMapper = productCategoryMapper;
         this.productMapper = productMapper;
@@ -94,6 +105,7 @@ public class ProductAdminService {
         this.productSalesAttributeValueMapper = productSalesAttributeValueMapper;
         this.productSkuMapper = productSkuMapper;
         this.gorseCatalogSyncService = gorseCatalogSyncService;
+        this.loggingService = loggingService;
     }
 
     public List<CategoryResponse> listCategories() {
@@ -212,6 +224,7 @@ public class ProductAdminService {
     @Transactional
     public ProductResponse updateProductStatus(Long productId, ProductStatusRequest request) {
         ProductEntity product = requireActiveProduct(productId);
+        String oldStatus = product.getStatus();
         String normalizedStatus = normalizeProductStatus(request.status());
 
         if (PRODUCT_STATUS_ON_SHELF.equals(normalizedStatus)) {
@@ -228,12 +241,31 @@ public class ProductAdminService {
         productMapper.updateById(product);
         gorseCatalogSyncService.syncProduct(product);
 
+        if (!oldStatus.equals(product.getStatus())) {
+            Map<String, Map<String, Object>> changes = new LinkedHashMap<>();
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("old", oldStatus);
+            entry.put("new", product.getStatus());
+            changes.put("status", entry);
+
+            loggingService.recordOperation(
+                resolveCurrentUserId(), resolveCurrentUserRole(),
+                "UPDATE_PRODUCT_STATUS",
+                "PRODUCT",
+                String.valueOf(productId),
+                "更新了商品 #" + productId + " 的状态",
+                resolveCurrentIp(),
+                product.getName(), product.getSpuCode(), toJson(changes));
+        }
+
         return buildProductResponse(product);
     }
 
     @Transactional
     public void deleteProduct(Long productId) {
         ProductEntity product = requireActiveProduct(productId);
+        String nameSnapshot = product.getName();
+        String spuCodeSnapshot = product.getSpuCode();
         productMapper.update(
             null,
             new LambdaUpdateWrapper<ProductEntity>()
@@ -245,6 +277,13 @@ public class ProductAdminService {
         product.setDeletedAt(LocalDateTime.now());
         product.setStatus(PRODUCT_STATUS_OFF_SHELF);
         gorseCatalogSyncService.syncProduct(product);
+        loggingService.recordOperation(
+            resolveCurrentUserId(), resolveCurrentUserRole(),
+            "DELETE_PRODUCT", "PRODUCT",
+            String.valueOf(productId),
+            "删除了商品 #" + productId,
+            resolveCurrentIp(),
+            nameSnapshot, spuCodeSnapshot, null);
     }
 
     private ProductResponse saveProduct(Long productId, ProductRequest request, Long shopId) {
@@ -272,6 +311,15 @@ public class ProductAdminService {
         product.setMinSalePrice(minSalePrice);
         product.setDeleted(false);
 
+        ProductEntity oldProduct = null;
+        long oldImageCount = 0;
+        if (productId != null) {
+            oldProduct = requireActiveProduct(productId);
+            oldImageCount = productImageMapper.selectCount(
+                new LambdaQueryWrapper<ProductImageEntity>()
+                    .eq(ProductImageEntity::getProductId, productId));
+        }
+
         if (productId == null) {
             product.setShopId(shopId);
             productMapper.insert(product);
@@ -288,6 +336,27 @@ public class ProductAdminService {
 
         ProductEntity persistedProduct = requireActiveProduct(persistedProductId);
         gorseCatalogSyncService.syncProduct(persistedProduct);
+
+        if (productId == null) {
+            loggingService.recordOperation(
+                resolveCurrentUserId(), resolveCurrentUserRole(),
+                "CREATE_PRODUCT", "PRODUCT",
+                String.valueOf(persistedProductId),
+                "创建了商品 #" + persistedProductId,
+                resolveCurrentIp(),
+                persistedProduct.getName(), persistedProduct.getSpuCode(), null);
+        } else {
+            long newImageCount = request.detailImages() != null ? request.detailImages().size() : 0;
+            String fieldChangesJson = buildFieldChanges(oldProduct, persistedProduct, oldImageCount, newImageCount);
+            loggingService.recordOperation(
+                resolveCurrentUserId(), resolveCurrentUserRole(),
+                "UPDATE_PRODUCT", "PRODUCT",
+                String.valueOf(persistedProductId),
+                "更新了商品 #" + persistedProductId,
+                resolveCurrentIp(),
+                oldProduct.getName(), oldProduct.getSpuCode(), fieldChangesJson);
+        }
+
         return buildProductResponse(persistedProduct);
     }
 
@@ -603,5 +672,91 @@ public class ProductAdminService {
 
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private String buildFieldChanges(ProductEntity oldProduct, ProductEntity newProduct,
+            long oldImageCount, long newImageCount) {
+        Map<String, Map<String, Object>> changes = new LinkedHashMap<>();
+
+        compareField(changes, "name", oldProduct.getName(), newProduct.getName());
+        compareField(changes, "description",
+            blankToNull(oldProduct.getDescription()), blankToNull(newProduct.getDescription()));
+        compareField(changes, "status", oldProduct.getStatus(), newProduct.getStatus());
+        compareField(changes, "categoryId", oldProduct.getCategoryId(), newProduct.getCategoryId());
+
+        if (decimalChanged(oldProduct.getMinSalePrice(), newProduct.getMinSalePrice())) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("old", oldProduct.getMinSalePrice());
+            entry.put("new", newProduct.getMinSalePrice());
+            changes.put("salePrice", entry);
+        }
+
+        if (oldImageCount != newImageCount) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("old", oldImageCount + " 张");
+            entry.put("new", newImageCount + " 张");
+            changes.put("images", entry);
+        }
+
+        if (changes.isEmpty()) return null;
+        try {
+            return OBJECT_MAPPER.writeValueAsString(changes);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean decimalChanged(java.math.BigDecimal oldVal, java.math.BigDecimal newVal) {
+        if (oldVal == null && newVal == null) return false;
+        if (oldVal == null || newVal == null) return true;
+        return oldVal.compareTo(newVal) != 0;
+    }
+
+    private void compareField(Map<String, Map<String, Object>> changes,
+            String key, Object oldVal, Object newVal) {
+        boolean oldNull = oldVal == null || (oldVal instanceof String s && s.isBlank());
+        boolean newNull = newVal == null || (newVal instanceof String s && s.isBlank());
+        if (oldNull && newNull) return;
+        if (!oldNull && !newNull && oldVal.equals(newVal)) return;
+
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("old", oldNull ? null : oldVal);
+        entry.put("new", newNull ? null : newVal);
+        changes.put(key, entry);
+    }
+
+    private String toJson(Object obj) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(obj);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String resolveCurrentIp() {
+        ServletRequestAttributes attributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) return "unknown";
+        var request = attributes.getRequest();
+        String forwarded = request.getHeader("X-Forwarded-For");
+        return forwarded != null && !forwarded.isBlank()
+            ? forwarded.split(",")[0].trim() : request.getRemoteAddr();
+    }
+
+    private Long resolveCurrentUserId() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof AuthenticatedUserPrincipal principal) {
+            return principal.id();
+        }
+        return null;
+    }
+
+    private String resolveCurrentUserRole() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof AuthenticatedUserPrincipal principal) {
+            var roles = principal.roles();
+            return roles != null && !roles.isEmpty() ? roles.get(0) : "UNKNOWN";
+        }
+        return "UNKNOWN";
     }
 }

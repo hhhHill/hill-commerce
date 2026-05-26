@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hillcommerce.framework.security.RequireRole;
 import com.hillcommerce.modules.admin.context.ShopContext;
 import com.hillcommerce.modules.logging.service.LoggingService;
@@ -32,6 +35,8 @@ import com.hillcommerce.modules.user.security.AuthenticatedUserPrincipal;
 
 @RestController
 public class LoggingController {
+
+    private static final Logger log = LoggerFactory.getLogger(LoggingController.class);
 
     private final JdbcTemplate jdbcTemplate;
     private final LoggingService loggingService;
@@ -67,12 +72,14 @@ public class LoggingController {
         return new LoginLogListResult(items);
     }
 
+    @Deprecated
     @GetMapping("/api/admin/operation-logs")
     @RequireRole("ADMIN")
     public OperationLogListResult getOperationLogs(
         @RequestParam(required = false) Long operatorUserId,
         @RequestParam(required = false) String actionType
     ) {
+        log.warn("Deprecated endpoint /api/admin/operation-logs called, migrate to /api/admin/product-logs");
         StringBuilder sql = new StringBuilder("""
             select id, operator_user_id, operator_role, action_type, target_type, target_id, action_detail, ip_address, created_at
             from operation_logs

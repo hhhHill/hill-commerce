@@ -17,6 +17,9 @@ public class OperationLogEntity {
     private String targetType;
     private String targetId;
     private String actionDetail;
+    private String targetName;
+    private String targetSpuCode;
+    private String fieldChanges; // MyBatis-Plus will auto-map MySQL JSON column to String
     private String ipAddress;
     private LocalDateTime createdAt;
 
@@ -74,6 +77,30 @@ public class OperationLogEntity {
 
     public void setActionDetail(String actionDetail) {
         this.actionDetail = actionDetail;
+    }
+
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
+    public String getTargetSpuCode() {
+        return targetSpuCode;
+    }
+
+    public void setTargetSpuCode(String targetSpuCode) {
+        this.targetSpuCode = targetSpuCode;
+    }
+
+    public String getFieldChanges() {
+        return fieldChanges;
+    }
+
+    public void setFieldChanges(String fieldChanges) {
+        this.fieldChanges = fieldChanges;
     }
 
     public String getIpAddress() {

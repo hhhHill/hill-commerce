@@ -39,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/products", label: "商品管理" },
   { label: "订单管理", children: ORDER_CHILDREN },
   { href: "/admin/analytics/overview", label: "数据分析", roles: ["ADMIN", "MERCHANT"] },
-  { href: "/admin/logs", label: "日志中心" },
+  { href: "/admin/product-logs", label: "商品日志" },
   { href: "/admin/dashboard", label: "仪表盘", roles: ["ADMIN"] },
   { href: "/admin/users", label: "用户管理", roles: ["ADMIN"] },
   { href: "/admin/shops", label: "店铺管理", roles: ["ADMIN"] },

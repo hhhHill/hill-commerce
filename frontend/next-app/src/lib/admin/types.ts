@@ -236,3 +236,30 @@ export interface UpdateShopRequest {
   logoUrl?: string;
   description?: string;
 }
+
+export type FieldChangeEntry = {
+  old: string | number | null;
+  new: string | number | null;
+};
+
+export type ProductLogEntry = {
+  id: number;
+  actionType: "CREATE_PRODUCT" | "UPDATE_PRODUCT" | "UPDATE_PRODUCT_STATUS" | "DELETE_PRODUCT";
+  targetType: string;
+  targetId: string;
+  targetName: string | null;
+  targetSpuCode: string | null;
+  operatorUserId: number;
+  operatorRole: string;
+  actionDetail: string;
+  fieldChanges: Record<string, FieldChangeEntry> | null;
+  ipAddress: string;
+  createdAt: string;
+};
+
+export type ProductLogListResult = {
+  items: ProductLogEntry[];
+  total: number;
+  page: number;
+  totalPages: number;
+};

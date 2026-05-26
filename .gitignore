@@ -27,6 +27,7 @@ backend/.mvn/
 
 logs/
 !frontend/next-app/src/features/admin/logs/
+!frontend/next-app/src/app/admin/logs/
 *.log
 *.out
 *.err

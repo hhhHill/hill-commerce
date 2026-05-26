@@ -26,6 +26,7 @@ backend/.mvn/
 *.war
 
 logs/
+!frontend/next-app/src/features/admin/logs/
 *.log
 *.out
 *.err

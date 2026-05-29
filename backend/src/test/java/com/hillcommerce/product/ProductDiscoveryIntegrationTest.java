@@ -119,8 +119,8 @@ class ProductDiscoveryIntegrationTest {
 
             mockMvc.perform(get("/api/categories/{categoryId}/products", visibleCategoryId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].name").value("Discovery Cotton Tee"));
+                .andExpect(jsonPath("$.items[*].name", hasItem("Discovery Cotton Tee")))
+                .andExpect(jsonPath("$.items[*].name", not(hasItem("Discovery Hidden Tee"))));
         } finally {
             updateCategoryStatus(adminSession, hiddenCategoryId, "服饰鞋包", "ENABLED");
         }

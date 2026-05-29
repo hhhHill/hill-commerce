@@ -384,15 +384,15 @@ class ProductAdminIntegrationTest {
                 .session(merchantSession)
                 .param("name", "Task4 Cotton"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].spuCode").value("TASK4-TEE"));
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.items[0].spuCode").value("TASK4-TEE"));
 
         mockMvc.perform(get("/api/admin/products")
                 .session(merchantSession)
                 .param("name", "TASK4-HOODIE"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].name").value("Task4 Hoodie"));
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.items[0].name").value("Task4 Hoodie"));
     }
 
 

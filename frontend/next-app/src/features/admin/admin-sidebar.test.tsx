@@ -27,13 +27,14 @@ describe("AdminSidebar", () => {
     expect(screen.queryByText("分类管理")).toBeNull();
     expect(screen.queryByText("用户管理")).toBeNull();
     expect(screen.queryByText("店铺管理")).toBeNull();
+    expect(screen.queryByText("首页运营")).toBeNull();
 
     // MERCHANT should see shared & merchant items
     expect(screen.getByText("我的店铺")).toBeDefined();
     expect(screen.getByText("商品管理")).toBeDefined();
     expect(screen.getByText("订单管理")).toBeDefined();
     expect(screen.getByText("数据分析")).toBeDefined();
-    expect(screen.getByText("日志中心")).toBeDefined();
+    expect(screen.getByText("商品日志")).toBeDefined();
   });
 
   it("shows admin-only items for admin users", () => {
@@ -41,15 +42,15 @@ describe("AdminSidebar", () => {
 
     // ADMIN should see admin-only items
     expect(screen.getByText("仪表盘")).toBeDefined();
-    expect(screen.getByText("分类管理")).toBeDefined();
     expect(screen.getByText("用户管理")).toBeDefined();
     expect(screen.getByText("店铺管理")).toBeDefined();
+    expect(screen.getByText("首页运营")).toBeDefined();
 
     // ADMIN should see shared items
     expect(screen.getByText("商品管理")).toBeDefined();
     expect(screen.getByText("订单管理")).toBeDefined();
     expect(screen.getByText("数据分析")).toBeDefined();
-    expect(screen.getByText("日志中心")).toBeDefined();
+    expect(screen.getByText("商品日志")).toBeDefined();
 
     // ADMIN should NOT see merchant-only items
     expect(screen.queryByText("我的店铺")).toBeNull();

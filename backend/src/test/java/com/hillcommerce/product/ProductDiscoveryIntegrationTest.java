@@ -97,31 +97,33 @@ class ProductDiscoveryIntegrationTest {
     @Test
     void anonymousUserCanBrowseVisibleCategoriesAndProducts() throws Exception {
         MockHttpSession merchantSession = loginAsMerchant("discovery-browse-sales@example.com", "Sales@123456");
+        MockHttpSession adminSession = loginAsAdmin();
         Long visibleCategoryId = getFixedCategoryId("手机数码");
         Long hiddenCategoryId = getFixedCategoryId("服饰鞋包");
 
         createProduct(merchantSession, visibleCategoryId, "Discovery Cotton Tee", "DISCOVERY-TEE", "ON_SHELF", 99.00, 12, 3, "ENABLED");
         createProduct(merchantSession, hiddenCategoryId, "Discovery Hidden Tee", "DISCOVERY-HIDDEN", "ON_SHELF", 119.00, 9, 2, "ENABLED");
-        updateCategoryStatus(merchantSession, hiddenCategoryId, "服饰鞋包", "DISABLED");
+        updateCategoryStatus(adminSession, hiddenCategoryId, "服饰鞋包", "DISABLED");
 
-        mockMvc.perform(get("/api/categories"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[*].id", hasItem(visibleCategoryId.intValue())))
-            .andExpect(jsonPath("$[*].name", hasItem("手机数码")))
-            .andExpect(jsonPath("$[*].name", not(hasItem("服饰鞋包"))));
+        try {
+            mockMvc.perform(get("/api/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].id", hasItem(visibleCategoryId.intValue())))
+                .andExpect(jsonPath("$[*].name", hasItem("手机数码")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("服饰鞋包"))));
 
-        mockMvc.perform(get("/api/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.items[*].name", hasItem("Discovery Cotton Tee")))
-            .andExpect(jsonPath("$.items[*].name", not(hasItem("Discovery Hidden Tee"))));
+            mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[*].name", hasItem("Discovery Cotton Tee")))
+                .andExpect(jsonPath("$.items[*].name", not(hasItem("Discovery Hidden Tee"))));
 
-        mockMvc.perform(get("/api/categories/{categoryId}/products", visibleCategoryId))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.items.length()").value(1))
-            .andExpect(jsonPath("$.items[0].name").value("Discovery Cotton Tee"));
-
-        // restore the disabled fixed category
-        updateCategoryStatus(merchantSession, hiddenCategoryId, "服饰鞋包", "ENABLED");
+            mockMvc.perform(get("/api/categories/{categoryId}/products", visibleCategoryId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].name").value("Discovery Cotton Tee"));
+        } finally {
+            updateCategoryStatus(adminSession, hiddenCategoryId, "服饰鞋包", "ENABLED");
+        }
     }
 
     @Test
@@ -159,6 +161,10 @@ class ProductDiscoveryIntegrationTest {
     private MockHttpSession loginAsMerchant(String email, String rawPassword) throws Exception {
         seedMerchantUser(email, rawPassword);
         return login(email, rawPassword);
+    }
+
+    private MockHttpSession loginAsAdmin() throws Exception {
+        return login("admin@hill-commerce.local", "Admin@123456");
     }
 
     private MockHttpSession login(String email, String password) throws Exception {

@@ -1,0 +1,3 @@
+hill:
+  rate-limit:
+    enabled: false

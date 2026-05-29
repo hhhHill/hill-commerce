@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { copyToClipboard } from "@/lib/clipboard";
 
 type CredentialRowProps = {
   label: string;
@@ -10,12 +11,15 @@ type CredentialRowProps = {
 function CredentialRow({ label, value }: CredentialRowProps) {
   const [copied, setCopied] = useState(false);
 
-  function handleCopy() {
-    navigator.clipboard.writeText(value).then(() => {
+  const handleCopy = useCallback(async () => {
+    try {
+      await copyToClipboard(value);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    });
-  }
+    } catch {
+      // 复制失败时静默回退，按钮保持"复制"状态
+    }
+  }, [value]);
 
   return (
     <div className="flex items-center justify-between gap-3 py-1.5">

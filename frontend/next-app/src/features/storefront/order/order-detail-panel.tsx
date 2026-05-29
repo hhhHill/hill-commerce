@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { copyToClipboard } from "@/lib/clipboard";
 import { cancelOrder, confirmReceipt } from "@/lib/order/client";
 import type { OrderDetail } from "@/lib/order/types";
 
@@ -88,7 +89,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
                   type="button"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(order.shipment?.trackingNo ?? "");
+                      await copyToClipboard(order.shipment?.trackingNo ?? "");
                       setMessage("运单号已复制");
                     } catch {
                       setMessage("复制失败，请手动复制运单号");

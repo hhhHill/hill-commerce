@@ -1,0 +1,9 @@
+[Unit]
+Description=Hill Commerce Stack Monitor
+After=docker.service hill-commerce.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/hill-commerce
+ExecStart=/opt/hill-commerce/ops/scripts/check-stack.sh

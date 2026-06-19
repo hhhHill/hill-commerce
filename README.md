@@ -5,7 +5,7 @@
 ## 项目亮点
 
 - **完整电商双闭环** — 15 个 feature spec 覆盖全链路：注册登录 → 商品浏览 → 购物车 → 下单 → 支付 → 收货 → 售后，后台分类 → 商品管理 → 库存 → 发货 → 数据统计
-- **现代化全栈技术** — Java 21 + Spring Boot 4 后端，Next.js 15.5 + React 19 + TypeScript 5.8 + Tailwind CSS 4 前端，MySQL 9.7 主库
+- **现代化全栈技术** — Java 21 + Spring Boot 4 后端，Next.js 15.5 + React 19 + TypeScript 5.8 + Tailwind CSS 4 前端，MySQL 8.4 主库
 - **智能推荐引擎** — 内置 Gorse 协同过滤推荐，首页个性化推荐 + 商品详情页相似推荐，用户浏览/购买行为实时反馈
 - **OSS 图片直传** — 阿里云 OSS + STS 临时凭证，浏览器端 Canvas 压缩后直传，缩略图按需生成
 - **一键全栈部署** — Docker Compose 编排 MySQL + Redis + Gorse + Backend + Frontend + Nginx，一条命令启动
@@ -18,7 +18,7 @@
 |------|------|
 | 后端 | Java 21, Spring Boot 4, Spring Security 7, MyBatis-Plus, Flyway |
 | 前端 | Next.js 15.5, React 19, TypeScript 5.8, Tailwind CSS 4, Recharts |
-| 数据库 | MySQL 9.7 |
+| 数据库 | MySQL 8.4 |
 | 缓存 | Redis 8 |
 | 消息队列 | RocketMQ（预留，非 MVP 主链路前提） |
 | 推荐引擎 | Gorse |
@@ -96,6 +96,17 @@ ops/                   Nginx 配置、Gorse 配置、MySQL 初始化脚本
 specs/                 各 feature 的规范/计划/任务文档
 .specify/              Spec Kit 工作流与项目治理
 ```
+
+## 运行稳定性
+
+生产/测试环境建议使用 `ops/systemd/` 下的 unit 文件托管整套 Compose 服务，并配合 `ops/scripts/` 下的脚本执行日常运维：
+
+- `ops/scripts/status.sh`：查看主机资源、Compose 状态和健康检查
+- `ops/scripts/restart-app.sh`：安全重启应用层容器
+- `ops/scripts/collect-debug.sh`：收集主机与容器调试信息
+- `ops/scripts/check-stack.sh`：供 systemd timer 周期执行的轻量巡检脚本
+
+Nginx 已改为通过 Docker DNS 在运行时重新解析 `frontend` / `backend`，避免容器重启后继续命中旧 IP 而触发 `502 Bad Gateway`。
 
 ## 工程方法
 

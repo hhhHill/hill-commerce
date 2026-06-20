@@ -40,6 +40,30 @@ cp .env.example .env
 docker compose --profile app up -d
 ```
 
+### VPS / 生产环境部署
+
+不要在小规格 VPS 上执行 `docker compose --profile app up -d --build`。当前后端镜像会在构建阶段运行 Maven 打包，Java 依赖下载、编译和镜像层写入会显著消耗 CPU、内存、磁盘 IO，并可能把 SSH 一起拖死。
+
+推荐路径：
+
+1. 由 GitHub Actions 构建并推送后端/前端镜像到 ACR。
+2. VPS 上只执行 `pull + up --no-build`。
+
+手动部署命令：
+
+```bash
+cd /opt/hill-commerce
+echo "$ACR_PASSWORD" | docker login "$ACR_REGISTRY" -u "$ACR_USERNAME" --password-stdin
+ACR_REGISTRY=<your-registry> ACR_NAMESPACE=<your-namespace> ops/scripts/deploy-prod.sh
+```
+
+如果只是重启应用层，不要追加 `--build`，直接用：
+
+```bash
+cd /opt/hill-commerce
+ACR_REGISTRY=<your-registry> ACR_NAMESPACE=<your-namespace> ops/scripts/restart-app.sh
+```
+
 ### 访问入口
 
 | 服务 | 地址 |
@@ -103,10 +127,11 @@ specs/                 各 feature 的规范/计划/任务文档
 
 - `ops/scripts/status.sh`：查看主机资源、Compose 状态和健康检查
 - `ops/scripts/restart-app.sh`：安全重启应用层容器
+- `ops/scripts/deploy-prod.sh`：拉取预构建镜像并以 `--no-build` 方式更新整套服务
 - `ops/scripts/collect-debug.sh`：收集主机与容器调试信息
 - `ops/scripts/check-stack.sh`：供 systemd timer 周期执行的轻量巡检脚本
 
-Nginx 已改为通过 Docker DNS 在运行时重新解析 `frontend` / `backend`，避免容器重启后继续命中旧 IP 而触发 `502 Bad Gateway`。
+Nginx 已改为通过宿主机映射端口回源到前后端容器，避免在这台机器上继续依赖不稳定的 Docker DNS 解析。生产环境应避免在 VPS 上直接构建应用镜像，优先使用预构建镜像部署。
 
 ## 工程方法
 

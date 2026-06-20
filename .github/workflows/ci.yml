@@ -13,7 +13,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9.7.0
+        image: mysql:8.4.10
         env:
           MYSQL_ROOT_PASSWORD: root123
           MYSQL_DATABASE: hill_commerce
@@ -107,13 +107,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Copy compose files to VPS
+      - name: Copy deploy files to VPS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: docker-compose.yml,docker-compose.prod.yml
+          source: docker-compose.yml,docker-compose.prod.yml,ops/scripts/deploy-prod.sh
           target: /opt/hill-commerce/
 
       - name: Deploy on VPS
@@ -125,7 +125,6 @@ jobs:
           command_timeout: 10m
           script: |
             echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
-            docker pull ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/hill-commerce-backend:latest
-            docker pull ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/hill-commerce-frontend:latest
             cd /opt/hill-commerce
-            ACR_REGISTRY=${{ secrets.ACR_REGISTRY }} ACR_NAMESPACE=${{ secrets.ACR_NAMESPACE }} docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile app up -d --remove-orphans
+            chmod +x ops/scripts/deploy-prod.sh
+            ACR_REGISTRY=${{ secrets.ACR_REGISTRY }} ACR_NAMESPACE=${{ secrets.ACR_NAMESPACE }} ops/scripts/deploy-prod.sh

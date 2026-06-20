@@ -1,5 +1,7 @@
 services:
   backend:
     image: ${ACR_REGISTRY}/${ACR_NAMESPACE}/hill-commerce-backend:latest
+    pull_policy: always
   frontend:
     image: ${ACR_REGISTRY}/${ACR_NAMESPACE}/hill-commerce-frontend:latest
+    pull_policy: always

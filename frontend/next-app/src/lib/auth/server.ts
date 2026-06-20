@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getBackendBaseUrl } from "@/lib/config";
+import { fetchWithTimeout, isTimeoutError } from "@/lib/server/fetch-with-timeout";
 import type { SessionUser, SessionUserRole } from "@/lib/auth/types";
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -10,14 +11,22 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     return null;
   }
 
-  const response = await fetch(`${getBackendBaseUrl()}/api/auth/me`, {
-    method: "GET",
-    headers: {
-      cookie: cookieHeader
-    },
-    cache: "no-store",
-    redirect: "manual"
-  });
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(`${getBackendBaseUrl()}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        cookie: cookieHeader
+      },
+      cache: "no-store",
+      redirect: "manual"
+    });
+  } catch (error) {
+    if (isTimeoutError(error) || error instanceof TypeError) {
+      return null;
+    }
+    throw error;
+  }
 
   if (response.status === 401) {
     return null;

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 import { getBackendBaseUrl } from "@/lib/config";
+import { fetchWithTimeout, isTimeoutError } from "@/lib/server/fetch-with-timeout";
 import { StorefrontRequestError } from "@/lib/storefront/errors";
 import type {
   StorefrontRecommendationParams,
@@ -86,12 +87,23 @@ export async function getServerStorefrontRecommendations(
 }
 
 async function fetchStorefrontJson<T>(pathname: string, cookieHeader?: string): Promise<T> {
-  const response = await fetch(`${getBackendBaseUrl()}${pathname}`, {
-    method: "GET",
-    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
-    cache: "no-store",
-    redirect: "manual"
-  });
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(`${getBackendBaseUrl()}${pathname}`, {
+      method: "GET",
+      headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+      cache: "no-store",
+      redirect: "manual"
+    });
+  } catch (error) {
+    if (isTimeoutError(error)) {
+      throw new StorefrontRequestError(504, `Timed out loading storefront data for ${pathname}`);
+    }
+    if (error instanceof TypeError) {
+      throw new StorefrontRequestError(502, `Failed to reach storefront backend for ${pathname}`);
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     throw new StorefrontRequestError(response.status, `Failed to load storefront data: ${response.status}`);

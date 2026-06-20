@@ -1,43 +1,33 @@
 import Link from "next/link";
 
 import { CategoryDirectory } from "@/features/storefront/catalog/category-list";
+import { loadHomepageData } from "@/features/storefront/catalog/homepage-data";
 import { StorefrontProductList } from "@/features/storefront/catalog/product-list";
 import { getSessionUser } from "@/lib/auth/server";
-import {
-  getServerActivityCards,
-  getServerStorefrontCategories,
-  getServerStorefrontProducts,
-  getServerStorefrontRecommendations,
-} from "@/lib/storefront/server";
 
 const DEFAULT_ACTIVITY_CARDS = [
   { title: "限时秒杀", imageUrl: null, linkUrl: "/search?keyword=限时秒杀" },
   { title: "百亿补贴", imageUrl: null, linkUrl: "/search?keyword=百亿补贴" },
   { title: "官方好货", imageUrl: null, linkUrl: "/search?keyword=官方好货" },
-  { title: "新品首发", imageUrl: null, linkUrl: "/search?keyword=新品首发" },
+  { title: "新品首发", imageUrl: null, linkUrl: "/search?keyword=新品首发" }
 ];
 
 export default async function HomePage() {
   const user = await getSessionUser();
-  const [categories, products, recommendations, activityCards] = await Promise.all([
-    getServerStorefrontCategories(),
-    getServerStorefrontProducts({ pageSize: 24 }),
-    getServerStorefrontRecommendations({ type: "home", n: 10 }),
-    getServerActivityCards(),
-  ]);
+  const { categories, products, recommendations, activityCards } = await loadHomepageData();
 
   return (
     <main className="min-h-screen bg-[var(--bg-page)] pb-24">
-      {/* Top: three-column layout — columns stretch to equal height */}
+      {/* Top: three-column layout - columns stretch to equal height */}
       <div className="mx-auto flex max-w-[1600px] gap-3 px-2 py-3">
         {/* Left sidebar: category directory */}
         <aside className="hidden w-[260px] shrink-0 md:block">
           <CategoryDirectory categories={categories} />
         </aside>
 
-        {/* Center: activity cards — fill to match category height */}
+        {/* Center: activity cards - fill to match category height */}
         <div className="flex min-w-0 flex-1">
-          <div className="grid grid-cols-2 grid-rows-2 gap-3 w-full">
+          <div className="grid w-full grid-cols-2 grid-rows-2 gap-3">
             {(activityCards.length > 0 ? activityCards : DEFAULT_ACTIVITY_CARDS).map((card) => (
               <Link
                 className="group relative overflow-hidden rounded-xl bg-[var(--bg-section)]"
@@ -48,9 +38,7 @@ export default async function HomePage() {
                   <img alt={card.title} className="h-full w-full object-cover" src={card.imageUrl} />
                 ) : (
                   <div className="flex h-full items-center justify-center">
-                    <span className="text-lg font-bold text-[var(--text-primary)]">
-                      {card.title}
-                    </span>
+                    <span className="text-lg font-bold text-[var(--text-primary)]">{card.title}</span>
                   </div>
                 )}
               </Link>
@@ -58,13 +46,13 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Right sidebar: user panel — fill to match category height */}
+        {/* Right sidebar: user panel - fill to match category height */}
         <aside className="hidden w-[260px] shrink-0 lg:block">
           <UserPanel user={user} />
         </aside>
       </div>
 
-      {/* Product grid — personalized when logged in, popular otherwise */}
+      {/* Product grid - personalized when logged in, popular otherwise */}
       <div className="mx-auto max-w-[1600px] px-2 pb-3">
         <StorefrontProductList
           emptyDescription="当前还没有可展示的首页商品。"
